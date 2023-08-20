@@ -10,7 +10,7 @@ import whyDidYouRender from '@welldone-software/why-did-you-render';
 import Modal from 'react-modal';
 
 Modal.setAppElement('#root'); // Assuming your app root element has the id 'root'
-const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+const BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://capital-route.amir-sh-dev.svc.cluster.local';
 const YEAR = 2023;
 const userId = 1;
 
