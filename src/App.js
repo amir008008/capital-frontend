@@ -218,13 +218,17 @@ const displayExpensesForTesting = () => {
   const [expenses, setExpenses] = useState([]);
   const [selectedMonthIndex, setSelectedMonthIndex] = useState(7); // August index
   const [showTransactionLogger, setShowTransactionLogger] = useState(false);
-const handleMonthChange = (index) => {
-  // Calculate the difference between the clicked tab's index and the currently selected month index
-  const indexDiff = index - selectedMonthIndex;
-  
-  // Update the selectedMonthIndex with the calculated difference
-  setSelectedMonthIndex(selectedMonthIndex + indexDiff);
+  const handleMonthChange = (index) => {
+    setSelectedMonthIndex(index);
+
+    // Scroll the selected month into view
+    monthRefs.current[index].current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'start'
+    });
 };
+
 
 
   function getYearMonth(index) {

@@ -726,7 +726,7 @@
 }
 
 .ongoing {
-  color: var(--purple-2); /* Aligned with corporate purple color */
+  color: var(--purple-3); /* Aligned with corporate purple color */
   font-weight: normal;
 }
 
@@ -959,4 +959,30 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.month-tab-list {
+  overflow-x: auto;
+  white-space: nowrap;
+  display: flex;
+  scroll-padding: 50%; /* Optional, to ensure the clicked item gets close to the center when it's scrolled */
+}
+.month-tab-list {
+    overflow-x: auto;
+    white-space: nowrap;
+    display: flex;
+    scroll-padding: 50%; /* Optional, to ensure the clicked item gets close to the center when it's scrolled */
+}
+.month-tab-item {
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: inline-block; /* Makes the block wrap content */
+  border-radius: 10px;   /* Rounds the corners */
+  margin: 5px;           /* Give some space around each item */
+}
+
+
+.month-tab-item.selected {
+  background-color: var(--gray); /* Using one of the purple shades for highlighting */
+  color: var(--text-on-purple); /* Text color for the purple shade */
 }
