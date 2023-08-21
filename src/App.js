@@ -8,9 +8,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import whyDidYouRender from '@welldone-software/why-did-you-render';
 import Modal from 'react-modal';
+import 'font-awesome/css/font-awesome.min.css';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 Modal.setAppElement('#root'); // Assuming your app root element has the id 'root'
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+// const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
 const userId = 1;
 
@@ -729,10 +732,13 @@ function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
                           <div className="budget-amount">{calculateTotalExpenses()}</div>
                           <div className="step-description">Step 1: Estimated Budget</div>
                       </div>
+                      <div className="budget-details">
                       <div className="expenses-heading">Fixed Expenses</div>
-                      <ul className="expense-list">
-                      {getExpensesOfType('Fixed', currentMonthStatus)}
-                      </ul>
+                        <ul className="expense-list">
+                        {getExpensesOfType('Fixed', currentMonthStatus)}
+                        </ul>
+                      
+
                       <div className="button-group">
                       <ExpenseInput 
                           isAddingCategory={isAddingCategoryFixed}
@@ -743,23 +749,24 @@ function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
                           handleAdd={(categoryName, categoryValue) => handleAddCategory('Fixed', categoryName, categoryValue)}
                           handleCancel={() => setIsAddingCategoryFixed(false)}
                       />
-
+                      </div>    
                       </div>
-                      <p></p>
-                      <div className="expenses-heading">Variable Expenses</div>
-                      <ul className="expense-list">
-                      {getExpensesOfType('Variable', currentMonthStatus)}
-                      </ul>
-                      <div className="button-group">
-                      <ExpenseInput 
-                          isAddingCategory={isAddingCategoryVariable}
-                          categoryName={newCategoryNameVariable}
-                          categoryValue={newCategoryValueVariable}
-                          setCategoryName={setNewCategoryNameVariable}
-                          setCategoryValue={setNewCategoryValueVariable}
-                          handleAdd={(categoryName, categoryValue) => handleAddCategory('Variable', categoryName, categoryValue)}
-                      />
-
+                      <div className="budget-details">
+                        <p></p>
+                        <div className="expenses-heading">Variable Expenses</div>
+                        <ul className="expense-list ">
+                        {getExpensesOfType('Variable', currentMonthStatus)}
+                        </ul>
+                        <div className="button-group">
+                        <ExpenseInput 
+                            isAddingCategory={isAddingCategoryVariable}
+                            categoryName={newCategoryNameVariable}
+                            categoryValue={newCategoryValueVariable}
+                            setCategoryName={setNewCategoryNameVariable}
+                            setCategoryValue={setNewCategoryValueVariable}
+                            handleAdd={(categoryName, categoryValue) => handleAddCategory('Variable', categoryName, categoryValue)}
+                        />
+                      </div>
                       </div>
                   </div>
               );
@@ -772,27 +779,28 @@ function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
                 <div className="expense-value">{calculateActualUsed()}</div>
                 <div className="step-description">Step 3, stay on budget {calculateTotalExpenses()}</div>
               </div>
-              <div className="expenses-heading">Fixed Expenses</div>
-              <ul className="expense-list">
-              {getExpensesOfType('Fixed', currentMonthStatus)}
-              </ul>
-              {/* <div className="button-group">
-                <div className="add-category">Add item</div>
-                <div className="add-value">Add value</div>
-              </div> */}
-              <p></p>
-              <div className="expenses-heading">Variable Expenses</div>
-              <ul className="expense-list">
-              {getExpensesOfType('Variable', currentMonthStatus)}
-              </ul>
-              {/* <div className="button-group">
-                <div className="add-category">Add item</div>
-                <div className="add-value">Add value</div>
-              </div> */}
-              <button className="submit-button open" onClick={closeBudget}>
-                Close Budget
-              </button>
-
+              <div className="budget-details">
+                <div className="expenses-heading">Fixed Expenses</div>
+                <ul className="expense-list">
+                {getExpensesOfType('Fixed', currentMonthStatus)}
+                </ul>
+                {/* <div className="button-group">
+                  <div className="add-category">Add item</div>
+                  <div className="add-value">Add value</div>
+                </div> */}
+                <p></p>
+                <div className="expenses-heading">Variable Expenses</div>
+                <ul className="expense-list">
+                {getExpensesOfType('Variable', currentMonthStatus)}
+                </ul>
+                {/* <div className="button-group">
+                  <div className="add-category">Add item</div>
+                  <div className="add-value">Add value</div>
+                </div> */}
+                <button className="submit-button  open" onClick={closeBudget}>
+                  Close Budget
+                </button>
+              </div>
             </div>
             
           );
@@ -806,7 +814,7 @@ function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
                   <div className="budget-amount">{calculateActualUsed()}</div>
                   <div className="step-description">Closed</div>
                 </div>
-
+                <div className="budget-details">
                 <ul className="expense-list">
                   <li className="expense-item">
                     <span className="expenses-heading">Fixed Expenses</span>
@@ -822,6 +830,7 @@ function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
                 <button className="submit-button  admin" onClick={openAgain}>
                   Open Again / Admin only
                 </button>
+              </div>
               </div>
               
             );
@@ -857,6 +866,16 @@ const goToPreviousMonth = () => {
     setSelectedMonthIndex(prevIndex => prevIndex - 1);
   }
 
+  React.useEffect(() => {
+    if (monthRefs.current[selectedMonthIndex] && monthRefs.current[selectedMonthIndex].current) {
+        monthRefs.current[selectedMonthIndex].current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+        });
+    }
+}, [selectedMonthIndex]);
+const monthRefs = React.useRef({});
 
   useEffect(() => {
     if (fixedCategoryInputRef.current) {
@@ -882,69 +901,117 @@ const goToPreviousMonth = () => {
     }
   }, [newCategoryValueVariable]);
 
+  function BottomNavBar() {
+    return (
+      <div className="bottom-nav-bar">
+        <button className="nav-button">
+          <i className="fa fa-list-alt"></i>
+          <span>Logs</span>
+        </button>
+        <button className="nav-button">
+          <i className="fa fa-file-text-o"></i>
+          <span>Report</span>
+        </button>
+        <button className="nav-button">
+          <i className="fa fa-bullseye"></i>
+          <span>Goals</span>
+        </button>
+        <button className="nav-button">
+          <i className="fa fa-user"></i>
+          <span>Account</span>
+        </button>
+      </div>
+    );
+  }
+
+
   
   return (
     
-    <div className="App">
-      <Header />
-      <div className="main-content">
-        <Tabs selectedIndex={2} onSelect={handleMonthChange} forceRenderTabPanel={true}>
-          <TabList className="tab-list">
-            {months.slice(Math.max(0, selectedMonthIndex - 2), selectedMonthIndex + 3).map((month, sliceIndex) => {
-              const actualMonthIndex = Math.max(0, selectedMonthIndex + sliceIndex - 2);
-              const monthYear = getYearMonth(actualMonthIndex);
-              const monthStatusClass = monthStatuses[monthYear] || 'default-status';
-              const isSelected = (selectedMonthIndex < 2 && sliceIndex === selectedMonthIndex) || (sliceIndex === 2 && selectedMonthIndex >= 2);
+<div className="App">
+    <Header />
+    <div className="main-content bg-off-white">
+        <div className="navbar-top">
+            <div className="navbar-title">
+                Capital AI
+            </div>
+            <div className="navbar-icons">
+              <FontAwesomeIcon icon={faUser} />
+            </div>
+        </div>
 
-              return (
-                <Tab key={sliceIndex} className={`tab-item ${isSelected ? 'selected' : ''}`}>
-                  <div className={`tab-inner ${isSelected ? 'active' : ''} ${monthStatusClass}`}>
-                    {month}
-                  </div>
-                </Tab>
-              );
-            })}
-          </TabList>
+        <Tabs className="tabs-container" selectedIndex={2} onSelect={handleMonthChange} forceRenderTabPanel={true}>
+            
+            {/* The scrollable months */}
+            <div className="month-tab-list">
+              {months.map((month, index) => {
+                  if (!monthRefs.current[index]) {
+                      monthRefs.current[index] = React.createRef();
+                  }
 
-          <SwipeableViews index={selectedMonthIndex} onChangeIndex={handleMonthChange} resistance>
-        {months.map((month, index) => (
-          <TabPanel 
-            key={index} 
-            className="tab-panel" 
-            changeToken={tabDataChangeToken}
-        >
-            <MemoizedTabContent  status={currentMonthStatus} />
-        </TabPanel>
-        ))}
-    </SwipeableViews>
+                  const monthYear = getYearMonth(index);
+                  const monthStatusClass = monthStatuses[monthYear] || 'default-status';
+                  const isSelected = selectedMonthIndex === index;
+
+                  return (
+                      <div 
+                          key={index} 
+                          className={`month-tab-item ${isSelected ? 'selected' : ''}`} 
+                          onClick={() => handleMonthChange(index)}
+                          ref={monthRefs.current[index]}
+                      >
+                          <div className={`tab-content ${monthStatusClass}`}>
+                              {month}
+                          </div>
+                      </div>
+                  );
+              })}
+          </div>
 
 
+
+            
+            {/* The swipeable content */}
+            <SwipeableViews index={selectedMonthIndex} onChangeIndex={handleMonthChange} resistance>
+                {months.map((month, index) => (
+                    <TabPanel 
+                        key={index} 
+                        className="tab-panel" 
+                        changeToken={tabDataChangeToken}
+                    >
+                        <MemoizedTabContent status={currentMonthStatus} />
+                    </TabPanel>
+                ))}
+            </SwipeableViews>
+            <div className="budget-details">
+              <button
+            className={`submit-button 
+                            ${currentMonthStatus === 'closed' ? 'closed' : 
+                              currentMonthStatus === 'waiting' ? 'waiting' : 
+                              currentMonthStatus === 'ongoing' ? 'ongoing' : 
+                              'not-closed'}`}
+                onClick={() => {
+                  if (currentMonthStatus === 'waiting') {
+                    approveBudget();
+                  } else if (currentMonthStatus === 'ongoing') {
+                    setShowTransactionLogger(true);  // Open the modal
+                  }
+                }}
+              >
+                {currentMonthStatus === 'closed'
+                  ? 'CLOSED'
+                  : currentMonthStatus === 'waiting'
+                  ? 'Approve Budget'
+                  : currentMonthStatus === 'ongoing'
+                  ? 'LOG TRANSACTION'
+                  : 'Edit Budget'}
+              </button>
+            </div>
         </Tabs>
-        <button
-          className={`submit-button 
-                      ${currentMonthStatus === 'closed' ? 'closed' : 
-                        currentMonthStatus === 'waiting' ? 'waiting' : 
-                        currentMonthStatus === 'ongoing' ? 'ongoing' : 
-                        'not-closed'}`}
-          onClick={() => {
-            if (currentMonthStatus === 'waiting') {
-              approveBudget();
-            } else if (currentMonthStatus === 'ongoing') {
-              setShowTransactionLogger(true);  // Open the modal
-            }
-          }}
-        >
-          {currentMonthStatus === 'closed'
-            ? 'CLOSED'
-            : currentMonthStatus === 'waiting'
-            ? 'Approve Budget'
-            : currentMonthStatus === 'ongoing'
-            ? 'LOG TRANSACTION'
-            : 'Edit Budget'}
-        </button>
+
 
         <TransactionLogger userId={1} isOpen={showTransactionLogger} onClose={() => setShowTransactionLogger(false)} />
-
+        <BottomNavBar />
       </div>
     </div>
     
