@@ -721,7 +721,7 @@
 }
 
 .waiting {
-  color: var(--gray); /* Aligned with corporate gray color */
+  color: var(--text-on-gray); /* Aligned with corporate gray color */
   font-weight: normal;
 }
 
