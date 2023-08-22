@@ -1,0 +1,28 @@
+{
+    "parserOptions": {
+      "ecmaVersion": 2020,    // or 6, 7, 8, 9, 10, 11, depending on your project's ES version
+      "sourceType": "module"  // this is crucial for ES6 import/export syntax
+    },
+    "env": {
+      "es6": true            // this enables ES6 global variables
+    },
+
+
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended"
+    ],
+    "plugins": [
+        "react",
+        "react-hooks"
+    ],
+    "rules": {
+        "react-hooks/rules-of-hooks": "error",
+        "react-hooks/exhaustive-deps": "warn"
+    },
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+    }
+}

@@ -6,6 +6,63 @@ import styled from 'styled-components';
 
 import '@fontsource/dancing-script'; // Import the font styles
 // Styled components for Android-like settings
+
+const colors = {
+    primary: {
+        light: '#bd0fea',
+        main: '#820ad1',
+        dark: '#4c0677',
+        darkest: '#2f0549',
+        background: '#f4f4f4',
+        secondaryBackground: '#e4e4e4',
+        text: '#ffffff',
+        secondaryText: '#000000'
+    },
+    secondary: {
+        green: '#c0e048',
+        blue: '#86cbf2',
+        pink: '#e88fc7',
+        hoverPink: '#e88fc7'
+    }
+};
+
+const SelectContainer = styled.div`
+    position: relative;
+`;
+
+
+const StyledDropdown = styled.select`
+    display: block;
+    width: 100%;
+    padding: 10px 15px;
+    font-size: 16px;
+    border: 1px solid ${colors.primary.dark};
+    border-radius: 4px;
+    appearance: none; 
+    background-color: ${colors.primary.light};
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+
+    &:hover {
+        border-color: ${colors.primary.main};
+    }
+
+    &:focus {
+        outline: none;
+        border-color: ${colors.primary.main};
+        box-shadow: 0 0 5px ${colors.secondary.blue};
+    }
+`;
+
+const DropdownArrow = styled.div`
+    content: '\25BC';
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    pointer-events: none; 
+`;
+
 const SettingTile = styled.div`
     padding: 15px;
     display: flex;
@@ -36,7 +93,7 @@ const SaveButton = styled.button`
     margin-top: 20px;
     padding: 10px 15px;
     border: none;
-    background-color: #007bff;
+    background-color: #820ad1;
     color: #fff;
     border-radius: 4px;
 `;
@@ -70,7 +127,7 @@ const Button = styled.button`
     padding: 10px 20px;
     border: none;
     border-radius: 4px;
-    background-color: #007bff;
+    background-color: #820ad1;
     color: white;
     cursor: pointer;
     font-size: 16px;
@@ -106,9 +163,18 @@ const Card = styled.div`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
+const StyledOption = styled.option`
+    &:hover {
+        background-color: ${colors.secondary.blue}; // Or whichever color you prefer.
+    }
+`;
 
 
 const Account = () => {
+    
+//     if (!user) {
+//         return <div>Loading...</div>;
+//    }
     const fetchOptionsFromApi = async () => {
         try {
             const response = await fetch(`${baseURL}/preferences/${user.id}`); // Replace with your actual API endpoint
