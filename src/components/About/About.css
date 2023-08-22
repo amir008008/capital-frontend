@@ -1,0 +1,30 @@
+/* Core styles */
+.container {
+    padding: 20px;
+    fontFamily: 'Arial, sans-serif';
+    textAlign: center;
+    backgroundColor: #f4f4f4;
+    borderRadius: 10px;
+    boxShadow: 0 4px 8px rgba(130, 10, 209, 0.2);
+    transform: translateY(50px); /* Initial position shifted */
+    transition: transform 1s ease-out; /* Transition settings */
+}
+
+.heading {
+    fontSize: 1.8rem;
+    paddingBottom: 10px;
+    marginBottom: 20px;
+}
+
+/* ... (rest of your styles) ... */
+
+/* Animation styles using react-transition-group */
+.slide-up-enter,
+.slide-up-appear {
+    transform: translateY(50px);
+}
+
+.slide-up-enter-active,
+.slide-up-appear-active {
+    transform: translateY(0);
+}
