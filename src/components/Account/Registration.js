@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
 // Reuse the styles from the previous refactored Login component
-const companyLogo = process.env.PUBLIC_URL + '/profile/amir.jpg';
+const companyLogo = process.env.PUBLIC_URL + '/logo/logo.jpg';
 const colors = {
     primary: {
         light: '#bd0fea',

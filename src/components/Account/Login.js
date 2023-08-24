@@ -3,7 +3,7 @@ import AuthContext from './AuthContext';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
-const companyLogo = process.env.PUBLIC_URL + '/profile/amir.jpg';
+const companyLogo = process.env.PUBLIC_URL + '/logo/logo.jpg';
 
 const colors = {
     primary: {

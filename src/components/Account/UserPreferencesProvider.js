@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import UserPreferencesContext from './UserPreferencesContext';
 
 const UserPreferencesProvider = ({ children }) => {
@@ -16,5 +17,9 @@ const UserPreferencesProvider = ({ children }) => {
         </UserPreferencesContext.Provider>
     );
 }
+
+UserPreferencesProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+};
 
 export default UserPreferencesProvider;
