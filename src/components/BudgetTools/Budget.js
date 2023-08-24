@@ -645,9 +645,9 @@ const Budget = () => {
     
       const [forceUpdate, setForceUpdate] = useState(0);
     
-    useEffect(() => {
-        console.log('Component updated!');
-    });
+    // useEffect(() => {
+    //     console.log('Component updated!');
+    // });
     
       
     function CustomInput(props) {
@@ -674,13 +674,13 @@ const Budget = () => {
       const categoryNameRef = useRef(null);
     const categoryValueRef = useRef(null);
     
-    const handleCategoryChange = useCallback((e) => {
-      setNewCategoryNameFixed(e.target.value);
-    }, []);
+    // const handleCategoryChange = useCallback((e) => {
+    //   setNewCategoryNameFixed(e.target.value);
+    // }, []);
     
-    const handleValueChange = useCallback((e) => {
-      setNewCategoryValueFixed(e.target.value);
-    }, []);
+    // const handleValueChange = useCallback((e) => {
+    //   setNewCategoryValueFixed(e.target.value);
+    // }, []);
     
     function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
       const [categoryName, setCategoryName] = useState('');
