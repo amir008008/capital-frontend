@@ -69,7 +69,13 @@ function MainApp() {
     const handleIconClick = () => {
         navigate("/about");
     };
+    const [budgetKey, setBudgetKey] = useState(Math.random());
+    const location = useLocation();
 
+    useEffect(() => {
+        setBudgetKey(Math.random());
+    }, [location]);
+    
     return (
         <UserPreferencesProvider>
             <div className="App">
@@ -87,7 +93,7 @@ function MainApp() {
                         <React.Suspense fallback={<div>Loading...</div>}>
                             <Routes>
                                 <Route path="/logs" element={<Logs />} />
-                                <Route path="/budget" element={<Budget />} />
+                                <Route path="/budget" element={<Budget key={budgetKey} />} />
                                 <Route path="/account" element={<Account />} />
                                 <Route path="/about" element={<About />} />
                                 <Route path="/login" element={<Login />} />

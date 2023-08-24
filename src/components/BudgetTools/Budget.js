@@ -22,7 +22,6 @@ import { useNavigate } from 'react-router-dom';
 // const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
  const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
-const userId = 1;
 
 
 
@@ -34,7 +33,11 @@ const Budget = () => {
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const username = user ? user.username : null;
-  
+  const [dataRefreshKey, setDataRefreshKey] = useState(0);
+  const handleRefresh = () => {
+    setDataRefreshKey(prevKey => prevKey + 1);
+};
+
   // if (!username) {
   //     navigate('/login');
   //     return <div>Loading...</div>;
@@ -83,7 +86,7 @@ const Budget = () => {
     
     const openAgain = () => {
         const monthYear = getYearMonth(activeMonthIndex_X9aB72);
-        const userId = 1; // Replace with the user ID later on
+        const userId = user.id; // Replace with the user ID later on
     
         // Check if there's already a month with 'ongoing' status
         const isOngoingMonthExists = Object.values(monthStatuses).includes('ongoing');
@@ -137,7 +140,7 @@ const Budget = () => {
     const closeBudget = () => {
       const monthYear = getYearMonth(activeMonthIndex_X9aB72);
       const nextMonthYear = getYearMonth((activeMonthIndex_X9aB72 + 1) % 12); // wrap around to 0 if it's December
-      const userId = 1; // Replace with the user ID later on
+      const userId = user.id; // Replace with the user ID later on
   
       const requests = [
         // Request to close the current month
@@ -193,7 +196,7 @@ const Budget = () => {
   
       const approveBudget = () => {
         const monthYear = getYearMonth(activeMonthIndex_X9aB72);
-        const userId = 1; // Replace with the user ID later on
+        const userId = user.id; // Replace with the user ID later on
         const newStatus = 'ongoing';
     
         fetch(`${BASE_URL}/edit-budget-status`, {
@@ -434,7 +437,7 @@ const Budget = () => {
               const expenseMonth = `${currentYear}-${formattedMonth}-01`;
               
               const payload = {
-                user_id: 1, // Get user ID from appropriate source
+                user_id: user.id, // Get user ID from appropriate source
                 category: 1,
                 expenseName: name,
                 expenseAmount: value,
@@ -459,6 +462,7 @@ const Budget = () => {
             setNewCategoryValueFixed('');
             setIsAddingCategoryFixed(false);
             // window.location.reload();
+            handleRefresh();
     
           } else {
             // If not in adding state, switch to the adding state
@@ -471,7 +475,7 @@ const Budget = () => {
               const expenseMonth = `${selectedMonthYear}-01`;
     
               const payload = {
-                  user_id: 1, // Get user ID from appropriate source
+                  user_id: user.id, // Get user ID from appropriate source
                   category: 1,
                   expenseName: name,
                   expenseAmount: value,
@@ -495,6 +499,7 @@ const Budget = () => {
               setNewCategoryValueVariable('');
               setIsAddingCategoryVariable(false);
               // window.location.reload();
+              handleRefresh();
     
             } else {
               setIsAddingCategoryVariable(true);
@@ -754,7 +759,7 @@ const Budget = () => {
       let isMounted = true; // Initial value indicates the component is mounted
   
       const monthYear = getYearMonth(selectedMonthIndex);
-      const userId = 1; // Replace with dynamic user ID later on
+      const userId = user.id; // Replace with dynamic user ID later on
   
       // If populateExpensesDropdown is async, we'll use a local async function
       async function fetchData() {
@@ -772,7 +777,7 @@ const Budget = () => {
       return () => {
           isMounted = false; // Component is no longer mounted
       }
-  }, [selectedMonthIndex]);
+  }, [activeMonthIndex_X9aB72]);
   
     
     const calculateExpenseProgress = (totalAmount, usedAmount) => {
@@ -795,37 +800,53 @@ const Budget = () => {
     }
   
     useEffect(() => {
-      // Fetch budget status for all months
-      months.forEach((_, monthIndex) => {
-        const monthYear = getYearMonth(monthIndex);
-        const userId = 1; // Replace with the user ID later on
-        fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
-          .then(response => response.json())
-          .then(data => {
-            setMonthStatuses(prevStatus => ({
-              ...prevStatus,
-              [monthYear]: data.status,
-            }));
-          })
-          .catch(error => {
-            console.error('Error fetching budget status for month', monthYear, error);
+
+      const fetchMonthStatuses = async () => {
+          // Create an array of fetch promises for all months
+          const fetchPromises = months.map((_, monthIndex) => {
+              const monthYear = getYearMonth(monthIndex);
+              const userId = user.id;
+  
+              return fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
+                  .then(response => response.json())
+                  .then(data => {
+                      return { monthYear, status: data.status };
+                  });
           });
-      });
   
-      // Fetch expenses and budget status for the selected month
-      const monthYear = getYearMonth(selectedMonthIndex);
-      const userId = 1; // Replace with the user ID later on
-      fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`)
-        .then(response => response.json())
-        .then(data => {
-          setExpenses(data.expenses);
-        })
-        .catch(error => {
-          console.error('Error fetching expenses:', error);
-        });
+          // Use Promise.all() to execute all fetch promises
+          try {
+              const results = await Promise.all(fetchPromises);
+              const newMonthStatuses = results.reduce((acc, result) => {
+                  acc[result.monthYear] = result.status;
+                  return acc;
+              }, {});
   
-    }, [selectedMonthIndex]);
+              setMonthStatuses(prevStatus => ({ ...prevStatus, ...newMonthStatuses }));
+          } catch (error) {
+              console.error('Error fetching budget status for months', error);
+          }
+      };
   
+      const fetchExpensesForSelectedMonth = async () => {
+          const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+          const userId = user.id;
+  
+          try {
+              const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
+              const data = await response.json();
+              setExpenses(data.expenses);
+          } catch (error) {
+              console.error('Error fetching expenses:', error);
+          }
+      };
+  
+      // Invoke the functions
+      fetchMonthStatuses();
+      fetchExpensesForSelectedMonth();
+  
+    }, [activeMonthIndex_X9aB72, dataRefreshKey]); // Include dataRefreshKey in the dependency array
+
     const formatExpenseName = (name) => {
       const maxChars = 20;  // Set this to your desired character limit
       if (name.length > maxChars) {
@@ -865,7 +886,7 @@ const Budget = () => {
         if (isOpen) {
             console.log("Fetching expenses...");
             const monthYear = getYearMonth(selectedMonthIndex);
-            const userId = 1; // Replace with dynamic user ID later on
+            const userId = user.id; // Replace with dynamic user ID later on
             abortController = populateExpensesDropdown(userId, monthYear); // This now returns the abort controller
         }
     
