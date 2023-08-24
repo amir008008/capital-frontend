@@ -199,7 +199,7 @@ const Account = () => {
             const response = await fetch(`${baseURL}/preferences/${user.id}`); // Replace with your actual API endpoint
             const data = await response.json();
             if (data.success) {
-                return data.options; // Replace "options" with the actual key in your API response
+                return data.data; // Replace "options" with the actual key in your API response
             } else {
                 console.error('Failed to fetch options:', data.error);
                 return null;
@@ -290,9 +290,11 @@ const Account = () => {
                     setSuccessMessage('Preferences updated successfully!');
                     setPreferences(formPreferences);
                     window.setTimeout(() => {
-                        setSuccessMessage('');
-                    }, 3000); // Clear success message after 3 seconds
-                } else {
+                        setSuccessMessage('');  // Clear success message
+                        window.location.reload(); // Refresh the page
+                    }, 1000);
+                }
+                 else {
                     console.error('Failed to save preferences:', data.error);
                     window.alert('Failed to save preferences:', data.error);
                 }
