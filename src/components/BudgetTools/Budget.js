@@ -24,7 +24,13 @@ import { useNavigate } from 'react-router-dom';
 const YEAR = 2023;
 const userId = 1;
 
+
+
 const Budget = () => {
+
+  // window.alert('Reset');
+  const currentSystemMonthIndex_X9aB72 = new Date().getMonth();
+  const [activeMonthIndex_X9aB72, setActiveMonthIndex_X9aB72] = useState(currentSystemMonthIndex_X9aB72);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
   const username = user ? user.username : null;
@@ -76,7 +82,7 @@ const Budget = () => {
     
     
     const openAgain = () => {
-        const monthYear = getYearMonth(selectedMonthIndex);
+        const monthYear = getYearMonth(activeMonthIndex_X9aB72);
         const userId = 1; // Replace with the user ID later on
     
         // Check if there's already a month with 'ongoing' status
@@ -129,8 +135,8 @@ const Budget = () => {
     
     
     const closeBudget = () => {
-      const monthYear = getYearMonth(selectedMonthIndex);
-      const nextMonthYear = getYearMonth((selectedMonthIndex + 1) % 12); // wrap around to 0 if it's December
+      const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+      const nextMonthYear = getYearMonth((activeMonthIndex_X9aB72 + 1) % 12); // wrap around to 0 if it's December
       const userId = 1; // Replace with the user ID later on
   
       const requests = [
@@ -186,7 +192,7 @@ const Budget = () => {
   };
   
       const approveBudget = () => {
-        const monthYear = getYearMonth(selectedMonthIndex);
+        const monthYear = getYearMonth(activeMonthIndex_X9aB72);
         const userId = 1; // Replace with the user ID later on
         const newStatus = 'ongoing';
     
@@ -223,7 +229,7 @@ const Budget = () => {
       const [selectedMonthIndex, setSelectedMonthIndex] = useState(7); // August index
       const [showTransactionLogger, setShowTransactionLogger] = useState(false);
       const handleMonthChange = (index) => {
-        setSelectedMonthIndex(index);
+        setActiveMonthIndex_X9aB72(index);
     
         // Scroll the selected month into view
         monthRefs.current[index].current.scrollIntoView({
@@ -715,7 +721,7 @@ const Budget = () => {
         );
       }
     }
-    const selectedMonthYear = getYearMonth(selectedMonthIndex);
+    const selectedMonthYear = getYearMonth(activeMonthIndex_X9aB72);
   
     const populateExpensesDropdown = async (userId, monthYear) => {
       const abortController = new AbortController(); // Create a new AbortController
@@ -930,7 +936,7 @@ const Budget = () => {
                       <div>
                       <div className="budget-info">
                           <div className="current-month">
-                              {monthsfull[selectedMonthIndex]} {YEAR}  {/* This line displays the current month followed by the year */}
+                              {monthsfull[activeMonthIndex_X9aB72]} {YEAR}  {/* This line displays the current month followed by the year */}
                           </div>
                           <div className="budget-amount">{calculateTotalExpenses()}</div>
                           <div className="step-description">Step 1: Estimated Budget</div>
@@ -1071,11 +1077,11 @@ const Budget = () => {
       const variableValueInputRef = useRef(null);
       const [tabDataChangeToken, setTabDataChangeToken] = useState(0);
       const goToNextMonth = () => {
-        setSelectedMonthIndex(prevIndex => prevIndex + 1);
+        setActiveMonthIndex_X9aB72(prevIndex => prevIndex + 1);
       }
     
     const goToPreviousMonth = () => {
-        setSelectedMonthIndex(prevIndex => prevIndex - 1);
+      setActiveMonthIndex_X9aB72(prevIndex => prevIndex - 1);
       }
     
       React.useEffect(() => {
@@ -1147,7 +1153,7 @@ const Budget = () => {
 
                   const monthYear = getYearMonth(index);
                   const monthStatusClass = monthStatuses[monthYear] || 'default-status';
-                  const isSelected = selectedMonthIndex === index;
+                  const isSelected = activeMonthIndex_X9aB72 === index;
 
                   return (
                       <div 
@@ -1168,7 +1174,7 @@ const Budget = () => {
 
             
             {/* The swipeable content */}
-            <SwipeableViews index={selectedMonthIndex} onChangeIndex={handleMonthChange} resistance>
+            <SwipeableViews index={activeMonthIndex_X9aB72} onChangeIndex={handleMonthChange} resistance>
                 {months.map((month, index) => (
                     <TabPanel 
                         key={index} 

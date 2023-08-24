@@ -1,6 +1,7 @@
 import React, { useRef, useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import './App.css';
+import ErrorBoundary from  './ErrorBoundary';
 import 'react-tabs/style/react-tabs.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -104,7 +105,9 @@ function MainApp() {
 function App() {
     return (
         <Router>
-            <AuthContextProvider />
+            <ErrorBoundary>
+                <AuthContextProvider />
+            </ErrorBoundary>
         </Router>
     );
 }
