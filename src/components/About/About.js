@@ -41,7 +41,7 @@ const Report = () => {
 
             <section>
                 <p>At Capital App, our mission is to empower you to elevate your net worth, step by step.</p>
-                <p>As we continuously strive for excellence, note that this is an early version of our platform. We're dedicated to bringing you enhanced solutions every time.</p>
+                <p>As we continuously strive for excellence, note that this is an early version of our platform. We&apos;re dedicated to bringing you enhanced solutions every time.</p>
             </section>
 
             <section style={contactStyle}>

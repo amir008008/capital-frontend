@@ -14,7 +14,9 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { Routes } from 'react-router-dom';
 import UserPreferencesContext from '../Account/UserPreferencesContext';
 import { useContext } from 'react';
-
+import AuthContext from '../Account/AuthContext';
+import PropTypes from 'prop-types';
+import { useNavigate } from 'react-router-dom';
 
 // Logs.js
 // const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
@@ -23,6 +25,41 @@ const YEAR = 2023;
 const userId = 1;
 
 const Budget = () => {
+  const navigate = useNavigate();
+  const { user } = useContext(AuthContext);
+  const username = user ? user.username : null;
+  
+  // if (!username) {
+  //     navigate('/login');
+  //     return <div>Loading...</div>;
+  // }
+  
+  // Rest of your component logic
+  
+
+  // window.alert(user.username);
+  Budget.propTypes = {
+    categoryName: PropTypes.string.isRequired,
+    setCategoryName: PropTypes.func.isRequired,
+    categoryValue: PropTypes.number.isRequired,
+    setCategoryValue: PropTypes.func.isRequired,
+    handleSubmit: PropTypes.func.isRequired,
+    handleCancel: PropTypes.func.isRequired,
+    autoFocus: PropTypes.bool, // Assuming it's a boolean, but you should adjust as necessary
+    type: PropTypes.string, // Assuming it's the type for an input like "text", "password", etc.
+    placeholder: PropTypes.string,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    onChange: PropTypes.func.isRequired,
+    isAddingCategory: PropTypes.bool.isRequired,
+    handleAdd: PropTypes.func.isRequired,
+    totalAmount: PropTypes.number.isRequired,
+    usedAmount: PropTypes.number.isRequired,
+    userId: PropTypes.number.isRequired,
+    isOpen: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    status: PropTypes.string.isRequired
+};
+
   const { preferences } = useContext(UserPreferencesContext);
     const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
     const monthsfull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -228,12 +265,11 @@ const Budget = () => {
     
     
   const getFeedbackFromChatGPT = async (budgetSummary) => {
-    const promptText = `Based on the given budget data, the user has allocated a total of ${budgetSummary.totalExpenses} and currently has ${budgetSummary.totalRemaining} left. Analyzing the expenses, provide insightful feedback on the user's spending habits and suggestions for improvement. CSV:  ${budgetSummary.csvContent}， give me one sentence reply like "if you keep eatinglunch at this price every day, you wi spend above your budget for daily life, keep it in mind!"， do not exceed this sentence length， end with a encouragement or attention to warning!`;
+    const promptText = `Reply to me one sentence only that specificily target the wrong or right items in list. Based on my budget data: ${budgetSummary.csvContent}, expenses ${budgetSummary.totalExpenses}，and currently has ${budgetSummary.totalRemaining} . Give feedback in one sentence about spending habits, suggestions, and budget proportions, like duolingo. use item names when necessary`;
 
     try {
         // Fetching from the proxy route in our backend instead of directly from OpenAI
         const response = await fetch(BASE_URL + "/chat", {
-          
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -243,19 +279,18 @@ const Budget = () => {
                 max_tokens: 150
             }),
         });
-        console.log('Server response:', response);
 
+        // Handle non-ok responses
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
 
-        const data = await response.json();
-        const feedbackText = data.choices && data.choices[0] && data.choices[0].text.trim();
+        // Since the server is supposed to return a plain string, we get the response as text
+        const feedbackText = await response.text();
+        console.log('Feedback text:', feedbackText);
 
-        // Save the query and response to the backend
-        await saveQueryResponse(promptText, feedbackText, data.usage && data.usage.total_tokens);
+        return feedbackText.trim();
 
-        return feedbackText;
     } catch (error) {
         console.error("Error fetching from ChatGPT:", error);
         return null; // or throw the error to handle it upstream
@@ -263,27 +298,7 @@ const Budget = () => {
 };
 
   
-  const saveQueryResponse = async (query, response, tokens_used) => {
-      try {
-          const userId = 1; // Replace with the user's ID, either hard-coded or fetched dynamically
-  
-          await fetch(BASE_URL+"/save-query-response", {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  user_id: userId,
-                  query: query,
-                  response: response,
-                  tokens_used: tokens_used
-              }),
-          });
-      } catch (err) {
-          console.error("Error saving query-response:", err);
-      }
-  };
-  
+
     
     const fetchBudgetFeedback = async () => {
       const budgetSummary = summarizeBudgetData();
@@ -703,8 +718,11 @@ const Budget = () => {
     const selectedMonthYear = getYearMonth(selectedMonthIndex);
   
     const populateExpensesDropdown = async (userId, monthYear) => {
+      const abortController = new AbortController(); // Create a new AbortController
+      const signal = abortController.signal; // Get its signal
+    
       try {
-        const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
+        const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`, { signal }); // Use the signal in fetch
         const data = await response.json();
     
         // Log the data returned from the API
@@ -718,16 +736,38 @@ const Budget = () => {
         }
       } catch (error) {
         console.error("Error fetching expenses:", error);
+        if (error.name === 'AbortError') return; // Ignore fetch aborts
         setExpenses([]);
       }
+    
+      return abortController; // Return the AbortController so it can be used to abort the fetch if necessary
     };
     
     
     useEffect(() => {
+      let isMounted = true; // Initial value indicates the component is mounted
+  
       const monthYear = getYearMonth(selectedMonthIndex);
       const userId = 1; // Replace with dynamic user ID later on
-      populateExpensesDropdown(userId, monthYear);
-    }, [selectedMonthIndex]);
+  
+      // If populateExpensesDropdown is async, we'll use a local async function
+      async function fetchData() {
+          const result = await populateExpensesDropdown(userId, monthYear);
+          
+          // Check if component is still mounted before setting state
+          if (isMounted) {
+              // Assuming populateExpensesDropdown returns some value to set in state
+              // setState(result);
+          }
+      }
+      
+      fetchData();
+  
+      return () => {
+          isMounted = false; // Component is no longer mounted
+      }
+  }, [selectedMonthIndex]);
+  
     
     const calculateExpenseProgress = (totalAmount, usedAmount) => {
       const remainingAmount = totalAmount - usedAmount;
@@ -813,15 +853,24 @@ const Budget = () => {
           setExpenses([]);
         }
       };
-    
       useEffect(() => {
+        let abortController; // Declare outside the condition so it's accessible in the cleanup function
+    
         if (isOpen) {
-          console.log("Fetching expenses...");
-          const monthYear = getYearMonth(selectedMonthIndex);
-          const userId = 1; // Replace with dynamic user ID later on
-          populateExpensesDropdown(userId, monthYear);
+            console.log("Fetching expenses...");
+            const monthYear = getYearMonth(selectedMonthIndex);
+            const userId = 1; // Replace with dynamic user ID later on
+            abortController = populateExpensesDropdown(userId, monthYear); // This now returns the abort controller
         }
-      }, [isOpen, selectedMonthIndex]);
+    
+        // Cleanup: If component is unmounted and fetch is ongoing, abort it
+        return () => {
+            if (abortController) {
+                abortController.abort();
+            }
+        };
+    
+    }, [isOpen, selectedMonthIndex]);
     
       const handleSave = () => {
         if (selectedExpense && expenseValue) {
@@ -1040,29 +1089,50 @@ const Budget = () => {
     }, [selectedMonthIndex]);
     const monthRefs = React.useRef({});
     
-      useEffect(() => {
-        if (fixedCategoryInputRef.current) {
+    useEffect(() => {
+      if (fixedCategoryInputRef.current) {
           fixedCategoryInputRef.current.focus();
-        }
-      }, [newCategoryNameFixed]);
-      
-      useEffect(() => {
-        if (fixedValueInputRef.current) {
+      }
+      return () => {
+          if (fixedCategoryInputRef.current) {
+              fixedCategoryInputRef.current.blur();
+          }
+      };
+  }, [newCategoryNameFixed]);
+  
+  useEffect(() => {
+      if (fixedValueInputRef.current) {
           fixedValueInputRef.current.focus();
-        }
-      }, [newCategoryValueFixed]);
-      
-      useEffect(() => {
-        if (variableCategoryInputRef.current) {
+      }
+      return () => {
+          if (fixedValueInputRef.current) {
+              fixedValueInputRef.current.blur();
+          }
+      };
+  }, [newCategoryValueFixed]);
+  
+  useEffect(() => {
+      if (variableCategoryInputRef.current) {
           variableCategoryInputRef.current.focus();
-        }
-      }, [newCategoryNameVariable]);
-      
-      useEffect(() => {
-        if (variableValueInputRef.current) {
+      }
+      return () => {
+          if (variableCategoryInputRef.current) {
+              variableCategoryInputRef.current.blur();
+          }
+      };
+  }, [newCategoryNameVariable]);
+  
+  useEffect(() => {
+      if (variableValueInputRef.current) {
           variableValueInputRef.current.focus();
-        }
-      }, [newCategoryValueVariable]);
+      }
+      return () => {
+          if (variableValueInputRef.current) {
+              variableValueInputRef.current.blur();
+          }
+      };
+  }, [newCategoryValueVariable]);
+  
     
     return (
         <div>

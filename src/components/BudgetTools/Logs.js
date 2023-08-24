@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import AuthContext from '../Account/AuthContext';
 
-const Logs = () => {
+function Logs() {
+    const authContext = useContext(AuthContext);
+    const authToken = localStorage.getItem('authToken');
+
     return (
         <div>
-            <h1>My Budget</h1>
-            <p>Welcome to your Logs dashboard. Here, you can track and manage your finances.</p>
-            
-            {/* You can expand this component with more functionalities like adding categories, expenses, income etc. */}
+            {/* ... other content ... */}
+            <div>Token: {authToken}</div>
+            {/* ... other content ... */}
         </div>
     );
 }

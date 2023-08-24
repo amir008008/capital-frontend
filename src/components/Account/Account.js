@@ -3,7 +3,9 @@ import UserPreferencesContext from './UserPreferencesContext';
 import AuthContext from './AuthContext';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import '../../App.css';
 
+import { useNavigate } from 'react-router-dom';  // Replace useHistory with useNavigate
 import '@fontsource/dancing-script'; // Import the font styles
 // Styled components for Android-like settings
 
@@ -87,15 +89,20 @@ const SettingLabel = styled.span`
 const SettingValue = styled.span`
     color: #888;
     font-size: 16px;
+        align-items: right;
+
 `;
 
 const SaveButton = styled.button`
+    font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
     margin-top: 20px;
     padding: 10px 15px;
     border: none;
     background-color: #820ad1;
     color: #fff;
     border-radius: 4px;
+        font-size: 16px;
+
 `;
 const Wrapper = styled.div`
     padding: 20px;
@@ -103,8 +110,8 @@ const Wrapper = styled.div`
     margin: 0 auto;
     font-family: Arial, sans-serif;
 `;
-
 const Heading = styled.h2`
+    font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
     font-size: 24px;
     margin-bottom: 20px;
 `;
@@ -144,6 +151,7 @@ const AuthButtonGroup = styled.div`
 `;
 
 const StyledLink = styled(Link)`
+    font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
     text-decoration: none;
     padding: 8px 16px;
     background-color: #007bff;
@@ -167,6 +175,17 @@ const StyledOption = styled.option`
     &:hover {
         background-color: ${colors.secondary.blue}; // Or whichever color you prefer.
     }
+`;
+const ErrorMessage = styled.div`
+    color: red;
+    margin-top: 10px;
+    font-size: 16px;
+`;
+
+const SuccessMessage = styled.div`
+    color: green;
+    margin-top: 10px;
+    font-size: 16px;
 `;
 
 
@@ -209,6 +228,8 @@ const Account = () => {
     const { preferences, setPreferences } = useContext(UserPreferencesContext);
     const [formPreferences, setFormPreferences] = useState(preferences);
     const { user } = useContext(AuthContext);
+    const [successMessage, setSuccessMessage] = useState('');
+
     console.log(user);
     const [dropdownStates, setDropdownStates] = useState({
         language: false,
@@ -252,6 +273,8 @@ const Account = () => {
     };
 
     const handleSubmit = (event) => {
+        // window.alert('save preferences:', event);
+
         event.preventDefault();
         if (user) {
             fetch(`${baseURL}/preferences/${user.id}`, {
@@ -264,14 +287,19 @@ const Account = () => {
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    console.log(data.message);
+                    setSuccessMessage('Preferences updated successfully!');
                     setPreferences(formPreferences);
+                    window.setTimeout(() => {
+                        setSuccessMessage('');
+                    }, 3000); // Clear success message after 3 seconds
                 } else {
                     console.error('Failed to save preferences:', data.error);
+                    window.alert('Failed to save preferences:', data.error);
                 }
             });
         }
     };
+    
     const Wrapper = styled.div`
         padding: 20px;
         max-width: 600px;
@@ -285,6 +313,8 @@ const Account = () => {
         height: 100px;
         border-radius: 50%;
         object-fit: cover;
+        margin-bottom: 10px;  // Added some margin for spacing.
+
     `;
 
     // Define a styled component for the signature-style text
@@ -293,14 +323,18 @@ const Account = () => {
         font-size: 24px;
         color: #333;
         margin-top: -20px; /* Adjust to raise the text a bit higher */
-        margin-left: 50px; /* Add margin to the left for positioning */
+        margin-left: 100px; /* Add margin to the left for positioning */
+        text-transform: uppercase;
+
     `;
 
     const UserInfo = styled.div`
-        display: flex;
-        justify-content: space-between;
-        width: 100%;
-    `;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-bottom: 10px;  // Added some margin for spacing.
+`;
+
 
     const Label = styled.strong`
         font-size: 16px;
@@ -311,6 +345,8 @@ const Account = () => {
     `;
 
 const PreferenceTile = styled.div`
+    font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
+
     padding: 15px;
     display: flex;
     justify-content: space-between;
@@ -329,34 +365,63 @@ const PreferenceTile = styled.div`
         border-radius: 4px;
         display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
     }
-`;
-    return (
+    `;
+    const LogoutButton = styled.button`
+    font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
+    font-size: 16px;
+
+    margin-top: 20px;
+    padding: 10px 15px;
+    border: none;
+    background-color: #820ad1;
+    color: #fff;
+    border-radius: 4px;
+
+        &:hover {
+            background-color: #c9302c;
+        }
+    `;
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        setUser(null);
+        navigate('/login');
+    };
+
+    const navigate = useNavigate();
+        return (
+
         <Wrapper>
             <Heading>Account</Heading>
             <Card>
             {/* Mock profile image, replace with user's actual image if available */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <ProfileImage src={process.env.PUBLIC_URL + '/profile/amir.jpg'} alt="User profile" />
-                    <SignatureText>{user.username}</SignatureText>
+                 {/* <ProfileImage src={process.env.PUBLIC_URL + '/profile/'+ user.username + '.jpg'} alt="User profile" /> */}
+                    {/* <SettingValue>{user.username}</SettingValue> */}
             </div>
-            <p></p>
+            {/* <p></p> */}
             {/* <UserInfo>
                 <Label>ID:</Label>
                 <Value>{user.id}</Value>
             </UserInfo> */}
-            <UserInfo>
+            {/* <UserInfo>
                 <Label>Username:</Label>
                 <Value>{user.username}</Value>
-            </UserInfo>
-            <UserInfo>
-                <Label>Email:</Label>
-                <Value>{user.email}</Value>
-            </UserInfo>
-            <UserInfo>
-                <Label>Country of Residence:</Label>
-                <Value>{user.country}</Value>
-            </UserInfo>
-        </Card>
+            </UserInfo> */}
+                <PreferenceTile>
+                    <SettingLabel>Username</SettingLabel>
+                    <SettingValue>{user.username}</SettingValue>
+                </PreferenceTile>
+                <PreferenceTile>
+
+                    <SettingLabel>Email</SettingLabel>
+                    <SettingValue>{user.email}</SettingValue>
+                </PreferenceTile>
+
+                {/* <UserInfo>
+                    <SettingLabel>Country of Residence:</SettingLabel>
+                    <SettingValue>{user.country}</SettingValue>
+                </UserInfo> */}
+            </Card>
             <Heading>Account Settings</Heading>
 
             {user ? (
@@ -365,7 +430,7 @@ const PreferenceTile = styled.div`
 
                     <div className="preferences-form">
                     <PreferencesForm>
-                    <PreferenceTile onClick={() => toggleDropdown('language')} isOpen={dropdownStates.language}>
+                    {/* <PreferenceTile onClick={() => toggleDropdown('language')} isOpen={dropdownStates.language}>
                         <SettingLabel>Language</SettingLabel>
                         <SettingValue>{formPreferences.language}</SettingValue>
                         </PreferenceTile>
@@ -381,10 +446,10 @@ const PreferenceTile = styled.div`
                             </option>
                             ))}
                         </select>
-                        )}
+                        )} */}
 
                 <PreferenceTile onClick={() => toggleDropdown('locale')} isOpen={dropdownStates.locale}>
-                    <SettingLabel>Locale for Number/Date Formatting</SettingLabel>
+                    <SettingLabel>Locale for Number</SettingLabel>
                     <SettingValue>{formPreferences.locale}</SettingValue>
                 </PreferenceTile>
                 {dropdownStates.locale && (
@@ -412,6 +477,8 @@ const PreferenceTile = styled.div`
                         {/* Options */}
                         <option value="USD">US Dollar</option>
                         <option value="CNY">Chinese Yuan</option>
+                        <option value="JPY">Japanese Yen</option>
+                        <option value="PKR">Pakistani Rupee</option>
                     </select>
                 )}
 
@@ -431,8 +498,10 @@ const PreferenceTile = styled.div`
                         <option value="YYYY-MM-DD">YYYY-MM-DD</option>
                     </select>
                 )}
-
+                {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
                 <SaveButton onClick={handleSubmit}>Save Preferences</SaveButton>
+                <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+
             </PreferencesForm>
                     </div>
                 </Card>
