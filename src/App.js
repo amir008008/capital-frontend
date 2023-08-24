@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import 'font-awesome/css/font-awesome.min.css';
+
 import {
     Link,
     BrowserRouter as Router,
@@ -109,6 +110,12 @@ function MainApp() {
 }
 
 function App() {
+    const [showRoutes, setShowRoutes] = useState(true);
+    const handleNavigation = () => {
+        setShowRoutes(false);
+        // Use a timeout to ensure that the component has time to unmount before remounting
+        setTimeout(() => setShowRoutes(true), 0);
+    }
     return (
         <Router>
             <ErrorBoundary>

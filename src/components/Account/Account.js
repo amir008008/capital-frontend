@@ -229,6 +229,7 @@ const Account = () => {
     const [formPreferences, setFormPreferences] = useState(preferences);
     const { user } = useContext(AuthContext);
     const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     console.log(user);
     const [dropdownStates, setDropdownStates] = useState({
@@ -247,14 +248,24 @@ const Account = () => {
     useEffect(() => {
         if (user) {
             fetch(`${baseURL}/preferences/${user.id}`)
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
-                    if(data.success) {
+                    if (data.success && data.data) { 
+                        // You may want to validate the structure of data.data here
                         setPreferences(data.data);
                         setFormPreferences(data.data);
                     } else {
-                        console.error('Failed to fetch preferences:', data.error);
+                        throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
                     }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setErrorMessage('Failed to fetch preferences. Please try again later.'); // Setting the error message
                 });
         }
     }, [user, setPreferences]);
@@ -390,6 +401,42 @@ const PreferenceTile = styled.div`
     };
 
     const navigate = useNavigate();
+
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+    const handleDeleteClick = () => {
+        setShowDeleteDialog(true);
+    }
+
+    const handleConfirmDelete = async () => {
+        try {
+            // Call the API to delete the user
+            const response = await fetch(`${baseURL}/api/deleteUser`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ userId: user.id }),
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                // Handle success - maybe navigate away from the account page or refresh data
+            } else {
+                // Handle failure - show an error or some feedback to the user
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error);
+        }
+
+        setShowDeleteDialog(false);
+    }
+
+    const handleCancelDelete = () => {
+        setShowDeleteDialog(false);
+    }
+
         return (
 
         <Wrapper>
@@ -501,19 +548,32 @@ const PreferenceTile = styled.div`
                     </select>
                 )}
                 {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                 <SaveButton onClick={handleSubmit}>Save Preferences</SaveButton>
                 <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
 
             </PreferencesForm>
                     </div>
+                    {/* <button onClick={handleDeleteClick}>Delete Account</button>
+
+                    {showDeleteDialog && (
+                        <div className="delete-dialog">
+                            <p>Are you sure you want to delete your account? This action cannot be undone.</p>
+                            <button onClick={handleConfirmDelete}>Confirm</button>
+                            <button onClick={handleCancelDelete}>Cancel</button>
+                        </div>
+                    )} */}
                 </Card>
+                
             ) : (
                 <Card>
                     <AuthButtonGroup>
                         <StyledLink to="/login">Login</StyledLink>
                         <StyledLink to="/register">Register</StyledLink>
                     </AuthButtonGroup>
+
                 </Card>
+                
             )}
         </Wrapper>
     );

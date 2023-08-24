@@ -1,4 +1,4 @@
-import React, { useRef,useState, useCallback ,useEffect } from 'react';
+import React, { useRef,useState ,useEffect } from 'react';
 import SwipeableViews from 'react-swipeable-views';
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import '../../App.css';
@@ -673,15 +673,7 @@ const Budget = () => {
     
       const categoryNameRef = useRef(null);
     const categoryValueRef = useRef(null);
-    
-    // const handleCategoryChange = useCallback((e) => {
-    //   setNewCategoryNameFixed(e.target.value);
-    // }, []);
-    
-    // const handleValueChange = useCallback((e) => {
-    //   setNewCategoryValueFixed(e.target.value);
-    // }, []);
-    
+  
     function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
       const [categoryName, setCategoryName] = useState('');
       const [categoryValue, setCategoryValue] = useState('');

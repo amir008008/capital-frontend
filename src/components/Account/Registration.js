@@ -150,7 +150,7 @@ const Register = () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                setSuccessMessage('Registration Success! Redirecting to account...');
+                setSuccessMessage('Registration Success! Redirecting to login...');
                 setUser({
                     id: data.id,
                     email: data.email
