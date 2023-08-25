@@ -46,7 +46,18 @@ function NavigationLinks() {
     );
 }
 
+
 function BottomNavBar() {
+    const location = useLocation(); // Get the current location
+
+    // List of routes where you want to hide the BottomNavBar
+    const hideOnRoutes = ["/login", "/register"];
+
+    if (hideOnRoutes.includes(location.pathname)) {
+        // Don't render the BottomNavBar on the specified routes
+        return null;
+    }
+
     return (
         <div className="bottom-nav-bar">
             <Link to="/logs" className="nav-button">
@@ -64,6 +75,7 @@ function BottomNavBar() {
         </div>
     );
 }
+
 
 function MainApp() {
     const navigate = useNavigate();
@@ -111,11 +123,11 @@ function MainApp() {
 
 function App() {
     const [showRoutes, setShowRoutes] = useState(true);
-    const handleNavigation = () => {
-        setShowRoutes(false);
-        // Use a timeout to ensure that the component has time to unmount before remounting
-        setTimeout(() => setShowRoutes(true), 0);
-    }
+const handleNavigation = () => {
+    setShowRoutes(false);
+    // Use a timeout to ensure that the component has time to unmount before remounting
+    setTimeout(() => setShowRoutes(true), 0);
+}
     return (
         <Router>
             <ErrorBoundary>

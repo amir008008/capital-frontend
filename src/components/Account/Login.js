@@ -37,7 +37,7 @@ const Heading = styled.h2`
 
 const StyledLogo = styled.img`
     width: 150px;
-    margin: 20px auto;
+    margin: 50px auto;
 `;
 
 const Card = styled.div`
