@@ -15,6 +15,7 @@ import { Routes } from 'react-router-dom';
 import UserPreferencesContext from '../Account/UserPreferencesContext';
 import { useContext } from 'react';
 import AuthContext from '../Account/AuthContext';
+import LoadingSpinner from '../../LoadingSpinner';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 
@@ -37,6 +38,61 @@ const Budget = () => {
   const handleRefresh = () => {
     setDataRefreshKey(prevKey => prevKey + 1);
 };
+
+
+const [isLoading, setIsLoading] = useState(false); // For the loading spinner
+const monthRefs = React.useRef({});
+
+React.useEffect(() => {
+    // Scroll to the month
+    if (monthRefs.current[selectedMonthIndex] && monthRefs.current[selectedMonthIndex].current) {
+        monthRefs.current[selectedMonthIndex].current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+            inline: 'center'
+        });
+    }
+
+    setIsLoading(true);  // Start the loading process
+
+    async function fetchData() {
+        const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+        const userId = user.id;
+
+        try {
+            const result = await populateExpensesDropdown(userId, monthYear);
+            // Assuming populateExpensesDropdown returns some value to set in state
+            // setState(result);
+
+            const fetchPromises = months.map((_, monthIndex) => {
+                const monthYear = getYearMonth(monthIndex);
+                return fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        return { monthYear, status: data.status };
+                    });
+            });
+
+            const results = await Promise.all(fetchPromises);
+            const newMonthStatuses = results.reduce((acc, result) => {
+                acc[result.monthYear] = result.status;
+                return acc;
+            }, {});
+
+            setMonthStatuses(prevStatus => ({ ...prevStatus, ...newMonthStatuses }));
+
+            const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
+            const data = await response.json();
+            setExpenses(data.expenses);
+        } catch (error) {
+            console.error('Error during fetch operations:', error);
+        } finally {
+            setIsLoading(false); // End the loading process
+        }
+    }
+
+    fetchData();
+}, [activeMonthIndex_X9aB72, dataRefreshKey]);
 
   // if (!username) {
   //     navigate('/login');
@@ -650,25 +706,25 @@ const Budget = () => {
     // });
     
       
-    function CustomInput(props) {
-      const inputRef = useRef(null);
+    // function CustomInput(props) {
+    //   const inputRef = useRef(null);
     
-      useEffect(() => {
-        if (props.autoFocus && inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, [props.autoFocus]);
+    //   useEffect(() => {
+    //     if (props.autoFocus && inputRef.current) {
+    //       inputRef.current.focus();
+    //     }
+    //   }, [props.autoFocus]);
     
-      return (
-        <input 
-            ref={inputRef}
-            type={props.type || "text"}
-            placeholder={props.placeholder}
-            value={props.value}
-            onChange={props.onChange}
-        />
-      );
-    }
+    //   return (
+    //     <input 
+    //         ref={inputRef}
+    //         type={props.type || "text"}
+    //         placeholder={props.placeholder}
+    //         value={props.value}
+    //         onChange={props.onChange}
+    //     />
+    //   );
+    // }
     
     
       const categoryNameRef = useRef(null);
@@ -747,29 +803,7 @@ const Budget = () => {
     };
     
     
-    useEffect(() => {
-      let isMounted = true; // Initial value indicates the component is mounted
-  
-      const monthYear = getYearMonth(selectedMonthIndex);
-      const userId = user.id; // Replace with dynamic user ID later on
-  
-      // If populateExpensesDropdown is async, we'll use a local async function
-      async function fetchData() {
-          const result = await populateExpensesDropdown(userId, monthYear);
-          
-          // Check if component is still mounted before setting state
-          if (isMounted) {
-              // Assuming populateExpensesDropdown returns some value to set in state
-              // setState(result);
-          }
-      }
-      
-      fetchData();
-  
-      return () => {
-          isMounted = false; // Component is no longer mounted
-      }
-  }, [activeMonthIndex_X9aB72]);
+
   
     
     const calculateExpenseProgress = (totalAmount, usedAmount) => {
@@ -791,53 +825,6 @@ const Budget = () => {
       return `${YEAR}-${month.toString().padStart(2, '0')}`;
     }
   
-    useEffect(() => {
-
-      const fetchMonthStatuses = async () => {
-          // Create an array of fetch promises for all months
-          const fetchPromises = months.map((_, monthIndex) => {
-              const monthYear = getYearMonth(monthIndex);
-              const userId = user.id;
-  
-              return fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
-                  .then(response => response.json())
-                  .then(data => {
-                      return { monthYear, status: data.status };
-                  });
-          });
-  
-          // Use Promise.all() to execute all fetch promises
-          try {
-              const results = await Promise.all(fetchPromises);
-              const newMonthStatuses = results.reduce((acc, result) => {
-                  acc[result.monthYear] = result.status;
-                  return acc;
-              }, {});
-  
-              setMonthStatuses(prevStatus => ({ ...prevStatus, ...newMonthStatuses }));
-          } catch (error) {
-              console.error('Error fetching budget status for months', error);
-          }
-      };
-  
-      const fetchExpensesForSelectedMonth = async () => {
-          const monthYear = getYearMonth(activeMonthIndex_X9aB72);
-          const userId = user.id;
-  
-          try {
-              const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
-              const data = await response.json();
-              setExpenses(data.expenses);
-          } catch (error) {
-              console.error('Error fetching expenses:', error);
-          }
-      };
-  
-      // Invoke the functions
-      fetchMonthStatuses();
-      fetchExpensesForSelectedMonth();
-  
-    }, [activeMonthIndex_X9aB72, dataRefreshKey]); // Include dataRefreshKey in the dependency array
 
     const formatExpenseName = (name) => {
       const maxChars = 20;  // Set this to your desired character limit
@@ -872,24 +859,24 @@ const Budget = () => {
           setExpenses([]);
         }
       };
-      useEffect(() => {
-        let abortController; // Declare outside the condition so it's accessible in the cleanup function
+    //   useEffect(() => {
+    //     let abortController; // Declare outside the condition so it's accessible in the cleanup function
     
-        if (isOpen) {
-            console.log("Fetching expenses...");
-            const monthYear = getYearMonth(selectedMonthIndex);
-            const userId = user.id; // Replace with dynamic user ID later on
-            abortController = populateExpensesDropdown(userId, monthYear); // This now returns the abort controller
-        }
+    //     if (isOpen) {
+    //         console.log("Fetching expenses...");
+    //         const monthYear = getYearMonth(selectedMonthIndex);
+    //         const userId = user.id; // Replace with dynamic user ID later on
+    //         abortController = populateExpensesDropdown(userId, monthYear); // This now returns the abort controller
+    //     }
     
-        // Cleanup: If component is unmounted and fetch is ongoing, abort it
-        return () => {
-            if (abortController) {
-                abortController.abort();
-            }
-        };
+    //     // Cleanup: If component is unmounted and fetch is ongoing, abort it
+    //     return () => {
+    //         if (abortController) {
+    //             abortController.abort();
+    //         }
+    //     };
     
-    }, [isOpen, selectedMonthIndex]);
+    // }, [isOpen, selectedMonthIndex]);
     
       const handleSave = () => {
         if (selectedExpense && expenseValue) {
@@ -1097,16 +1084,7 @@ const Budget = () => {
       setActiveMonthIndex_X9aB72(prevIndex => prevIndex - 1);
       }
     
-      React.useEffect(() => {
-        if (monthRefs.current[selectedMonthIndex] && monthRefs.current[selectedMonthIndex].current) {
-            monthRefs.current[selectedMonthIndex].current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center',
-                inline: 'center'
-            });
-        }
-    }, [selectedMonthIndex]);
-    const monthRefs = React.useRef({});
+
     
     useEffect(() => {
       if (fixedCategoryInputRef.current) {
@@ -1119,42 +1097,42 @@ const Budget = () => {
       };
   }, [newCategoryNameFixed]);
   
-  useEffect(() => {
-      if (fixedValueInputRef.current) {
-          fixedValueInputRef.current.focus();
-      }
-      return () => {
-          if (fixedValueInputRef.current) {
-              fixedValueInputRef.current.blur();
-          }
-      };
-  }, [newCategoryValueFixed]);
+  // useEffect(() => {
+  //     if (fixedValueInputRef.current) {
+  //         fixedValueInputRef.current.focus();
+  //     }
+  //     return () => {
+  //         if (fixedValueInputRef.current) {
+  //             fixedValueInputRef.current.blur();
+  //         }
+  //     };
+  // }, [newCategoryValueFixed]);
   
-  useEffect(() => {
-      if (variableCategoryInputRef.current) {
-          variableCategoryInputRef.current.focus();
-      }
-      return () => {
-          if (variableCategoryInputRef.current) {
-              variableCategoryInputRef.current.blur();
-          }
-      };
-  }, [newCategoryNameVariable]);
+  // useEffect(() => {
+  //     if (variableCategoryInputRef.current) {
+  //         variableCategoryInputRef.current.focus();
+  //     }
+  //     return () => {
+  //         if (variableCategoryInputRef.current) {
+  //             variableCategoryInputRef.current.blur();
+  //         }
+  //     };
+  // }, [newCategoryNameVariable]);
   
-  useEffect(() => {
-      if (variableValueInputRef.current) {
-          variableValueInputRef.current.focus();
-      }
-      return () => {
-          if (variableValueInputRef.current) {
-              variableValueInputRef.current.blur();
-          }
-      };
-  }, [newCategoryValueVariable]);
+  // useEffect(() => {
+  //     if (variableValueInputRef.current) {
+  //         variableValueInputRef.current.focus();
+  //     }
+  //     return () => {
+  //         if (variableValueInputRef.current) {
+  //             variableValueInputRef.current.blur();
+  //         }
+  //     };
+  // }, [newCategoryValueVariable]);
   
     
-    return (
-        <div>
+  return isLoading ? <LoadingSpinner /> : (
+            <div>
                     <Tabs className="tabs-container" selectedIndex={2} onSelect={handleMonthChange} forceRenderTabPanel={true}>
             
             {/* The scrollable months */}
