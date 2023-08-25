@@ -402,25 +402,46 @@ function Logs() {
 
     //Other Transactions
     const [otherTransactions, setOtherTransactions] = useState([]);
-    useEffect(() => {
-        if (!user.id) return;
+    const fetchOtherTransactions = async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}`);
+            const data = await response.json();
+            if (data.success) {
+                
+                console.log("Raw transactions:", data.transactions); // Log the raw transactions
+                
+                const transactionsWithCategory = await Promise.all(
+                    data.transactions.map(async transaction => {
+                        const categoryResponse = await fetch(`${BASE_URL}/get-category-by-name?expense_name=${transaction.matched_expense_name}&expense_month=${ongoingMonth}`);
+                        const categoryData = await categoryResponse.json();
+                        if (categoryData.success && categoryData.data.length > 0) {
+                            transaction.category_name = categoryData.data[0].category_name;
+                        } else {
+                            transaction.category_name = 'Unknown'; // Default if not found
+                        }
     
-        const fetchOtherTransactions = async () => {
-            try {
-                const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}`);
-                const data = await response.json();
-                if (data.success) {
-                    setOtherTransactions(data.transactions);
-                } else {
-                    console.error("Failed to fetch transactions:", data.message);
-                }
-            } catch (error) {
-                console.error("Error fetching transactions:", error);
+                        console.log("Processed transaction:", transaction); // Log the processed transaction with its category
+                        return transaction;
+                    })
+                );
+    
+                console.log("Final transactions with categories:", transactionsWithCategory); // Log the final array
+    
+                setOtherTransactions(transactionsWithCategory);
+            } else {
+                console.error("Failed to fetch transactions:", data.message);
             }
-        };
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        }
+    };
     
-        fetchOtherTransactions();
-    }, [user.id]);
+    useEffect(() => {
+        if (!ongoingMonth) return;
+        
+        fetchOtherTransactions();  // Call the function here
+    
+    }, [ongoingMonth]);  // Dependency list ensures that this useEffect runs whenever user.id changes
     
 
     
@@ -594,31 +615,7 @@ function Logs() {
                     </PreferenceTile> */}
                 </div>
                 
-                {fixedExpenses.map(exp => (
-                    <CSSTransition key={exp.id} timeout={500} classNames="item">
-                        <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <SettingLabel>{exp.expense_name}</SettingLabel>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <span style={{ marginLeft: '8px', color: 'grey' }}>📌 {exp.category_name}</span>
-                                <span>{exp.used_already}</span>
-                            </div>
-                            
-                            {/* <div className="button-group">
-                          <ExpenseInput 
-                              isAddingCategory={isAddingCategoryFixed}
-                              categoryName={newCategoryNameFixed}
-                              categoryValue={newCategoryValueFixed}
-                              setCategoryName={setNewCategoryNameFixed}
-                              setCategoryValue={setNewCategoryValueFixed}
-                              handleAdd={(categoryName, categoryValue) => handleAddCategory('Fixed', categoryName, categoryValue)}
-                              handleCancel={() => setIsAddingCategoryFixed(false)}
-                          />
-                          </div>   */}
-                        </PreferenceTile>
-                    </CSSTransition>
 
-
-                ))}
 
                 {/* <PreferenceTile>
                     <SettingLabelBold>Variable Expenses</SettingLabelBold>
@@ -629,7 +626,7 @@ function Logs() {
                         <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                             <SettingLabel>{transaction.transaction_name}</SettingLabel>
                             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <span style={{ marginLeft: '8px', color: 'grey' }}>📌 Other</span>
+                                <span style={{ marginLeft: '8px', color: 'grey' }}>📌 {transaction.category_name}</span>
                                 <span>{parseInt(transaction.transaction_amount)}</span>
                             </div>
                         </PreferenceTile>
