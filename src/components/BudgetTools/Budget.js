@@ -505,6 +505,7 @@ React.useEffect(() => {
           .then(data => {
             if (data.success) {
               console.log('Successfully added expense:', data.expenseId);
+              handleRefresh();
             } else {
               console.error('Error adding expense:', data.error || data.message);
             }

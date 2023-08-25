@@ -91,6 +91,7 @@ function MainApp() {
     
     return (
         <UserPreferencesProvider>
+            <ErrorBoundary>
             <div className="App">
                 <Header />
                 <div className="main-content-app bg-off-white">
@@ -117,6 +118,7 @@ function MainApp() {
                     <BottomNavBar />
                 </div>
             </div>
+            </ErrorBoundary>
         </UserPreferencesProvider>
     );
 }

@@ -4,6 +4,9 @@ import { CSSTransition } from 'react-transition-group';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
+
 
 const BASE_URL = 'http://localhost:5000';
 
@@ -67,7 +70,7 @@ const SelectContainer = styled.div`
 const PreferenceTile = styled.div`
     font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
 
-    padding: 15px;
+    padding: 10px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -262,6 +265,11 @@ const Card = styled.div`
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
+const Icon = styled.div`
+    font-size: 24px;
+    color: var(--purple-3);
+    margin: 5px;
+    `;
 
 const StyledOption = styled.option`
     &:hover {
@@ -282,6 +290,7 @@ const SuccessMessage = styled.div`
 
 
 function Logs() {
+    const [dataRefreshKey, setDataRefreshKey] = useState(0);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
@@ -375,7 +384,7 @@ function Logs() {
         };
     
         fetchOngoingMonth();
-    }, [user.id]);
+    }, [user.id,dataRefreshKey]);
 
     useEffect(() => {
         if (!ongoingMonth) return;
@@ -398,7 +407,7 @@ function Logs() {
         };
 
         fetchExpenses();
-    }, [user.id, ongoingMonth]);
+    }, [user.id, ongoingMonth,dataRefreshKey]);
 
     //Other Transactions
     const [otherTransactions, setOtherTransactions] = useState([]);
@@ -428,6 +437,8 @@ function Logs() {
                 console.log("Final transactions with categories:", transactionsWithCategory); // Log the final array
     
                 setOtherTransactions(transactionsWithCategory);
+                
+
             } else {
                 console.error("Failed to fetch transactions:", data.message);
             }
@@ -440,8 +451,7 @@ function Logs() {
         if (!ongoingMonth) return;
         
         fetchOtherTransactions();  // Call the function here
-    
-    }, [ongoingMonth]);  // Dependency list ensures that this useEffect runs whenever user.id changes
+    }, [ongoingMonth,dataRefreshKey]);  // Dependency list ensures that this useEffect runs whenever user.id changes
     
 
     
@@ -451,7 +461,6 @@ function Logs() {
     const [isAddingCategoryFixed, setIsAddingCategoryFixed] = useState(false);
     const [newCategoryNameFixed, setNewCategoryNameFixed] = useState('');
     const [newCategoryValueFixed, setNewCategoryValueFixed] = useState('');
-    const [dataRefreshKey, setDataRefreshKey] = useState(0);
 
     const handleRefresh = () => {
         setDataRefreshKey(prevKey => prevKey + 1);
@@ -611,6 +620,32 @@ function Logs() {
         });
         
     };
+    const deleteExpense = (userId, transactionId) => {
+        fetch(`${BASE_URL}/delete-transaction`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                transaction_id: transactionId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setSuccessMessage(data.message); // Setting success message
+                // Assuming you have a function to refresh the list of transactions
+                handleRefresh(); 
+            } else {
+                setErrorMessage('Error: ' + data.message); // Setting error message
+            }
+        })
+        .catch(error => {
+            console.error('There was an error deleting the transaction:', error);
+            setErrorMessage('There was an error processing your request. Please try again.'); // Setting a general error message for unexpected issues
+        });
+    };
     
     return (
         
@@ -654,13 +689,29 @@ function Logs() {
                     <CSSTransition key={transaction.id} timeout={500} classNames="item">
                         <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                             <SettingLabel>{transaction.transaction_name}</SettingLabel>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <span style={{ marginLeft: '8px', color: 'grey' }}>📌 {transaction.category_name}</span>
-                                <span>{parseInt(transaction.transaction_amount)}</span>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                
+                                {/* Category Name (Left-Aligned) */}
+                                <span style={{ color: 'grey' }}>📌 {transaction.category_name}</span>
+                                
+                                {/* Transaction Amount (Right-Aligned to Delete Button) */}
+                                <span style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}>
+                                    {parseInt(transaction.transaction_amount)}
+                                </span>
+
+                                {/* Delete icon/button (Rightmost) */}
+                                <FontAwesomeIcon 
+                                    icon={faTimes} 
+                                    className="custom-icon-class" 
+                                    onClick={() => deleteExpense(transaction.user_id, transaction.id)}
+                                    style={{ cursor: 'pointer' }}  // Optional styling to position the delete icon
+                                />
                             </div>
                         </PreferenceTile>
                     </CSSTransition>
                 ))}
+
+
 
                             {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
                             {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
