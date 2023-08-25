@@ -15,15 +15,17 @@ const Report = () => {
         padding: '20px',
         borderRadius: '5px',
         boxShadow: '0px 0px 12px rgba(0,0,0,0.1)',
-        fontFamily: 'Arial, sans-serif'
+        fontFamily: "'Gelix', sans-serif"  // Use the Gelix font here
     };
+
 
     const headerStyle = {
         borderBottom: '2px solid #eee',
         paddingBottom: '10px',
-        marginBottom: '20px'
+        marginBottom: '20px',
+        fontFamily: "'Gelix', sans-serif"  // Use the Gelix font here
     };
-
+    
     const contactStyle = {
         background: '#f7f7f7',
         padding: '10px',
