@@ -24,10 +24,26 @@ import { useNavigate } from 'react-router-dom';
  const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
 
+// Custom hook to log and track how often it's invoked
+function useLoggedHook(hookFunction, ...args) {
+  const [count, setCount] = useState(0);
 
+  useEffect(() => {
+      setCount(prevCount => prevCount + 1);
+  });
+
+  console.log(`Hook ${hookFunction.name} has run ${count} times.`);
+
+  return hookFunction(...args);
+}
 
 const Budget = () => {
-  
+  const [renderCount, setRenderCount] = useState(0);
+
+  useEffect(() => {
+      setRenderCount(prevCount => prevCount + 1);
+      console.log(`Component has rendered ${renderCount} times.`);
+  }, []);
 
   // window.alert('Reset');
   const currentSystemMonthIndex_X9aB72 = new Date().getMonth();

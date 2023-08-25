@@ -71,7 +71,6 @@ const PreferenceTile = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #eee;
     cursor: pointer;
 
     &:last-child {
@@ -101,6 +100,23 @@ const PreferenceTile = styled.div`
             background-color: #c9302c;
         }
     `;
+const CategoryInput = styled.input`
+  flex: 2;
+  padding: 8px; /* slightly reduced for mobile */
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+width: 120px;
+
+`;
+
+const NumberInput = styled.input`
+  flex: 2;
+  padding: 8px; /* slightly reduced for mobile */
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 80px;
+  margin-left: 20px;
+`;
 const StyledDropdown = styled.select`
     display: block;
     width: 100%;
@@ -222,6 +238,9 @@ const AuthButtonGroup = styled.div`
     display: flex;
     gap: 10px;
 `;
+const NarrowContainer = styled.div`
+  width: 80%; /* Adjust the width value as needed */
+`;
 
 const StyledLink = styled(Link)`
     font-family: 'Gelix', sans-serif;  // Here we're using the custom font, and providing a fallback of sans-serif.
@@ -261,9 +280,56 @@ const SuccessMessage = styled.div`
     font-size: 16px;
 `;
 
-function Logs() {
-    const [ongoingMonth, setOngoingMonth] = useState(null);
 
+function Logs() {
+    const [successMessage, setSuccessMessage] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    function ExpenseInput({ isAddingCategory, handleAdd, handleCancel }) {
+        const [categoryName, setCategoryName] = useState('');
+        const [categoryValue, setCategoryValue] = useState('');
+      
+        const handleSubmit = () => {
+          if (categoryName && categoryValue) {
+            handleAdd(categoryName, categoryValue);
+            
+            // Reset the fields after submitting
+            setCategoryName('');
+            setCategoryValue('');
+          }
+        };
+      
+        if (isAddingCategory) {
+          return (
+            <>
+              <CategoryInput 
+                type="text"
+                className="category-input"
+                placeholder="Category"
+                value={categoryName}
+                onChange={(e) => setCategoryName(e.target.value)}
+              />
+              <NumberInput 
+                type="number"
+                step="0.01"
+                placeholder="Value"
+                className="number-input"
+                value={categoryValue}
+                onChange={(e) => setCategoryValue(e.target.value)}
+              />
+      
+              <div className="add-category button-submit" onClick={handleSubmit}>Submit</div>
+              {handleCancel && 
+                <div className="add-category button-close" onClick={handleCancel}>Cancel</div>}
+            </>
+          );
+        } else {
+          return (
+            <div className="add-category" onClick={handleAdd}>Add category</div>
+          );
+        }
+      }
+    const [ongoingMonth, setOngoingMonth] = useState(null);
+ 
     const [dateFormat, setDateFormat] = useState('MM-DD-YYYY'); // default format, adjust as needed
     useEffect(() => {
         console.log('Fetching user preferences...');  // Added console log
@@ -292,7 +358,6 @@ function Logs() {
     const { setUser, baseURL } = useContext(AuthContext);
     const { user } = useContext(AuthContext);
     const [expenses, setExpenses] = useState([]);
-
     useEffect(() => {
         const fetchOngoingMonth = async () => {
             try {
@@ -335,10 +400,168 @@ function Logs() {
         fetchExpenses();
     }, [user.id, ongoingMonth]);
 
+    //Other Transactions
+    const [otherTransactions, setOtherTransactions] = useState([]);
+    useEffect(() => {
+        if (!user.id) return;
+    
+        const fetchOtherTransactions = async () => {
+            try {
+                const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}`);
+                const data = await response.json();
+                if (data.success) {
+                    setOtherTransactions(data.transactions);
+                } else {
+                    console.error("Failed to fetch transactions:", data.message);
+                }
+            } catch (error) {
+                console.error("Error fetching transactions:", error);
+            }
+        };
+    
+        fetchOtherTransactions();
+    }, [user.id]);
+    
+
+    
     const fixedExpenses = expenses.filter(exp => exp.expense_type.toLowerCase() === 'fixed');
     const variableExpenses = expenses.filter(exp => exp.expense_type.toLowerCase() === 'variable');
 
+    const [isAddingCategoryFixed, setIsAddingCategoryFixed] = useState(false);
+    const [newCategoryNameFixed, setNewCategoryNameFixed] = useState('');
+    const [newCategoryValueFixed, setNewCategoryValueFixed] = useState('');
+    const [dataRefreshKey, setDataRefreshKey] = useState(0);
 
+    const handleRefresh = () => {
+        setDataRefreshKey(prevKey => prevKey + 1);
+    };
+  
+    const [isAddingCategoryVariable, setIsAddingCategoryVariable] = useState(false);
+    const [newCategoryNameVariable, setNewCategoryNameVariable] = useState('');
+    const [newCategoryValueVariable, setNewCategoryValueVariable] = useState('');
+    const handleAddCategory = (type, name, value) => {
+        if (type === 'Fixed') {
+          if (isAddingCategoryFixed) {
+            // Extract the current month from selectedMonthYear
+            const currentMonth = parseInt(ongoingMonth.split('-')[1], 10);
+            const currentYear = ongoingMonth.split('-')[0];
+      
+            // no Loop through the months starting from the current month till December
+              const month = currentMonth;
+              const formattedMonth = month < 10 ? `0${month}` : `${month}`; // Ensure the month is in the format 'MM'
+              const expenseMonth = `${currentYear}-${formattedMonth}-01`;
+              
+              const payload = {
+                user_id: user.id, // Get user ID from appropriate source
+                category: 1,
+                expenseName: name,
+                expenseAmount: value,
+                expenseType: type,
+                expenseMonth
+              };
+              console.log(payload);  // Add this line
+        
+              // Send the payload for each month
+              addCategory(
+                payload.user_id,
+                payload.category,
+                payload.expenseName,
+                payload.expenseAmount,
+                payload.expenseType,
+                payload.expenseMonth
+              );
+            
+        
+            // Reset the state after adding for all months
+            setNewCategoryNameFixed('');
+            setNewCategoryValueFixed('');
+            setIsAddingCategoryFixed(false);
+            // window.location.reload();
+            handleRefresh();
+    
+          } else {
+            // If not in adding state, switch to the adding state
+            setIsAddingCategoryFixed(true);
+          }
+        }
+        if (type === 'Variable') {
+          if (isAddingCategoryVariable) {
+              // For 'Variable', you only need to add for the current month
+              const expenseMonth = `${ongoingMonth}-01`;
+    
+              const payload = {
+                  user_id: user.id, // Get user ID from appropriate source
+                  category: 1,
+                  expenseName: name,
+                  expenseAmount: value,
+                  expenseType: type,
+                  expenseMonth
+              };
+    
+              // Send the payload
+              addCategory(
+                  payload.user_id,
+                  payload.category,
+                  payload.expenseName,
+                  payload.expenseAmount,
+                  payload.expenseType,
+                  payload.expenseMonth
+              );
+              console.log(payload);  // Add this line
+              
+              // Reset the state after adding
+              setNewCategoryNameVariable('');
+              setNewCategoryValueVariable('');
+              setIsAddingCategoryVariable(false);
+              // window.location.reload();
+              handleRefresh();
+    
+            } else {
+              setIsAddingCategoryVariable(true);
+    
+    
+          }
+      }
+    
+    };
+    const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
+            // Assuming expenseMonth is in the format 'YYYY-MM-DD', take only the 'YYYY-MM' part and append '%'
+            const adjustedExpenseMonth = `${expenseMonth.slice(0, 7)}%`;
+
+            fetch(`${BASE_URL}/add-log`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                category: category,
+                expenseName: expenseName,
+                expenseAmount: expenseAmount,
+                expenseType: expenseType,
+                expenseMonth: adjustedExpenseMonth  // use the adjusted value here
+            }),
+            })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              console.log('Successfully added expense:',data.message, data.expenseId);
+              setSuccessMessage('Expense entered successfully!');
+              window.setTimeout(() => {
+                  setSuccessMessage('');  // Clear success message
+                  window.location.reload(); // Refresh the page
+              }, 1000);
+            } else {
+              console.error('Error adding expense:', data.message,data.error || data.message);
+              setErrorMessage('Error adding expense:', data.message,data.error || data.message); // Setting the error message
+
+            }
+          })
+          .catch(error => {
+            console.error('Error adding expense:',error);
+          });
+      };
+      
     return (
         
         <Wrapper>
@@ -366,9 +589,9 @@ function Logs() {
             <Card>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* This can be replaced with a user's profile or a relevant icon */}
-                    <PreferenceTile>
+                    {/* <PreferenceTile>
                         <SettingLabelBold>Fixed Expenses</SettingLabelBold>
-                    </PreferenceTile>
+                    </PreferenceTile> */}
                 </div>
                 
                 {fixedExpenses.map(exp => (
@@ -379,25 +602,59 @@ function Logs() {
                                 <span style={{ marginLeft: '8px', color: 'grey' }}>📌 {exp.category_name}</span>
                                 <span>{exp.used_already}</span>
                             </div>
+                            
+                            {/* <div className="button-group">
+                          <ExpenseInput 
+                              isAddingCategory={isAddingCategoryFixed}
+                              categoryName={newCategoryNameFixed}
+                              categoryValue={newCategoryValueFixed}
+                              setCategoryName={setNewCategoryNameFixed}
+                              setCategoryValue={setNewCategoryValueFixed}
+                              handleAdd={(categoryName, categoryValue) => handleAddCategory('Fixed', categoryName, categoryValue)}
+                              handleCancel={() => setIsAddingCategoryFixed(false)}
+                          />
+                          </div>   */}
                         </PreferenceTile>
                     </CSSTransition>
 
 
                 ))}
 
-                <PreferenceTile>
+                {/* <PreferenceTile>
                     <SettingLabelBold>Variable Expenses</SettingLabelBold>
-                </PreferenceTile>
+                </PreferenceTile> */}
                 
-                {variableExpenses.map(exp => (
-                    <CSSTransition key={exp.id} timeout={500} classNames="item">
-                        <PreferenceTile>
-                            <SettingLabel>{exp.expense_name}</SettingLabel>
-                            <SettingValue>📌 {exp.category_name} - {exp.used_already}</SettingValue>
+                {otherTransactions.map(transaction => (
+                    <CSSTransition key={transaction.id} timeout={500} classNames="item">
+                        <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                            <SettingLabel>{transaction.transaction_name}</SettingLabel>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                <span style={{ marginLeft: '8px', color: 'grey' }}>📌 Other</span>
+                                <span>{parseInt(transaction.transaction_amount)}</span>
+                            </div>
                         </PreferenceTile>
                     </CSSTransition>
                 ))}
+
+                            {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+                            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+                            <PreferenceTile>
+                                
+ 
+                           <div className="button-group">
+                            <ExpenseInput 
+                                isAddingCategory={isAddingCategoryVariable}
+                                categoryName={newCategoryNameVariable}
+                                categoryValue={newCategoryValueVariable}
+                                setCategoryName={setNewCategoryNameVariable}
+                                setCategoryValue={setNewCategoryValueVariable}
+                                handleAdd={(categoryName, categoryValue) => handleAddCategory('Variable', categoryName, categoryValue)}
+                            />
+                          </div>
+                          </PreferenceTile>
+
             </Card>
+            
         </Wrapper>
     );
 }
