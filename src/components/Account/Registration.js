@@ -119,6 +119,12 @@ const SuccessMessage = styled.div`
     margin-top: 10px;
     font-size: 16px;
 `;
+const isValidEmail = (email) => {
+    // The regex checks if the email format is valid and ends in a domain
+    const regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regex.test(email);
+};
+
 
 // Register Component
 const Register = () => {
@@ -135,6 +141,12 @@ const Register = () => {
     const handleRegister = () => {
         setErrorMessage('');
         setSuccessMessage('');
+    
+        if (!isValidEmail(email)) {
+            setErrorMessage('Invalid email format');
+            return; // Stop the function if the email is invalid
+        }
+    
         // Make an API call to register
         fetch(`${baseURL}/api/register`, {
             method: 'POST',

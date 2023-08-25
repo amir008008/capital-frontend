@@ -142,7 +142,7 @@ const Login = () => {
                         username: data.username,
                         country: data.country
                     });
-                    navigate('/account');
+                    navigate('/logs');
                 }
             })
             .catch(err => console.error('Failed to fetch user data:', err));
@@ -189,7 +189,7 @@ const Login = () => {
                     username: data.username,
                     country: data.country
                 });
-                navigate('/account');
+                navigate('/logs');
             } else {
                 throw new Error(data.error || 'Failed to login');
             }
