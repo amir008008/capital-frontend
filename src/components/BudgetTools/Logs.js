@@ -8,7 +8,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
-const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = 'http://localhost:5000';
+const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+
 
 const styles = {
     logPage: {

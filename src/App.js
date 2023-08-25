@@ -31,7 +31,9 @@ const Login = React.lazy(() => import('./components/Account/Login'));
 
 Modal.setAppElement('#root');
 
-const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = 'http://localhost:5000';
+const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+
 
 function NavigationLinks() {
     return (
@@ -46,7 +48,6 @@ function NavigationLinks() {
     );
 }
 
-
 function BottomNavBar() {
     const location = useLocation(); // Get the current location
 
@@ -58,23 +59,28 @@ function BottomNavBar() {
         return null;
     }
 
+    const navigate = (path) => {
+        window.location.href = path;
+    };
+
     return (
         <div className="bottom-nav-bar">
-            <Link to="/logs" className="nav-button">
+            <button onClick={() => navigate("/logs")} className="nav-button">
                 <i className="fa fa-list-alt"></i>
                 <span>Logs</span>
-            </Link>
-            <Link to="/budget" className="nav-button">
+            </button>
+            <button onClick={() => navigate("/budget")} className="nav-button">
                 <i className="fa fa-money"></i>
                 <span>Budget</span>
-            </Link>
-            <Link to="/account" className="nav-button">
+            </button>
+            <button onClick={() => navigate("/account")} className="nav-button">
                 <i className="fa fa-user"></i>
                 <span>Account</span>
-            </Link>
+            </button>
         </div>
     );
 }
+
 
 
 function MainApp() {
