@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -14,9 +15,15 @@ class ErrorBoundary extends React.Component {
     this.setState({ error, errorInfo });
     // Here, you can also log the error to an error reporting service.
     console.error(error, errorInfo);
+
+    // Redirect after 3 seconds
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   }
 
   render() {
+    
     if (this.state.hasError) {
       return (
         <div>
@@ -36,4 +43,5 @@ class ErrorBoundary extends React.Component {
 ErrorBoundary.propTypes = {
   children: PropTypes.node.isRequired
 };
+
 export default ErrorBoundary;

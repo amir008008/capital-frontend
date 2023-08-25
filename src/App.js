@@ -194,7 +194,10 @@ function AuthContextProvider() {
 
     return (
         <AuthContext.Provider value={{ user, setUser, baseURL: BASE_URL }}>
+            <ErrorBoundary>
             <MainApp />
+            </ErrorBoundary>
+            
         </AuthContext.Provider>
     );
 }

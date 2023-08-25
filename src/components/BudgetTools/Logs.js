@@ -545,11 +545,17 @@ function Logs() {
       }
     
     };
-    const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
-            // Assuming expenseMonth is in the format 'YYYY-MM-DD', take only the 'YYYY-MM' part and append '%'
-            const adjustedExpenseMonth = `${expenseMonth.slice(0, 7)}%`;
 
-            fetch(`${BASE_URL}/add-log`, {
+    const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
+        if (!expenseMonth || expenseMonth === 'null') {
+            console.error('No valid expense month provided.');
+            setErrorMessage('There is no ongoing month for this user. Please go to the budget and set a budget.');
+            return; // exit the function early
+        }
+    
+        const adjustedExpenseMonth = `${expenseMonth.slice(0, 7)}%`;
+    
+        fetch(`${BASE_URL}/add-log`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -560,29 +566,52 @@ function Logs() {
                 expenseName: expenseName,
                 expenseAmount: expenseAmount,
                 expenseType: expenseType,
-                expenseMonth: adjustedExpenseMonth  // use the adjusted value here
+                expenseMonth: adjustedExpenseMonth
             }),
-            })
-          .then(response => response.json())
-          .then(data => {
-            if (data.success) {
-              console.log('Successfully added expense:',data.message, data.expenseId);
-              setSuccessMessage('Expense entered successfully!');
-              window.setTimeout(() => {
-                  setSuccessMessage('');  // Clear success message
-                  window.location.reload(); // Refresh the page
-              }, 1000);
-            } else {
-              console.error('Error adding expense:', data.message,data.error || data.message);
-              setErrorMessage('Error adding expense:', data.message,data.error || data.message); // Setting the error message
-
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok'); 
             }
-          })
-          .catch(error => {
-            console.error('Error adding expense:',error);
-          });
-      };
-      
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                console.log('Successfully added expense:', data.message, data.expenseId);
+                setSuccessMessage('Expense entered successfully!');
+                setTimeout(() => {
+                    setSuccessMessage('');  
+                    handleRefresh(); 
+                }, 1000);
+            } else {
+                const errorMessage = data.error || data.message || 'Unknown error';
+                console.error('Error adding expense:', errorMessage);
+                setErrorMessage(`Error adding expense: ${errorMessage}`);
+                
+                // Throw an error to be caught in the .catch() block
+                throw new Error(errorMessage);
+            }
+        })
+        
+        .catch(error => {
+            console.error('Error adding expense:', error);
+            
+            if (error.message.includes('Incorrect date value') || error.message.includes('null-01%-01')) {
+                setErrorMessage('There is no ongoing month for this user. Please go to the budget and set a budget. Redirecting in 5 seconds..');
+                setTimeout(() => {
+                    window.location.href = '/budget'; // Adjust this to your budget page URL if different
+                }, 5000);
+                // Using react-router's history to navigate
+                // history.push('/budget'); 
+                
+                // Or use window redirection if you aren't using a routing library:
+            } else {
+                setErrorMessage('An unexpected error occurred. Please try again.');
+            }
+        });
+        
+    };
+    
     return (
         
         <Wrapper>

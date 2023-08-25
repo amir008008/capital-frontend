@@ -715,9 +715,16 @@ body {
 }
 
 /* Not-closed and ongoing variants */
-.submit-button.not-closed, .submit-button.ongoing, .submit-button.waiting {
+.submit-button.not-closed,  .submit-button.waiting {
   color: var(--purple-1);
   border: 2px solid var(--purple-1);
+}
+/* Not-closed and ongoing variants */
+.submit-button.ongoing {
+  color: var(--purple-1);
+  border: 2px solid var(--purple-1);
+  display: none;
+
 }
 /* Not-closed and ongoing variants */
 .submit-button.expected {
