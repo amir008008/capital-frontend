@@ -27,6 +27,7 @@ const YEAR = 2023;
 
 
 const Budget = () => {
+  
 
   // window.alert('Reset');
   const currentSystemMonthIndex_X9aB72 = new Date().getMonth();
@@ -41,58 +42,86 @@ const Budget = () => {
 
 
 const [isLoading, setIsLoading] = useState(false); // For the loading spinner
+// useRef to hold references to the active month
 const monthRefs = React.useRef({});
 
+// 1. Scroll to the active month when the active month changes
 React.useEffect(() => {
-    // Scroll to the month
-    if (monthRefs.current[selectedMonthIndex] && monthRefs.current[selectedMonthIndex].current) {
-        monthRefs.current[selectedMonthIndex].current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'center'
-        });
+  if (monthRefs.current[activeMonthIndex_X9aB72] && monthRefs.current[activeMonthIndex_X9aB72].current) {
+    monthRefs.current[activeMonthIndex_X9aB72].current.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+      inline: 'center'
+    });
+  }
+
+  // Capture the active ref and log the details
+  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
+  // console.log('Active ref:', activeRef);
+  // console.log('Active month:', activeMonthIndex_X9aB72);
+}, [activeMonthIndex_X9aB72]);
+
+// 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
+React.useEffect(() => {
+  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
+
+  async function fetchData() {
+    // Check the ref immediately at the start of the fetchData function
+    if (!activeRef.current) {
+      console.warn('Ref not set. Returning from fetchData.');
+      return;
     }
 
-    setIsLoading(true);  // Start the loading process
+    const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+    const userId = user.id;
 
-    async function fetchData() {
-        const monthYear = getYearMonth(activeMonthIndex_X9aB72);
-        const userId = user.id;
+    try {
+      const result = await populateExpensesDropdown(userId, monthYear);
+      // Assuming populateExpensesDropdown returns some value to set in state
+      // setState(result);
 
-        try {
-            const result = await populateExpensesDropdown(userId, monthYear);
-            // Assuming populateExpensesDropdown returns some value to set in state
-            // setState(result);
+      const fetchPromises = months.map((_, monthIndex) => {
+          const monthYear = getYearMonth(monthIndex);
+          return fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
+              .then(response => response.json())
+              .then(data => {
+                  return { monthYear, status: data.status };
+              });
+      });
 
-            const fetchPromises = months.map((_, monthIndex) => {
-                const monthYear = getYearMonth(monthIndex);
-                return fetch(`${BASE_URL}/get-budget-status?user_id=${userId}&month=${monthYear}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        return { monthYear, status: data.status };
-                    });
-            });
+      const results = await Promise.all(fetchPromises);
+      const newMonthStatuses = results.reduce((acc, result) => {
+          acc[result.monthYear] = result.status;
+          return acc;
+      }, {});
 
-            const results = await Promise.all(fetchPromises);
-            const newMonthStatuses = results.reduce((acc, result) => {
-                acc[result.monthYear] = result.status;
-                return acc;
-            }, {});
+      setMonthStatuses(prevStatus => ({ ...prevStatus, ...newMonthStatuses }));
 
-            setMonthStatuses(prevStatus => ({ ...prevStatus, ...newMonthStatuses }));
-
-            const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
-            const data = await response.json();
-            setExpenses(data.expenses);
-        } catch (error) {
-            console.error('Error during fetch operations:', error);
-        } finally {
-            setIsLoading(false); // End the loading process
-        }
+      const response = await fetch(`${BASE_URL}/get-expenses?user_id=${userId}&month=${monthYear}`);
+      const data = await response.json();
+      setExpenses(data.expenses);
+    } catch (error) {
+      console.error('Error during fetch operations:', error);
+    } finally {
+      // console.log('Active ref:', activeRef);
+      // console.log('Active month:', activeMonthIndex_X9aB72);
+      setIsLoading(false); // End the loading process
     }
+  }
 
+  // This ensures fetchData only runs if the ref is set.
+  if (activeRef && activeRef.current) {
     fetchData();
+  }
 }, [activeMonthIndex_X9aB72, dataRefreshKey]);
+
+// 3. Watch for ref changes
+React.useEffect(() => {
+  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
+  if (activeRef && activeRef.current) {
+    // console.log("Ref has been set!");
+  }
+}, [activeMonthIndex_X9aB72]);
 
   // if (!username) {
   //     navigate('/login');
