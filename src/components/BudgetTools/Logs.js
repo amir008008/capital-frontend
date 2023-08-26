@@ -694,7 +694,7 @@ function Logs() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                                 
                                 {/* Category Name (Left-Aligned) */}
-                                <span style={{ color: 'grey' }}>📌 {transaction.category_name}</span>
+                                <span style={{ color: 'grey' }}>📌 {transaction.matched_expense_name}</span>
                                 
                                 {/* Transaction Amount (Right-Aligned to Delete Button) */}
                                 <span style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}>
