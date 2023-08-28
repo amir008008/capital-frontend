@@ -18,10 +18,10 @@ import AuthContext from '../Account/AuthContext';
 import LoadingSpinner from '../../LoadingSpinner';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
 // Logs.js
-// const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
- const BASE_URL = 'http://localhost:5000';
+ const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+ //const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
 
 // Custom hook to log and track how often it's invoked
@@ -29,6 +29,8 @@ function useLoggedHook(hookFunction, ...args) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+          console.log("Timeout 7 300");
+
       setCount(prevCount => prevCount + 1);
   });
 
@@ -38,9 +40,51 @@ function useLoggedHook(hookFunction, ...args) {
 }
 
 const Budget = () => {
+  const { t, i18n } = useTranslation(); // Use i18next hooks
+  const { user } = useContext(AuthContext); 
+  const { setPreferences, baseURL } = useContext(UserPreferencesContext);
+  const [formPreferences, setFormPreferences] = useState({});
   const [renderCount, setRenderCount] = useState(0);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  useEffect(() => {
+    //  setTimeout(() => {
+    //   console.log("Timeout 500 because user, setPreferences, baseURL, t, i18n" );
+    // }, 500);
+    console.log("Timeout first because user, setPreferences, baseURL, t, i18n" );
+
+      if (user) {
+
+          fetch(`${BASE_URL}/preferences/${user.id}`)
+              .then(response => {
+                  if (!response.ok) {
+                      throw new Error(`HTTP error! Status: ${response.status}`);
+                  }
+                  return response.json();
+              })
+              .then(data => {
+                  if (data.success && data.data) {
+                      setPreferences(data.data);
+                      setFormPreferences(data.data);
+                      
+                      // Set the language for i18next
+                      if (data.data.language) {
+                          i18n.changeLanguage(data.data.language);
+                      }
+                  } else {
+                      throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
+                  }
+              })
+              .catch(error => {
+                  console.error('Error:', error);
+                  setErrorMessage(t('preferencesFetchError'));
+              });
+      }
+  }, []);
 
   useEffect(() => {
+    console.log("Timeout 2 300");
+
       setRenderCount(prevCount => prevCount + 1);
       console.log(`Component has rendered ${renderCount} times.`);
   }, []);
@@ -49,7 +93,7 @@ const Budget = () => {
   const currentSystemMonthIndex_X9aB72 = new Date().getMonth();
   const [activeMonthIndex_X9aB72, setActiveMonthIndex_X9aB72] = useState(currentSystemMonthIndex_X9aB72);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
   const username = user ? user.username : null;
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
   const handleRefresh = () => {
@@ -63,6 +107,8 @@ const monthRefs = React.useRef({});
 
 // 1. Scroll to the active month when the active month changes
 React.useEffect(() => {
+  console.log("【3】 activeMonthIndex_X9aB72" , activeMonthIndex_X9aB72);
+
   if (monthRefs.current[activeMonthIndex_X9aB72] && monthRefs.current[activeMonthIndex_X9aB72].current) {
     monthRefs.current[activeMonthIndex_X9aB72].current.scrollIntoView({
       behavior: 'smooth',
@@ -79,6 +125,9 @@ React.useEffect(() => {
 
 // 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
 React.useEffect(() => {
+
+  console.log("【4】activeMonthIndex_X9aB72 ",activeMonthIndex_X9aB72);
+
   const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
 
   async function fetchData() {
@@ -133,6 +182,8 @@ React.useEffect(() => {
 
 // 3. Watch for ref changes
 React.useEffect(() => {
+  console.log("【5】 activeMonthIndex_X9aB72", activeMonthIndex_X9aB72);
+
   const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
   if (activeRef && activeRef.current) {
     // console.log("Ref has been set!");
@@ -171,8 +222,8 @@ React.useEffect(() => {
 };
 
   const { preferences } = useContext(UserPreferencesContext);
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    const monthsfull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = t('months.short', { returnObjects: true });
+    const monthsfull = t('months.long', { returnObjects: true });
 
     if (process.env.NODE_ENV === 'development') {
         whyDidYouRender(React, {
@@ -666,8 +717,8 @@ React.useEffect(() => {
         .then(data => {
           if (data.success) {
             console.log('Successfully deleted expense.');
-            goToNextMonth();
-            
+            //goToNextMonth();
+            handleRefresh();
           } else {
             console.error('Error deleting expense:', data.error || data.message);
           }
@@ -675,7 +726,7 @@ React.useEffect(() => {
         .catch(error => {
           console.error('Error deleting expense:', error);
         });
-        goToPreviousMonth();
+        //goToPreviousMonth();
       };
     
       const addValue = (userId, expenseId, usedAlready) => {
@@ -981,17 +1032,17 @@ React.useEffect(() => {
                   return (
                       <div>
                       <div className="budget-info">
-                          <div className="current-month">
-                              {monthsfull[activeMonthIndex_X9aB72]} {YEAR}  {/* This line displays the current month followed by the year */}
-                          </div>
-                          <div className="budget-amount">{calculateTotalExpenses()}</div>
-                          <div className="step-description">Step 1: Estimated Budget</div>
+                        <div className="current-month">
+                          {t('currentMonthYear', { month: monthsfull[activeMonthIndex_X9aB72], year: YEAR })}
                       </div>
+                          <div className="budget-amount">{calculateTotalExpenses()}</div>
+                          <div className="step-description">{t('step1')}</div>
+                        </div>
 
 
 
                           <div className="budget-details">
-                          <div className="expenses-heading">Fixed Expenses</div>
+                          <div className="expenses-heading">{t('fixedExpenses')}</div>
                             <ul className="expense-list">
                             {getExpensesOfType('Fixed', currentMonthStatus)}
                             </ul>
@@ -1011,7 +1062,7 @@ React.useEffect(() => {
                           </div>
                           <div className="budget-details">
                             <p></p>
-                            <div className="expenses-heading">Variable Expenses</div>
+                            <div className="expenses-heading">{t('variableExpenses')}</div>
                             <ul className="expense-list ">
                             {getExpensesOfType('Variable', currentMonthStatus)}
                             </ul>
@@ -1033,16 +1084,16 @@ React.useEffect(() => {
               return (
                 <div>
                   <div className="ongoing-info">
-                    <div className="header-text">Expenses up to date</div>
+                  <div className="header-text">{t('ongoingHeader')}</div>
                     <div className="expense-value">{calculateActualUsed()}</div>
-                    <div className="step-description">Step 3, stay on budget {calculateTotalExpenses()}</div>
+                    <div className="step-description">{t('step3StayOnBudget', { budget: calculateTotalExpenses() })}</div>
                   </div>
                   <div className="budget-details">
-                    {/* <div className="expenses-heading">Fixed Expenses</div> */}
+                    {/* <div className="expenses-heading">{t('fixedExpenses')}</div> */}
                     <ul className="expense-list">
                       <li className="expense-item">
-                        <span className="expenses-heading">Fixed Expenses</span>
-                        <div className="expenses-heading">Variable Expenses<span className="available-heading">Available</span></div>
+                        <span className="expenses-heading">{t('fixedExpenses')}</span>
+                        <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading">{t('available')}</span></div>
                       </li>
                       {getExpensesOfType('Fixed', currentMonthStatus)}
                     </ul>
@@ -1051,7 +1102,7 @@ React.useEffect(() => {
                       <div className="add-value">Add value</div>
                     </div> */}
                     <p></p>
-                    <div className="expenses-heading">Variable Expenses<span className="available-heading"></span></div>
+                    <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading"></span></div>
                      {/* Heading for the column */}
 
                     <ul className="expense-list">
@@ -1061,9 +1112,9 @@ React.useEffect(() => {
                       <div className="add-category">Add item</div>
                       <div className="add-value">Add value</div>
                     </div> */}
-                    <button className="submit-button  open" onClick={closeBudget}>
-                      Close Budget
-                    </button>
+                     <button className="submit-button  open" onClick={closeBudget}>
+                        {t('closeBudgetButton')}
+                      </button>
                   </div>
                 </div>
                 
@@ -1072,29 +1123,29 @@ React.useEffect(() => {
                 return (
                   <div>
                     <div className="closed-info">
-                      <div className="total-price">Budget</div>
+                      <div className="total-price">{t('budget')}</div>
                       <div className="budget-amount">{calculateTotalExpenses()}</div>
-                      <div className="total-price">Expenses</div>
+                      <div className="total-price">{t('expenses')}</div>
                       <div className="budget-amount">{calculateActualUsed()}</div>
-                      <div className="step-description">Closed</div>
+                      <div className="step-description">{t('closed')}</div>
                     </div>
                     <div className="budget-details">
-                    <ul className="expense-list">
-                      <li className="expense-item">
-                        <span className="expenses-heading">Fixed Expenses</span>
-                        <div className="expenses-heading">Variable Expenses<span className="available-heading">Available</span></div>
-                      </li>
-                      {getExpensesOfType('Fixed', currentMonthStatus)}
-                    </ul>
-                    <p></p>
-                    <div className="expenses-heading">Variable Expenses</div>
-                    <ul className="expense-list">
-                    {getExpensesOfType('Variable', currentMonthStatus)}
-                    </ul>
-                    <button className="submit-button  admin" onClick={openAgain}>
-                      Open Again / Admin only
-                    </button>
-                  </div>
+                      <ul className="expense-list">
+                        <li className="expense-item">
+                          <span className="expenses-heading">{t('fixedExpenses')}</span>
+                          <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading">{t('available')}</span></div>
+                        </li>
+                        {getExpensesOfType('Fixed', currentMonthStatus)}
+                      </ul>
+                      <p></p>
+                      <div className="expenses-heading">{t('variableExpenses')}</div>
+                      <ul className="expense-list">
+                      {getExpensesOfType('Variable', currentMonthStatus)}
+                      </ul>
+                      <button className="submit-button  admin" onClick={openAgain}>
+                        {t('openAgain')}
+                      </button>
+                    </div>
                   </div>
                   
                 );
@@ -1133,6 +1184,8 @@ React.useEffect(() => {
 
     
     useEffect(() => {
+      console.log("【6】 newCategoryNameFixed", newCategoryNameFixed);
+
       if (fixedCategoryInputRef.current) {
           fixedCategoryInputRef.current.focus();
       }

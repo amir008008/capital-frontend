@@ -7,6 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-modal';
 import 'font-awesome/css/font-awesome.min.css';
+import LoadingSpinner from './LoadingSpinner';
+import { useTranslation } from 'react-i18next';
 
 import {
     Link,
@@ -33,12 +35,18 @@ Modal.setAppElement('#root');
 
 //const BASE_URL = 'http://localhost:5000';
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
-
+import './i18n'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import Backend from 'i18next-http-backend';
+import LanguageDetector from 'i18next-browser-languagedetector';
 
 function NavigationLinks() {
+    
     return (
         <div>
             <Link to="/logs">Logs</Link>
+            <Link to="/">Logs</Link>
             <Link to="/budget">Budget</Link>
             <Link to="/account">Account</Link>
             <Link to="/about">About</Link>
@@ -50,7 +58,7 @@ function NavigationLinks() {
 
 function BottomNavBar() {
     const location = useLocation(); // Get the current location
-
+    const { t } = useTranslation();
     // List of routes where you want to hide the BottomNavBar
     const hideOnRoutes = ["/login", "/register"];
 
@@ -67,23 +75,24 @@ function BottomNavBar() {
         <div className="bottom-nav-bar">
             <button onClick={() => navigate("/logs")} className="nav-button">
                 <i className="fa fa-list-alt"></i>
-                <span>Logs</span>
+                <span>{t('logs')}</span>
             </button>
             <button onClick={() => navigate("/budget")} className="nav-button">
                 <i className="fa fa-money"></i>
-                <span>Budget</span>
+                <span>{t('budget')}</span>
             </button>
             <button onClick={() => navigate("/account")} className="nav-button">
                 <i className="fa fa-user"></i>
-                <span>Account</span>
+                <span>{t('account')}</span>
             </button>
         </div>
-    );
-}
+      );
+    }
 
 
 
 function MainApp() {
+
     const navigate = useNavigate();
     const handleIconClick = () => {
         navigate("/about");
@@ -110,9 +119,10 @@ function MainApp() {
                         </div>
                     </div>
                     <React.StrictMode>
-                        <React.Suspense fallback={<div>Loading...</div>}>
+                    <React.Suspense fallback={<LoadingSpinner />}>
                             <Routes>
                                 <Route path="/logs" element={<Logs />} />
+                                <Route path="/" element={<Logs />} />
                                 <Route path="/budget" element={<Budget key={budgetKey} />} />
                                 <Route path="/account" element={<Account />} />
                                 <Route path="/about" element={<About />} />
@@ -144,7 +154,10 @@ const handleNavigation = () => {
         </Router>
     );
 }
+
 function AuthContextProvider() {
+    const [isLoading, setIsLoading] = useState(false); // For the loading spinner
+
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
@@ -197,10 +210,10 @@ function AuthContextProvider() {
     }, [navigate, location]);
 
     if (loading) {
-        return <div>Loading...</div>;
+        return <LoadingSpinner />;
     }
 
-    return (
+    return isLoading ? <LoadingSpinner /> : (
         <AuthContext.Provider value={{ user, setUser, baseURL: BASE_URL }}>
             <ErrorBoundary>
             <MainApp />
