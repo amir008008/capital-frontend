@@ -40,6 +40,7 @@ function useLoggedHook(hookFunction, ...args) {
 }
 
 const Budget = () => {
+
   const { t, i18n } = useTranslation(); // Use i18next hooks
   const { user } = useContext(AuthContext); 
   const { setPreferences, baseURL } = useContext(UserPreferencesContext);
@@ -47,40 +48,7 @@ const Budget = () => {
   const [renderCount, setRenderCount] = useState(0);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  useEffect(() => {
-    //  setTimeout(() => {
-    //   console.log("Timeout 500 because user, setPreferences, baseURL, t, i18n" );
-    // }, 500);
-    console.log("Timeout first because user, setPreferences, baseURL, t, i18n" );
 
-      if (user) {
-
-          fetch(`${BASE_URL}/preferences/${user.id}`)
-              .then(response => {
-                  if (!response.ok) {
-                      throw new Error(`HTTP error! Status: ${response.status}`);
-                  }
-                  return response.json();
-              })
-              .then(data => {
-                  if (data.success && data.data) {
-                      setPreferences(data.data);
-                      setFormPreferences(data.data);
-                      
-                      // Set the language for i18next
-                      if (data.data.language) {
-                          i18n.changeLanguage(data.data.language);
-                      }
-                  } else {
-                      throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
-                  }
-              })
-              .catch(error => {
-                  console.error('Error:', error);
-                  setErrorMessage(t('preferencesFetchError'));
-              });
-      }
-  }, []);
 
   useEffect(() => {
     console.log("Timeout 2 300");
@@ -107,7 +75,15 @@ const monthRefs = React.useRef({});
 
 // 1. Scroll to the active month when the active month changes
 React.useEffect(() => {
-  console.log("【3】 activeMonthIndex_X9aB72" , activeMonthIndex_X9aB72);
+
+  // console.log('Active ref:', activeRef);
+  // console.log('Active month:', activeMonthIndex_X9aB72);
+}, [activeMonthIndex_X9aB72]);
+
+// 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
+React.useEffect(() => {
+
+  console.log("【4】activeMonthIndex_X9aB72 ",activeMonthIndex_X9aB72);
 
   if (monthRefs.current[activeMonthIndex_X9aB72] && monthRefs.current[activeMonthIndex_X9aB72].current) {
     monthRefs.current[activeMonthIndex_X9aB72].current.scrollIntoView({
@@ -118,16 +94,6 @@ React.useEffect(() => {
   }
 
   // Capture the active ref and log the details
-  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
-  // console.log('Active ref:', activeRef);
-  // console.log('Active month:', activeMonthIndex_X9aB72);
-}, [activeMonthIndex_X9aB72]);
-
-// 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
-React.useEffect(() => {
-
-  console.log("【4】activeMonthIndex_X9aB72 ",activeMonthIndex_X9aB72);
-
   const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
 
   async function fetchData() {
@@ -177,18 +143,11 @@ React.useEffect(() => {
   // This ensures fetchData only runs if the ref is set.
   if (activeRef && activeRef.current) {
     fetchData();
-  }
+  } 
+
 }, [activeMonthIndex_X9aB72, dataRefreshKey]);
 
-// 3. Watch for ref changes
-React.useEffect(() => {
-  console.log("【5】 activeMonthIndex_X9aB72", activeMonthIndex_X9aB72);
 
-  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
-  if (activeRef && activeRef.current) {
-    // console.log("Ref has been set!");
-  }
-}, [activeMonthIndex_X9aB72]);
 
   // if (!username) {
   //     navigate('/login');
@@ -233,7 +192,39 @@ React.useEffect(() => {
         });
     }
      
+    useEffect(() => {
 
+      console.log("Set preferences" );
+  
+        // if (user) {
+  
+        //     fetch(`${BASE_URL}/preferences/${user.id}`)
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error(`HTTP error! Status: ${response.status}`);
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             if (data.success && data.data) {
+  
+        //                 setPreferences(data.data);
+        //                 setFormPreferences(data.data);
+                        
+        //                 // Set the language for i18next
+        //                 if (data.data.language) {
+        //                     i18n.changeLanguage(data.data.language);
+        //                 }
+        //             } else {
+        //                 throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             setErrorMessage(t('preferencesFetchError'));
+        //         });
+        // }
+    }, []);
     
     
     const openAgain = () => {
@@ -492,7 +483,9 @@ React.useEffect(() => {
                 <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
 
                 <span className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}>
-                   {new Intl.NumberFormat(preferences.locale, { style: 'currency', currency: preferences.currency }).format(Math.round(expense.expense_amount))}
+                  {/* ${user.locale} */}
+                  {/* ${user.currency} */}
+                   {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
                 </span>
 
 
@@ -1229,8 +1222,45 @@ React.useEffect(() => {
   //     };
   // }, [newCategoryValueVariable]);
   
-    
+        // console.log("【start】pref"+preferences.locale);
+        // console.log("locale "+user.locale);
+        // console.log("user "+user.username);
+          if (user) {
+  
+            fetch(`${BASE_URL}/preferences/${user.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success && data.data) {
+  
+                        // setPreferences(data.data);
+                        // setFormPreferences(data.data);
+                        user.locale = data.data.locale;
+                        user.currency = data.data.currency;
+
+                        // Set the language for i18next
+                        // if (data.data.language) {
+                        //     i18n.changeLanguage(data.data.language);
+                        // }
+                    } else {
+                        throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setErrorMessage(t('preferencesFetchError'));
+                });
+        }
+      //  user.locale = preferences.locale;
+      //   console.log("【end】"+preferences.locale);
+      //   console.log("locale "+user.locale);
+      //   console.log("user "+user.username);
   return isLoading ? <LoadingSpinner /> : (
+            
             <div>
                     <Tabs className="tabs-container" selectedIndex={2} onSelect={handleMonthChange} forceRenderTabPanel={true}>
             

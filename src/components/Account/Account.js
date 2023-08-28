@@ -512,7 +512,7 @@ const PreferenceTile = styled.div`
                     )}
 
 
-                <PreferenceTile onClick={() => toggleDropdown('locale')} isOpen={dropdownStates.locale}>
+                {/* <PreferenceTile onClick={() => toggleDropdown('locale')} isOpen={dropdownStates.locale}>
                 <SettingLabel>{t('localeForNumber')}</SettingLabel>
                 <SettingValue>{t(`${formPreferences.locale}`)}</SettingValue>
                 </PreferenceTile>
@@ -522,11 +522,10 @@ const PreferenceTile = styled.div`
                         value={formPreferences.locale}
                         onChange={handleChange}
                     >
-                        {/* Options */}
                         <option value="en-US">{t('englishUS')}</option>
                         <option value="zh-CN">{t('chineseChina')}</option>
                     </select>
-                )}
+                )} */}
 
 
 

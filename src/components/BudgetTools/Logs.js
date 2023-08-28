@@ -318,22 +318,22 @@ function Logs() {
               <CategoryInput 
                 type="text"
                 className="category-input"
-                placeholder="Category"
+                placeholder={t('category')}
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
               />
               <NumberInput 
                 type="number"
                 step="0.01"
-                placeholder="Value"
+                placeholder={t('value')}
                 className="number-input"
                 value={categoryValue}
                 onChange={(e) => setCategoryValue(e.target.value)}
               />
       
-              <div className="add-category button-submit" onClick={handleSubmit}>Submit</div>
+              <div className="add-category button-submit" onClick={handleSubmit}>{t('submit')}</div>
               {handleCancel && 
-                <div className="add-category button-close" onClick={handleCancel}>Cancel</div>}
+                <div className="add-category button-close" onClick={handleCancel}>{t('cancel')}</div>}
             </>
           );
         } else {

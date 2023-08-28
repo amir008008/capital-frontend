@@ -59,6 +59,9 @@
   "redirecting": "5秒后重定向..",
   "errorAddingExpense": "添加费用时出错：{{errorMessage}}",
   "successAddExpense": "费用录入成功！",
-  "addCategory": "添加类别"
+  "addCategory": "添加类别",
+  "category": "类别",
+  "submit": "提交",
+  "value": "价格"
 }
 

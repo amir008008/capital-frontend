@@ -55,5 +55,8 @@
     "redirecting": "Redirecting in 5 seconds..",
     "errorAddingExpense": "Error adding expense: {{errorMessage}}",
     "successAddExpense": "Expense entered successfully!",
-    "addCategory": "Add category"
+    "addCategory": "Add category",
+    "category": "Category",
+    "submit": "Submit",
+    "value": "Value"
 }
