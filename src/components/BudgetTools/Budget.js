@@ -19,9 +19,10 @@ import LoadingSpinner from '../../LoadingSpinner';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
  const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
- //const BASE_URL = 'http://localhost:5000';
+// const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
 
 // Custom hook to log and track how often it's invoked
@@ -40,14 +41,14 @@ function useLoggedHook(hookFunction, ...args) {
 }
 
 const Budget = () => {
-
+  
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const { t, i18n } = useTranslation(); // Use i18next hooks
   const { user } = useContext(AuthContext); 
   const { setPreferences, baseURL } = useContext(UserPreferencesContext);
   const [formPreferences, setFormPreferences] = useState({});
   const [renderCount, setRenderCount] = useState(0);
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
 
 
   useEffect(() => {
@@ -60,6 +61,10 @@ const Budget = () => {
   // window.alert('Reset');
   const currentSystemMonthIndex_X9aB72 = new Date().getMonth();
   const [activeMonthIndex_X9aB72, setActiveMonthIndex_X9aB72] = useState(currentSystemMonthIndex_X9aB72);
+  useEffect(() => {
+    setIsEditing(false);
+}, [activeMonthIndex_X9aB72]); 
+
   const navigate = useNavigate();
   //const { user } = useContext(AuthContext);
   const username = user ? user.username : null;
@@ -459,29 +464,176 @@ React.useEffect(() => {
       window.alert(feedback);
 
     };
-    
-    
-    const getExpensesOfType = (expenseType, status) => {
-      return expenses
-        .filter(expense => expense.expense_type === expenseType)
-        .map((expense, expenseIndex) => (
-          <li key={expenseIndex} className="expense-item">
-            {editingExpenseId === expense.id ? (
-              <>
-                <input 
-                  value={editingExpenseName}
-                  onChange={(e) => setEditingExpenseName(e.target.value)}
-                />
-                <input 
-                  value={editingExpenseValue}
-                  onChange={(e) => setEditingExpenseValue(e.target.value)}
-                />
-                <button className="button-submit" onClick={() => setEditingExpenseId(null)}>Save</button>
-              </>
-            ) : (
-              <>
-                <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
 
+    function EditExpenseInput({ 
+      isEditing, 
+      handleSave, 
+      handleCancel,
+      toggleEdit,  // <-- New prop
+      saveEditedExpense, // <-- New prop
+      expense, // <-- New prop
+      initialExpenseName,
+      initialExpenseValue 
+  }) {
+      const [editExpenseName, setEditExpenseName] = useState(initialExpenseName);
+      const [editExpenseValue, setEditExpenseValue] = useState(initialExpenseValue);
+    
+      const handleSaveEdit = () => {
+        if (editExpenseName && editExpenseValue) {
+          handleSave(editExpenseName, editExpenseValue);
+          
+          // Reset fields
+          setEditExpenseName('');
+          setEditExpenseValue('');
+          
+          // Call the saveEditedExpense function here
+          saveEditedExpense({
+            ...expense,
+            expense_name: editExpenseName,
+            expense_amount: editExpenseValue
+          });
+          // Close edit mode
+          toggleEdit();
+        }
+      };
+  
+      if (isEditing) {
+        return (
+          <>
+            <input
+              type="text"
+              className="category-input"
+              placeholder="Expense"
+              value={editExpenseName}
+              onChange={(e) => setEditExpenseName(e.target.value)}
+            />
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Value"
+              className="number-input"
+              value={editExpenseValue}
+              onChange={(e) => setEditExpenseValue(e.target.value)}
+            />
+  
+              <button
+                className="button-submit"
+                onClick={() => handleSaveEdit()}
+                style={{ width: 'auto', marginLeft: '5px' }} // Corrected style properties
+              >
+                <FontAwesomeIcon icon={faCheck} style={{ width: '14px', height: '14px' }} /> {/* Adjust the width */}
+              </button>  
+            {/* {handleCancel && 
+              <div className="edit-expense button-close" onClick={handleCancel}>Cancel</div>} */}
+          </>
+        );
+      } else {
+        return null;  // Render nothing if not editing
+      }
+  }
+  
+    const [currentlyEditingExpenseId, setCurrentlyEditingExpenseId] = useState(null);
+    const [currentEditExpenseName, setCurrentEditExpenseName] = useState('');
+    const [currentEditExpenseValue, setCurrentEditExpenseValue] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+
+  
+    const getExpensesOfType = (expenseType, status) => {
+      
+      const setEditingExpense = (expense) => {
+        setCurrentlyEditingExpenseId(expense.id);
+        setCurrentEditExpenseName(expense.expense_name);
+        setCurrentEditExpenseValue(expense.expense_amount);
+            setIsEditing(true);  // Set isEditing to true
+      };
+
+      const saveEditedExpense = async (expense) => {
+        console.log("Attempting to edit expense with ID:", expense.expenseId);  // Log the expenseId
+    
+        try {
+          
+            const response = await fetch(`${BASE_URL}/edit-expense`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    expenseId: expense.expenseId,
+                    user_id: expense.user_id,
+                    category: expense.category,
+                    expenseName: expense.expense_name,
+                    expenseAmount: expense.expense_amount,
+                    expenseType: expense.expense_type,
+                    expenseMonth: expense.expense_month
+                }),
+            });
+    
+            if (!response.ok) {
+                console.error("Server returned an error status:", response.status);
+                    setErrorMessage(t('serverError'));  // use the i18n translation function `t` 
+                return;  // Exit early if response was not okay
+            }
+    
+            const data = await response.json();
+            console.log("Server response:", data);  // Log server response
+            
+            if (data.success) {
+                // Clear the editing state
+                console.log("Successfully edited expense with ID:", expense.expenseId);
+                    setSuccessMessage(t('editSuccess'));  // use the i18n translation function `t`
+                setEditingExpenseId(null);
+                setEditingExpenseName('');
+                setEditingExpenseValue('');
+                setIsEditing(false);  // Exit edit mode after successful save
+                 handleRefresh();
+            } else {
+                console.error("Error editing expense:", data.error);
+                    setErrorMessage(t('editError'));  // use the i18n translation function `t`
+            }
+        } catch (err) {
+            console.error("API request failed:", err);
+        }
+    };
+    
+    
+
+      return expenses
+          .filter(expense => expense.expense_type === expenseType)
+          .map((expense, expenseIndex) => (
+            <li key={expenseIndex} className="expense-item">
+              {currentlyEditingExpenseId === expense.id ? (
+                <EditExpenseInput 
+                isEditing={true}
+                toggleEdit={() => setIsEditing(!isEditing)} // Toggle the edit mode
+                handleSave={(name, value) => {
+                  // Use the edited name and value directly
+                  saveEditedExpense({
+                    expenseId: expense.id,
+                    user_id: user.id,
+                    category_id: expense.category_id, 
+                    expense_name: name, 
+                    expense_amount: value, 
+                    expense_type: expense.expense_type, 
+                    expense_month: expense.expense_month
+                  });
+                }}
+                
+                handleCancel={() => {/* Cancel logic here */}}
+                saveEditedExpense={() => saveEditedExpense(expense)} // <-- Pass down this prop
+                expense={expense} // <-- Pass down this prop
+                initialExpenseName={expense.expense_name}
+                initialExpenseValue={expense.expense_amount}
+              />
+              ) : (
+              <>
+                <span className="expense-name" onClick={() => {
+                    setEditingExpense(expense);  // Set the current expense to edit
+                    setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
+                }}>
+                    {formatExpenseName(expense.expense_name)}
+                </span>
+
+    
                 <span className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}>
                   {/* ${user.locale} */}
                   {/* ${user.currency} */}
@@ -512,15 +664,18 @@ React.useEffect(() => {
                 </button>
                 */}
                 {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
-                  <FontAwesomeIcon 
-                    icon={faTimes} 
-                    className="custom-icon-class" 
-                    onClick={() => deleteExpense(1, expense.id)}
-                  />
-                )}
-              </>
+              <FontAwesomeIcon
+                icon={faTimes}
+                className="custom-icon-class"
+                onClick={() => deleteExpense(user.id, expense.id)}
+              />
             )}
-          </li>
+            {/* <button className="button-submit" onClick={() => setEditingExpense(expense)}>
+              Edit
+            </button> */}
+          </>
+        )}
+      </li>
         ));
     };
     
@@ -549,6 +704,7 @@ React.useEffect(() => {
           .then(data => {
             if (data.success) {
               console.log('Successfully added expense:', data.expenseId);
+
               handleRefresh();
             } else {
               console.error('Error adding expense:', data.error || data.message);
@@ -840,27 +996,27 @@ React.useEffect(() => {
             <input
               type="text"
               className="category-input"
-              placeholder="Category"
+              placeholder={t('category')}
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
             />
             <input
               type="number"
               step="0.01"
-              placeholder="Value"
+              placeholder={t('value')}
               className="number-input"
               value={categoryValue}
               onChange={(e) => setCategoryValue(e.target.value)}
             />
     
-            <div className="add-category button-submit" onClick={handleSubmit}>Submit</div>
+            <div className="add-category button-submit" onClick={handleSubmit}>{t('submit')}</div>
             {handleCancel && 
-              <div className="add-category button-close" onClick={handleCancel}>Cancel</div>}
+              <div className="add-category button-close" onClick={handleCancel}>{t('cancel')}</div>}
           </>
         );
       } else {
         return (
-          <div className="add-category" onClick={handleAdd}>Add category</div>
+          <div className="add-category" onClick={handleAdd}>{t('addCategory')}</div>
         );
       }
     }
@@ -1284,8 +1440,7 @@ function getButtonClassName(status) {
     default:
       return 'not-closed';
   }
-}
-
+}  
   return isLoading ? <LoadingSpinner /> : (
             
             <div>
@@ -1312,7 +1467,10 @@ function getButtonClassName(status) {
                           <div className={`tab-content ${monthStatusClass}`}>
                               {month}
                           </div>
+
                       </div>
+                                                // {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}，
+                                                // {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                   );
               })}
           </div>

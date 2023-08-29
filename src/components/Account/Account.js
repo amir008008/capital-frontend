@@ -494,7 +494,7 @@ const PreferenceTile = styled.div`
                                 'en': `🇬🇧 ${t('english')}`,
                                 'zh-CN': `🇨🇳 ${t('chinese')}`,
                                 'es': `🇪🇸 ${t('spanish')}`,
-                                'ru': `🇷🇺 ${t('russian')}`,     // Russian
+                                // 'ru': `🇷🇺 ${t('russian')}`,     // Russian
                                 'ar': `🇸🇦 ${t('arabic')}`      // Arabic (using Saudi Arabia flag)
                             }[formPreferences.language] || formPreferences.language
                         }
@@ -511,7 +511,7 @@ const PreferenceTile = styled.div`
                             <option value="en">{t('englishLabel')}</option>
                             <option value="zh-CN">{t('chineseLabel')}</option>
                             <option value="es">{t('spanishLabel')}</option>
-                            <option value="ru">{t('russianLabel')}</option>
+                            {/* <option value="ru">{t('russianLabel')}</option> */}
                             <option value="ar">{t('arabicLabel')}</option>
 
                         </select>
@@ -563,28 +563,25 @@ const PreferenceTile = styled.div`
                     >
                         {/* Options */}
                         <option value="USD">{t('usDollar')}</option>
-                        <option value="CNY">{t('chineseYuan')}</option>
-                        <option value="JPY">{t('japaneseYen')}</option>
-                        <option value="PKR">{t('pakistaniRupee')}</option>
-                        <option value="USD">$ USD (United States Dollar)</option>
-                        <option value="EUR">€ EUR (Euro)</option>
-                        <option value="GBP">£ GBP (British Pound Sterling)</option>
-                        <option value="JPY">¥ JPY (Japanese Yen)</option>
-                        <option value="AUD">A$ AUD (Australian Dollar)</option>
-                        <option value="CAD">C$ CAD (Canadian Dollar)</option>
-                        <option value="CHF">CHF (Swiss Franc)</option>
-                        <option value="CNY">¥ CNY (Chinese Yuan)</option>
-                        <option value="SEK">SEK (Swedish Krona)</option>
-                        <option value="NZD">NZ$ NZD (New Zealand Dollar)</option>
-                        <option value="MXN">MX$ MXN (Mexican Peso)</option>
-                        <option value="SGD">S$ SGD (Singapore Dollar)</option>
-                        <option value="HKD">HK$ HKD (Hong Kong Dollar)</option>
-                        <option value="NOK">NOK (Norwegian Krone)</option>
-                        <option value="INR">₹ INR (Indian Rupee)</option>
-                        <option value="ZAR">ZAR (South African Rand)</option>
-                        <option value="BRL">R$ BRL (Brazilian Real)</option>
-                        <option value="RUB">₽ RUB (Russian Ruble)</option>
-                        <option value="KRW">₩ KRW (South Korean Won)</option>
+                    <option value="EUR">{t('euro')}</option>
+                    <option value="GBP">{t('britishPound')}</option>
+                    <option value="JPY">{t('japaneseYen')}</option>
+                    <option value="AUD">{t('australianDollar')}</option>
+                    <option value="CAD">{t('canadianDollar')}</option>
+                    <option value="CHF">{t('swissFranc')}</option>
+                    <option value="CNY">{t('chineseYuan')}</option>
+                    <option value="SEK">{t('swedishKrona')}</option>
+                    <option value="NZD">{t('newZealandDollar')}</option>
+                    <option value="MXN">{t('mexicanPeso')}</option>
+                    <option value="SGD">{t('singaporeDollar')}</option>
+                    <option value="HKD">{t('hongKongDollar')}</option>
+                    <option value="NOK">{t('norwegianKrone')}</option>
+                    <option value="INR">{t('indianRupee')}</option>
+                    <option value="ZAR">{t('southAfricanRand')}</option>
+                    <option value="BRL">{t('brazilianReal')}</option>
+                    <option value="RUB">{t('russianRuble')}</option>
+                    <option value="KRW">{t('southKoreanWon')}</option>
+                    <option value="PKR">{t('pakistaniRupee')}</option>
                     </select>
                 )}
 

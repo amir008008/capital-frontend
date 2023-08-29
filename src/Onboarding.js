@@ -241,9 +241,9 @@ function LanguageSelection({ onNext, onLanguageChange }) {
                 <Button style={buttonStyle} onClick={() => onLanguageChange('ar')}>
                     🇸🇦 العربية
                 </Button>
-                <Button style={buttonStyle} onClick={() => onLanguageChange('ru')}>
+                {/* <Button style={buttonStyle} onClick={() => onLanguageChange('ru')}>
                     🇷🇺 Русский
-                </Button>
+                </Button> */}
             </div>
         </div>
     );
@@ -291,7 +291,7 @@ function Onboarding() {
             });
             
         }, []);
-        const [currency, setCurrency] = useState('USD'); // Default to USD
+        const [currency, setCurrency] = useState('CNY'); // Default to USD
 
         return (
             <div style={{ padding: '20px', textAlign: 'center' }}>
