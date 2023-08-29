@@ -9,9 +9,12 @@ import UserPreferencesContext from '../src/components/Account/UserPreferencesCon
 import i18n from 'i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
-
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 //const BASE_URL = 'http://localhost:5000';
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const Nushi = process.env.PUBLIC_URL + '/Nushi/onboarding.jpg';
+const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/analytical.jpg';
+const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/supportive.jpg';
 
 
 export const OnboardingContainer = styled.div`
@@ -100,58 +103,80 @@ function CompletionModal({ onFinish, onNext, onAICoachChange, setProgress, progr
     );
 }
 
-
-
 function AppInfo({ onNext, setProgress, progress }) {
     const { t } = useTranslation();
     setProgress(40); 
+    const { user } = useContext(AuthContext);
 
-    // Uncomment this if you want the progress to update on component mount
-    // useEffect(() => {
-    //     setProgress(Math.min(progress + 25, 100));
-    // }, []);
-  
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh', // Take the full viewport height
-        margin: '0 auto', // Center the container horizontally
-        padding: '0 5%', // 5% padding on the left and right
-        maxWidth: '800px', // Set a maximum width
-        textAlign: 'center', // Center the text
+        justifyContent: 'flex-start',
+        height: '100vh',
+        margin: '40px auto 0', // Added 10px margin from the top
+        padding: '0 5%',
+        maxWidth: '100%',
+        textAlign: 'left',
+    };
+
+    const contentWrapperStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-start',
+        flex: 1,
     };
 
     const headingStyle = {
         fontSize: '28px',
-        marginBottom: '20px'
+        marginBottom: '20px',
     };
 
     const paragraphStyle = {
         fontSize: '16px',
         margin: '20px 0',
-        lineHeight: '1.5' // Improve readability by increasing line height
+        lineHeight: '1.5',
+        textAlign: 'left',
     };
 
     const buttonStyle = {
         padding: '10px 20px',
         fontSize: '18px',
+        marginTop: '300px', // Adjusted margin from the image
+        alignSelf: 'flex-end', // Move the button to the right
+    };
+
+    const imageStyle = {
+        width: '255px', // Adjusted width to 70% of the original
+        height: '402px', // Adjusted height to 70% of the original
+        position: 'absolute',
+        top: 'calc(340px + 45px)', // Adjusted top position with additional margin
+        right: '25%',
+        zIndex: 1,
     };
 
     const handleContinue = () => {
-        setProgress(60); // Update the progress to 60
-        onNext(); // Call the onNext function to proceed to the next step
+        setProgress(60);
+        onNext();
     };
 
     return (
         <div style={containerStyle}>
-            <h1 style={headingStyle}>{t('appInfo')}</h1>
-            <p style={paragraphStyle}>{t('appDescription')}</p>
-            <Button style={buttonStyle} onClick={handleContinue}>{t('continue')}</Button>
+            <div style={contentWrapperStyle}>
+                <h1 style={headingStyle}>{t('greeting', {username: user.username})}</h1>
+                <p style={paragraphStyle}>{t('coachIntro')}</p>
+                <ul>
+                    <li>{t('bulletPoint1')}</li>
+                    <li>{t('bulletPoint2')}</li>
+                    <li>{t('bulletPoint3')}</li>
+                </ul>
+                <p style={paragraphStyle}>{t('successNote')}</p>
+                <Button style={buttonStyle} onClick={handleContinue}>{t('agree')}</Button>
+            </div>
+            <img src={Nushi} alt="Man Image" style={imageStyle} />
         </div>
     );
 }
+
 
 function LanguageSelection({ onNext, onLanguageChange }) {
     const { t } = useTranslation();
@@ -236,7 +261,7 @@ function Onboarding() {
         const { user } = useContext(AuthContext); 
     
         const [income, setIncome] = useState('');
-        const handleMonthlyIncomeChange = useCallback((income) => {
+        const handleMonthlyIncomeChange = useCallback((income,currency) => {
             // Assume you have userId and other user info, send to server:
             fetch(`${BASE_URL}/preferences/${user.id}`, {
                 method: 'POST',
@@ -245,23 +270,29 @@ function Onboarding() {
                 },
                 body: JSON.stringify({
                     monthly_income: income,
+                    currency: currency, // Send selected currency
                     // ... other preferences if necessary
                 })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    console.log("Income updated successfully.")
-                     //setProgress(90);
+                    console.log("Income updated successfully.");
+                    //setProgress(90);
                     // setCurrentPage(5);
                     setShowCompletionModal(true);
-    
                 } else {
-                    console.log("Error updating monthly income.")
+                    console.log("Error updating monthly income.");
                     // Handle error
                 }
+            })
+            .catch(error => {
+                console.error("An error occurred:", error); // Log any other unexpected errors
             });
+            
         }, []);
+        const [currency, setCurrency] = useState('USD'); // Default to USD
+
         return (
             <div style={{ padding: '20px', textAlign: 'center' }}>
                 <h2>{t('tellUsMore')}</h2>
@@ -269,8 +300,36 @@ function Onboarding() {
                     {t('monthlyIncome')}
                     <input type="text" value={income} onChange={(e) => setIncome(e.target.value)} placeholder="XXXX" />
                 </label>
-                <Button onClick={() => handleMonthlyIncomeChange(income)}>{t('submit')}</Button>
-    
+                
+                <label>
+                    <p>{t('currency')}
+                    <select value={currency} onChange={(e) => setCurrency(e.target.value)}>
+                    <option value="USD">{t('usDollar')}</option>
+                    <option value="EUR">{t('euro')}</option>
+                    <option value="GBP">{t('britishPound')}</option>
+                    <option value="JPY">{t('japaneseYen')}</option>
+                    <option value="AUD">{t('australianDollar')}</option>
+                    <option value="CAD">{t('canadianDollar')}</option>
+                    <option value="CHF">{t('swissFranc')}</option>
+                    <option value="CNY">{t('chineseYuan')}</option>
+                    <option value="SEK">{t('swedishKrona')}</option>
+                    <option value="NZD">{t('newZealandDollar')}</option>
+                    <option value="MXN">{t('mexicanPeso')}</option>
+                    <option value="SGD">{t('singaporeDollar')}</option>
+                    <option value="HKD">{t('hongKongDollar')}</option>
+                    <option value="NOK">{t('norwegianKrone')}</option>
+                    <option value="INR">{t('indianRupee')}</option>
+                    <option value="ZAR">{t('southAfricanRand')}</option>
+                    <option value="BRL">{t('brazilianReal')}</option>
+                    <option value="RUB">{t('russianRuble')}</option>
+                    <option value="KRW">{t('southKoreanWon')}</option>
+                    <option value="PKR">{t('pakistaniRupee')}</option>
+                        {/* Add other currencies as needed */}
+                    </select>
+                    </p>
+                </label>
+
+                <Button onClick={() => handleMonthlyIncomeChange(income,currency)}>{t('submit')}</Button>
                 {showCompletionModal && <CompletionModal onFinish={() => setShowCompletionModal(false)} />}
             </div>
         );
@@ -298,14 +357,15 @@ function AICoachSelection({ onNext, setProgress, progress }) {
         .then(data => {
             if (data.success) {
                 console.log("Handle success - e.g. go to next onboarding step")
-
                 // Handle success - e.g. go to next onboarding step
                 setProgress(80); 
-                
             } else {
-                console.log("Error with coach setting")
+                console.log("Error with coach setting:", data.error); // Log the error message from the server
                 // Handle error
             }
+        })
+        .catch(error => {
+            console.error("An error occurred:", error); // Log any other unexpected errors
         });
     }, []);
     const onAICoachChange = (coachName) => {
@@ -325,64 +385,114 @@ function AICoachSelection({ onNext, setProgress, progress }) {
     //     }
     // }, [progress]);
 
+
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'flex-start', 
         padding: '10px 5%',
-        height: 'calc(100vh - 150px)', // account for the header
+        height: 'calc(100vh - 0px)', // account for the header
         overflowY: 'auto' // enable vertical scrolling
     };
 
     const titleStyle = {
         fontSize: '24px',
-        marginBottom: '20px'
+        marginBottom: '5px'
     };
 
-    const coachTileStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        margin: '10px',
-        padding: '10px',
-        border: '1px solid #ccc',
-        borderRadius: '8px',
-        width: '90%', // nearly full width for mobiles
-        boxSizing: 'border-box'
-    };
 
     const avatarStyle = {
         fontSize: '40px',
         marginBottom: '5px'
     };
+    const arrowButtonStyle = {
+        fontSize: '36px',
+        fontWeight: 'bold',
+        color: 'transparent', // Transparent background
+        alignSelf: 'flex-end', // Align arrow to the right side
+        marginTop: '10px', // Add margin between the tile content and arrow
+        cursor: 'pointer', // Add pointer cursor to indicate interactivity
+    };
+
+    const coachTileStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'left',
+        justifyContent: 'space-between',
+        margin: '5px',
+        padding: '10px',
+        border: '1px solid #ccc',
+        borderRadius: '8px',
+        width: '45%',
+        boxSizing: 'border-box',
+        height: '240px', // Adjusted height to 240px
+    };
+const selectButtonStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    fontSize: '18px',                  // Reduced font size for a "smaller" look
+    fontWeight: 'bold',
+    backgroundColor: 'transparent',
+    border: '1px solid #ccc',          // Thinner border to match the tile style
+    borderRadius: '8px',
+    padding: '8px 16px',               // Adjusted padding to better suit the reduced size
+    marginTop: '5px',                 // Reduced margin to make it feel compact
+    cursor: 'pointer',
+    color: '#555',
+    transition: 'all 0.3s',
+    ':hover': {
+        backgroundColor: '#e6e6e6',   // Slightly darker hover to offer a subtle effect
+        borderColor: '#aaa',
+        color: '#333',
+        transform: 'translateY(-2px)'
+    }
+};
+    
+    // Usage
+    // Assuming you're using React for example:
+    // <button style={selectButtonStyle}>Select \u2192</button>
+    
 
     return (
-        <div style={containerStyle}>
+        <div style={{ ...containerStyle, marginTop: '30px' }}>
             <h1 style={titleStyle}>{t('selectAICoach')}</h1>
+            <p>{t('basedOnThis')}</p>
             
-            <div>
-                {/* {[1, 2, 3, 4].map((index) => ( */}
-                {[1, 2, ].map((index) => (
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                {[1, 2].map((index) => (
                     <div key={index} style={coachTileStyle}>
-                        <div style={avatarStyle}>🤖</div>
-                        <Button 
-                            onClick={() => { 
+                        <img
+                            src={index === 1 ? NushiAnalytical : NushiSupportive} // Use different images based on the index
+                            alt="Nushi"
+                            style={{ width: '100%', height: 'auto', maxHeight: '220px' }}
+                            onClick={() => {
                                 onAICoachChange(`coach${index}`);
-                                onNext(); // Move to the next page
+                                onNext();
                             }}
+                        />
+                        <div>
+                            <h3>{t(`coach${index}`)}</h3>
+                            <p style={{ width: '110%' }}>{t(`coach${index}Description`)}</p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                onAICoachChange(`coach${index}`);
+                                onNext();
+                            }}
+                            style={selectButtonStyle}
                         >
-                            {t(`coach${index}`)}
-                        </Button>
-                        <p>{t(`coach${index}Description`)}</p>
+                            {t('select')}
+                            <FontAwesomeIcon icon={faArrowRight} style={{ marginLeft: '5px' }} />
+                        </button>
                     </div>
                 ))}
             </div>
+
         </div>
     );
 }
-
-
 
     const handleLanguageChange = useCallback((language) => {
         
@@ -542,7 +652,7 @@ function AICoachSelection({ onNext, setProgress, progress }) {
                     style={{
                         position: 'absolute',
                         left: '10px',
-                        top: '80px',
+                        top: '60px',
                         background: 'transparent',
                         border: 'none',
                         color: 'grey'
@@ -587,7 +697,7 @@ function AICoachSelection({ onNext, setProgress, progress }) {
                     setProgress(Math.min(progress + 20, 100));
                 }
             }}>
-             { t('next')}
+             { t('skip')}
             </button>
     
             {showCompletionModal && <CompletionModal onFinish={closeCompletionModal} />}

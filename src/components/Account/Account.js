@@ -489,14 +489,17 @@ const PreferenceTile = styled.div`
                     <PreferenceTile onClick={() => toggleDropdown('language')} isOpen={dropdownStates.language}>
                     <SettingLabel>{t('language')}</SettingLabel>
                     <SettingValue>
+                        {
                             {
-                                {
-                                    'en': `🇬🇧 ${t('english')}`,
-                                    'zh-CN': `🇨🇳 ${t('chinese')}`,
-                                    'es': `🇪🇸 ${t('spanish')}`
-                                }[formPreferences.language] || formPreferences.language
-                            }
-                        </SettingValue>
+                                'en': `🇬🇧 ${t('english')}`,
+                                'zh-CN': `🇨🇳 ${t('chinese')}`,
+                                'es': `🇪🇸 ${t('spanish')}`,
+                                'ru': `🇷🇺 ${t('russian')}`,     // Russian
+                                'ar': `🇸🇦 ${t('arabic')}`      // Arabic (using Saudi Arabia flag)
+                            }[formPreferences.language] || formPreferences.language
+                        }
+                    </SettingValue>
+
                     </PreferenceTile>
                     {dropdownStates.language && (
                         <select 
@@ -508,6 +511,9 @@ const PreferenceTile = styled.div`
                             <option value="en">{t('englishLabel')}</option>
                             <option value="zh-CN">{t('chineseLabel')}</option>
                             <option value="es">{t('spanishLabel')}</option>
+                            <option value="ru">{t('russianLabel')}</option>
+                            <option value="ar">{t('arabicLabel')}</option>
+
                         </select>
                     )}
 
@@ -526,6 +532,22 @@ const PreferenceTile = styled.div`
                         <option value="zh-CN">{t('chineseChina')}</option>
                     </select>
                 )} */}
+                    {/* AI Coach Preference */}
+                    <PreferenceTile onClick={() => toggleDropdown('ai_coach')} isOpen={dropdownStates.ai_coach}>
+                        <SettingLabel>{t('AICoach')}</SettingLabel>
+                        <SettingValue>{t(`${formPreferences.ai_coach}`)}</SettingValue>
+                    </PreferenceTile>
+
+                    {dropdownStates.ai_coach && (
+                        <select
+                            name="ai_coach"
+                            value={formPreferences.ai_coach}
+                            onChange={handleChange}
+                        >
+                            <option value="coach1">{t('coach1')}</option>
+                            <option value="coach2">{t('coach2')}</option>
+                        </select>
+                    )}
 
 
 
@@ -544,6 +566,25 @@ const PreferenceTile = styled.div`
                         <option value="CNY">{t('chineseYuan')}</option>
                         <option value="JPY">{t('japaneseYen')}</option>
                         <option value="PKR">{t('pakistaniRupee')}</option>
+                        <option value="USD">$ USD (United States Dollar)</option>
+                        <option value="EUR">€ EUR (Euro)</option>
+                        <option value="GBP">£ GBP (British Pound Sterling)</option>
+                        <option value="JPY">¥ JPY (Japanese Yen)</option>
+                        <option value="AUD">A$ AUD (Australian Dollar)</option>
+                        <option value="CAD">C$ CAD (Canadian Dollar)</option>
+                        <option value="CHF">CHF (Swiss Franc)</option>
+                        <option value="CNY">¥ CNY (Chinese Yuan)</option>
+                        <option value="SEK">SEK (Swedish Krona)</option>
+                        <option value="NZD">NZ$ NZD (New Zealand Dollar)</option>
+                        <option value="MXN">MX$ MXN (Mexican Peso)</option>
+                        <option value="SGD">S$ SGD (Singapore Dollar)</option>
+                        <option value="HKD">HK$ HKD (Hong Kong Dollar)</option>
+                        <option value="NOK">NOK (Norwegian Krone)</option>
+                        <option value="INR">₹ INR (Indian Rupee)</option>
+                        <option value="ZAR">ZAR (South African Rand)</option>
+                        <option value="BRL">R$ BRL (Brazilian Real)</option>
+                        <option value="RUB">₽ RUB (Russian Ruble)</option>
+                        <option value="KRW">₩ KRW (South Korean Won)</option>
                     </select>
                 )}
 
