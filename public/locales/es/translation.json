@@ -45,7 +45,7 @@
     "openAgain": "Abrir de nuevo / Solo administrador",
     "currentMonthYear": "{{month}} {{year}}",
     "step1": "Paso 1: Presupuesto estimado",
-    "ongoingHeader": "Gastos al día",
+    "ongoingHeader": "Gastos hasta la fecha",
     "step3StayOnBudget": "Paso 3, mantente en el presupuesto {{budget}}",
     "closeBudgetButton": "Cerrar Presupuesto",
     "step2": "Paso 2: Registra TODAS mis transacciones",
@@ -56,7 +56,27 @@
     "redirecting": "Redirigiendo en 5 segundos..",
     "errorAddingExpense": "Error al agregar el gasto: {{errorMessage}}",
     "successAddExpense": "¡Gasto ingresado con éxito!",
-    "addCategory": "Añadir categoría"
-      
+    "addCategory": "Añadir categoría",
+    "category": "Categoría",
+    "submit": "Presentación",
+    "value": "Valor",
+    "Choose your language": "Elige tu idioma",
+    "appInfo": "Información de la Aplicación",
+    "appDescription": "Esta aplicación utiliza inteligencia artificial para empoderarte y ayudarte a alcanzar tus objetivos financieros.",
+    "finishOnboarding": "Terminar la incorporación",
+    "selectAICoach": "Selecciona tu Entrenador AI",
+    "coach1": "Entrenador Alex",
+    "coach1Description": "Conoce a Alex. Conoce las luchas de empezar desde cero y le apasiona ayudar a los principiantes a abrirse camino en el mundo financiero. Piensa en él como tu animador personal.",
+    "coach2": "Entrenadora Jane",
+    "coach2Description": "Saluda a Jane. Es la genio cuando se trata de maniobras financieras avanzadas. Si buscas sumergirte y dominar tus finanzas, Jane es tu entrenadora.",
+    "coach3": "Entrenador Sam",
+    "coach3Description": "Aquí está Sam. Tiene un ojo de águila para las inversiones y le encanta ayudar a otros a crecer su riqueza con el tiempo. ¿Listo para jugar a largo plazo? Sam te respalda.",
+    "coach4": "Entrenadora Lily",
+    "coach4Description": "Presentando a Lily. Es la reina de la presupuestación. Ya sea que estés ahorrando para un día lluvioso o planeando una gran compra, el consejo de Lily es oro.",
+    "monthlyIncome": "¿Cuál es tu ingreso mensual?",
+    "continue": "continuar",
+    "allDone": "🤖¡Todo hecho!",
+    "tellUsMore": "Cuéntanos más sobre ti para que podamos optimizar tu primer presupuesto."
+
       
 }

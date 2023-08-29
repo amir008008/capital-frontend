@@ -170,7 +170,7 @@ const Register = () => {
                 
                 // Wait for 2 seconds and then redirect
                 setTimeout(() => {
-                    navigate('/account');
+                    navigate('/onboarding');
                 }, 2000);
             } else {
                 setErrorMessage(data.error || 'Failed to register');

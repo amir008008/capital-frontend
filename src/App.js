@@ -9,7 +9,7 @@ import Modal from 'react-modal';
 import 'font-awesome/css/font-awesome.min.css';
 import LoadingSpinner from './LoadingSpinner';
 import { useTranslation } from 'react-i18next';
-
+import Onboarding from './Onboarding';
 import {
     Link,
     BrowserRouter as Router,
@@ -60,7 +60,7 @@ function BottomNavBar() {
     const location = useLocation(); // Get the current location
     const { t } = useTranslation();
     // List of routes where you want to hide the BottomNavBar
-    const hideOnRoutes = ["/login", "/register"];
+    const hideOnRoutes = ["/login", "/register","/onboarding"];
 
     if (hideOnRoutes.includes(location.pathname)) {
         // Don't render the BottomNavBar on the specified routes
@@ -92,16 +92,27 @@ function BottomNavBar() {
 
 
 function MainApp() {
-
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // State for onboarding check
+    const [hasDoneOnboarding, setHasDoneOnboarding] = useState(localStorage.getItem('hasDoneOnboarding'));
+
+    const finishOnboarding = () => {
+        localStorage.setItem('hasDoneOnboarding', 'true');
+        setHasDoneOnboarding(true);
+    };
     const handleIconClick = () => {
         navigate("/about");
     };
     const [budgetKey, setBudgetKey] = useState(Math.random());
-    const location = useLocation();
 
     useEffect(() => {
         setBudgetKey(Math.random());
+        // Check if user has completed onboarding
+        if (!localStorage.getItem('hasDoneOnboarding')) {
+            //navigate('/onboarding');
+        }
     }, [location]);
     
     return (
@@ -128,6 +139,7 @@ function MainApp() {
                                 <Route path="/about" element={<About />} />
                                 <Route path="/login" element={<Login />} />
                                 <Route path="/register" element={<Register />} />
+                                <Route path="/onboarding" element={<Onboarding onFinish={finishOnboarding} />} />
                             </Routes>
                         </React.Suspense>
                     </React.StrictMode>
@@ -169,7 +181,7 @@ function AuthContextProvider() {
         // Helper function to handle unauthorized actions
         const handleUnauthorized = () => {
             localStorage.removeItem('authToken');
-            if (location.pathname !== "/login" && location.pathname !== "/register") {
+            if (location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/onboarding") {
                 navigate('/login');
             }
         }

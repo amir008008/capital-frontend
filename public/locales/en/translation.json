@@ -58,5 +58,21 @@
     "addCategory": "Add category",
     "category": "Category",
     "submit": "Submit",
-    "value": "Value"
+    "value": "Value",
+    "Choose your language": "Choose your language",  "appInfo": "App Information",
+    "appDescription": "This app uses AI to empower you to reach your financial goals.",
+    "finishOnboarding": "Finish Onboarding",
+    "selectAICoach": "Select Your AI Coach",
+    "coach1": "Coach Alex",
+    "coach1Description": "Meet Alex. He knows the struggles of starting from scratch and is passionate about helping beginners pave their way in the financial world. Think of him as your personal cheerleader.",
+    "coach2": "Coach Jane",
+    "coach2Description": "Say hi to Jane. She's the genius when it comes to advanced financial maneuvers. If you're looking to dive deep and master your finances, Jane's your coach.",
+    "coach3": "Coach Sam",
+    "coach3Description": "Here's Sam. He's got an eagle eye for investments and loves to help others grow their wealth over time. Ready to play the long game? Sam's got you covered.",
+    "coach4": "Coach Lily",
+    "coach4Description": "Introducing Lily. She's the queen of budgeting. Whether you're saving for a rainy day or planning a big purchase, Lily's advice is gold.",
+    "allDone": "🤖All Done!",
+    "tellUsMore": "Tell us more about you, so we can optimize your first budget.",
+    "monthlyIncome": "What's your monthly income?",
+    "continue": "Continue"
 }

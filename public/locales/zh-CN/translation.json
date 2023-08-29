@@ -62,6 +62,25 @@
   "addCategory": "添加类别",
   "category": "类别",
   "submit": "提交",
-  "value": "价格"
+  "value": "价格",
+  "Choose your language": "选择你的语言",
+  "appInfo": "应用信息",
+  "appDescription": "此应用使用人工智能赋予您实现财务目标的能力。",
+  "finishOnboarding": "完成入门",
+  "allDone": "🤖完成了!",
+  "tellUsMore": "告诉我们更多关于你的事，这样我们可以优化你的首次预算。",
+  "monthlyIncome": "你的月收入是多少？",
+  "selectAICoach": "选择您的AI教练",
+  "coach1": "教练 Alex",
+  "coach1Description": "这是Alex。他知道从零开始的挣扎，热衷于帮助初学者在金融世界中铺路。想象他为你的个人啦啦队长。",
+  "coach2": "教练 Jane",
+  "coach2Description": "向Jane打招呼。她在高级财务策略方面是个天才。如果您想深入了解并掌握您的财务，Jane就是您的教练。",
+  "coach3": "教练 Sam",
+  "coach3Description": "这是Sam。他对投资有着敏锐的眼光，喜欢帮助他人随着时间的推移增长财富。准备玩长线游戏吗？Sam为你提供支持。",
+  "coach4": "教练 Lily",
+  "coach4Description": "介绍Lily。她是制定预算的女王。无论您是为雨天存钱还是计划进行大购物，Lily的建议都是金子。",
+  "continue": "继续"
+
+
 }
 

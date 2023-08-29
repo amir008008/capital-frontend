@@ -377,8 +377,11 @@ function Logs() {
     const { user } = useContext(AuthContext);
     //console.log('User Locale: ' + userLocale);
     moment.locale(userLocale);
-    const formattedOngoingMonth  = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
+    // const formattedOngoingMonth  = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
+    const ongoingMonthIndex = new Date().getMonth(); // Returns index from 0-11
 
+    // Get the long-form month name based on current language
+    const formattedOngoingMonth = i18n.t(`months.long[${ongoingMonthIndex}]`);
  
     const [expenses, setExpenses] = useState([])    ;
     useEffect(() => {
