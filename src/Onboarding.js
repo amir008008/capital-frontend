@@ -51,7 +51,7 @@ const containerStyle = {
 
 const lineStyle = {
     position: 'fixed',
-    top: 80,  // Position it right at the top
+    top: 50,  // Position it right at the top
     left: '15%',  // Assuming you want it to start 15% from the left to achieve 70% width
     width: '70%',
     zIndex: 1000  // Ensure it stays above other elements
@@ -153,7 +153,6 @@ function AppInfo({ onNext, setProgress, progress }) {
     );
 }
 
-
 function LanguageSelection({ onNext, onLanguageChange }) {
     const { t } = useTranslation();
     const [transformValue, setTransformValue] = useState('100vh');
@@ -166,41 +165,39 @@ function LanguageSelection({ onNext, onLanguageChange }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        height: '50vh',
+        height: '100vh',
         justifyContent: 'center',
         padding: '5%',
+        overflow: 'hidden',
         transition: 'transform 0.7s ease-in-out',
         transform: `translateY(${transformValue})`
     };
 
+    document.body.style.margin = "0";
+    document.body.style.overflow = "hidden";
+    
     const headingStyle = {
         fontSize: '24px',
         textAlign: 'top',
-        marginBottom: '160px'
+        marginTop: '0%',   // Move the heading closer to the top
+        marginBottom: '50px'  // Slightly reduce the bottom margin to balance spacing
     };
 
     const buttonContainer = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: '10px', // Use the gap property to space out the buttons without adding too much margin
+        gap: '10px',
     };
 
     const buttonStyle = {
-        margin: '5px',
-        padding: '10px 20px',
+        margin: '10px',
+        padding: '15px 30px',
+        fontSize: '18px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        width: '200px'
-    };
-
-    const skipButtonStyle = {
-        ...buttonStyle,
-        position: 'absolute',
-        bottom: '5%',
-        right: '5%',
-        backgroundColor: 'transparent'
+        width: '250px',
     };
 
     return (
@@ -208,21 +205,25 @@ function LanguageSelection({ onNext, onLanguageChange }) {
             <h1 style={headingStyle}>{t('Choose your language')}</h1>
             <div style={buttonContainer}>
                 <Button style={buttonStyle} onClick={() => onLanguageChange('en-US')}>
-                    🇺🇸 {t('english')}
+                    🇺🇸 English
                 </Button>
                 <Button style={buttonStyle} onClick={() => onLanguageChange('es-ES')}>
-                    🇪🇸 {t('spanish')}
+                    🇪🇸 Español
                 </Button>
                 <Button style={buttonStyle} onClick={() => onLanguageChange('zh-CN')}>
-                    🇨🇳 {t('chinese')}
+                    🇨🇳 中文
+                </Button>
+                <Button style={buttonStyle} onClick={() => onLanguageChange('ar')}>
+                    🇸🇦 العربية
+                </Button>
+                <Button style={buttonStyle} onClick={() => onLanguageChange('ru')}>
+                    🇷🇺 Русский
                 </Button>
             </div>
-            {/* <Button style={skipButtonStyle} onClick={onNext}>
-                Skip
-            </Button> */}
         </div>
     );
 }
+
 
 
 function Onboarding() {  
@@ -521,9 +522,11 @@ function AICoachSelection({ onNext, setProgress, progress }) {
         border: '1px solid grey',
         borderRadius: '15px',
         color: 'grey',
-        padding: '10px',
-        cursor: 'pointer'
+        padding: '15px 40px', // Increase right and left padding to make it wider
+        cursor: 'pointer',
+        minWidth: '150px' // Setting a minimum width will also ensure it's wider
     };
+    
 
 
     return (
@@ -584,7 +587,7 @@ function AICoachSelection({ onNext, setProgress, progress }) {
                     setProgress(Math.min(progress + 20, 100));
                 }
             }}>
-                Skip
+             { t('next')}
             </button>
     
             {showCompletionModal && <CompletionModal onFinish={closeCompletionModal} />}

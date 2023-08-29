@@ -76,7 +76,9 @@
     "monthlyIncome": "¿Cuál es tu ingreso mensual?",
     "continue": "continuar",
     "allDone": "🤖¡Todo hecho!",
-    "tellUsMore": "Cuéntanos más sobre ti para que podamos optimizar tu primer presupuesto."
+    "tellUsMore": "Cuéntanos más sobre ti para que podamos optimizar tu primer presupuesto.",
+    "next": "Siguiente",
+    "currentMonthStatus": "Me comprometo con mi objetivo 😊"
 
       
 }

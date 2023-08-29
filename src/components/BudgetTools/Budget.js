@@ -1259,6 +1259,33 @@ React.useEffect(() => {
       //   console.log("【end】"+preferences.locale);
       //   console.log("locale "+user.locale);
       //   console.log("user "+user.username);
+      function getButtonLabel(status) {
+  switch (status) {
+    case 'closed':
+      return 'CLOSED';
+    case 'waiting':
+      return t('currentMonthStatus'); // Assuming you have the translation key as 'waiting' in your i18n file
+    case 'ongoing':
+      return 'LOG TRANSACTION';
+    case 'expected':
+      return 'Expected';
+    default:
+      return 'NOT CLOSED';
+  }
+}
+
+function getButtonClassName(status) {
+  switch (status) {
+    case 'closed':
+    case 'waiting':
+    case 'expected':
+    case 'ongoing':
+      return status;
+    default:
+      return 'not-closed';
+  }
+}
+
   return isLoading ? <LoadingSpinner /> : (
             
             <div>
@@ -1306,30 +1333,18 @@ React.useEffect(() => {
                 ))}
             </SwipeableViews>
             <div className="budget-details">
-              <button
-            className={`submit-button 
-                            ${currentMonthStatus === 'closed' ? 'closed' : 
-                              currentMonthStatus === 'waiting' ? 'waiting' : 
-                              currentMonthStatus === 'expected' ? 'expected' : 
-                              currentMonthStatus === 'ongoing' ? 'ongoing' : 
-                              'not-closed'}`}
-                onClick={() => {
-                  if (currentMonthStatus === 'waiting') {
-                    approveBudget();
-                  } else if (currentMonthStatus === 'ongoing') {
-                    setShowTransactionLogger(true);  // Open the modal
-                  }
-                }}
-              >
-              {currentMonthStatus === 'closed'
-                  ? 'CLOSED'
-                  : currentMonthStatus === 'waiting'
-                  ? 'I commit myself to my goal 😊'
-                  : currentMonthStatus === 'ongoing'
-                  ? 'LOG TRANSACTION'
-                  : 'Expected'}
-
-              </button>
+            <button
+              className={`submit-button ${getButtonClassName(currentMonthStatus)}`}
+              onClick={() => {
+                if (currentMonthStatus === 'waiting') {
+                  approveBudget();
+                } else if (currentMonthStatus === 'ongoing') {
+                  setShowTransactionLogger(true); // Open the modal
+                }
+              }}
+            >
+              {getButtonLabel(currentMonthStatus)}
+            </button>
               {/* <button className="submit-button"onClick={fetchBudgetFeedback}>Get Budget Feedback</button> */}
 
             </div>
