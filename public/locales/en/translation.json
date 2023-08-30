@@ -106,9 +106,5 @@
     "southAfricanRand": "ZAR (South African Rand)",
     "brazilianReal": "BRL (Brazilian Real)",
     "russianRuble": "RUB (Russian Ruble)",
-    "southKoreanWon": "KRW (South Korean Won)",
-    "serverError": "An error occurred while communicating with the server.",
-    "editSuccess": "Expense edited successfully.",
-    "editError": "Failed to edit expense."
-
+    "southKoreanWon": "KRW (South Korean Won)"
 }

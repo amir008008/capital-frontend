@@ -21,10 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
-
  const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 // const BASE_URL = 'http://localhost:5000';
-
 const YEAR = 2023;
 
 // Custom hook to log and track how often it's invoked
@@ -570,39 +568,6 @@ React.useEffect(() => {
                 }),
             });
     
-
-    const getExpensesOfType = (expenseType, status) => {
-
-
-      const setEditingExpense = (expense) => {
-        setCurrentlyEditingExpenseId(expense.id);
-        setCurrentEditExpenseName(expense.expense_name);
-        setCurrentEditExpenseValue(expense.expense_amount);
-            setIsEditing(true);  // Set isEditing to true
-      };
-
-      const saveEditedExpense = async (expense) => {
-        console.log("Attempting to edit expense with ID:", expense.expenseId);  // Log the expenseId
-    
-        try {
-          
-            const response = await fetch(`${BASE_URL}/edit-expense`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    expenseId: expense.expenseId,
-                    user_id: expense.user_id,
-                    category: expense.category,
-                    expenseName: expense.expense_name,
-                    expenseAmount: expense.expense_amount,
-                    expenseType: expense.expense_type,
-                    expenseMonth: expense.expense_month
-                }),
-            });
-    
-
             if (!response.ok) {
                 console.error("Server returned an error status:", response.status);
                     setErrorMessage(t('serverError'));  // use the i18n translation function `t` 
@@ -630,10 +595,7 @@ React.useEffect(() => {
         }
     };
     
-
-    const currencyCode = user.currency || 'CNY';
-
-
+    
 
       return expenses
           .filter(expense => expense.expense_type === expenseType)
