@@ -4,7 +4,8 @@ import AuthContext from './AuthContext';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import '../../App.css';
-
+import i18n from 'i18next';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';  // Replace useHistory with useNavigate
 import '@fontsource/dancing-script'; // Import the font styles
 // Styled components for Android-like settings
@@ -190,7 +191,7 @@ const SuccessMessage = styled.div`
 
 
 const Account = () => {
-    
+    const { t } = useTranslation();
 //     if (!user) {
 //         return <div>Loading...</div>;
 //    }
@@ -259,13 +260,18 @@ const Account = () => {
                         // You may want to validate the structure of data.data here
                         setPreferences(data.data);
                         setFormPreferences(data.data);
+                        console.log(data.data);
+                          // Set the language for i18next
+                        if (data.data.language) {
+                            i18n.changeLanguage(data.data.language);
+                        }
                     } else {
                         throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    setErrorMessage('Failed to fetch preferences. Please try again later.'); // Setting the error message
+                    setErrorMessage(t('preferencesFetchError'));
                 });
         }
     }, [user, setPreferences]);
@@ -298,7 +304,7 @@ const Account = () => {
             .then(response => response.json())
             .then(data => {
                 if(data.success) {
-                    setSuccessMessage('Preferences updated successfully!');
+                    setSuccessMessage(t('preferencesUpdatedSuccess'));
                     setPreferences(formPreferences);
                     window.setTimeout(() => {
                         setSuccessMessage('');  // Clear success message
@@ -440,7 +446,7 @@ const PreferenceTile = styled.div`
         return (
 
         <Wrapper>
-            <Heading>Account</Heading>
+            <Heading>{t('account')}</Heading>
             <Card>
             {/* Mock profile image, replace with user's actual image if available */}
             <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -457,13 +463,13 @@ const PreferenceTile = styled.div`
                 <Value>{user.username}</Value>
             </UserInfo> */}
                 <PreferenceTile>
-                    <SettingLabel>Username</SettingLabel>
-                    <SettingValue>{user.username}</SettingValue>
+                <SettingLabel>{t('username')}</SettingLabel>
+                <SettingValue>{user.username}</SettingValue>
                 </PreferenceTile>
                 <PreferenceTile>
 
-                    <SettingLabel>Email</SettingLabel>
-                    <SettingValue>{user.email}</SettingValue>
+                <SettingLabel>{t('email')}</SettingLabel>
+                <SettingValue>{user.email}</SettingValue>
                 </PreferenceTile>
 
                 {/* <UserInfo>
@@ -471,7 +477,7 @@ const PreferenceTile = styled.div`
                     <SettingValue>{user.country}</SettingValue>
                 </UserInfo> */}
             </Card>
-            <Heading>Account Settings</Heading>
+            <Heading>{t('accountSettings')}</Heading>
 
             {user ? (
                 <Card>
@@ -479,27 +485,42 @@ const PreferenceTile = styled.div`
 
                     <div className="preferences-form">
                     <PreferencesForm>
-                    {/* <PreferenceTile onClick={() => toggleDropdown('language')} isOpen={dropdownStates.language}>
-                        <SettingLabel>Language</SettingLabel>
-                        <SettingValue>{formPreferences.language}</SettingValue>
-                        </PreferenceTile>
-                        {dropdownStates.language && (
-                        <select
+
+                    <PreferenceTile onClick={() => toggleDropdown('language')} isOpen={dropdownStates.language}>
+                    <SettingLabel>{t('language')}</SettingLabel>
+                    <SettingValue>
+                        {
+                            {
+                                'en': `🇬🇧 ${t('english')}`,
+                                'zh-CN': `🇨🇳 ${t('chinese')}`,
+                                'es': `🇪🇸 ${t('spanish')}`,
+                                // 'ru': `🇷🇺 ${t('russian')}`,     // Russian
+                                'ar': `🇸🇦 ${t('arabic')}`      // Arabic (using Saudi Arabia flag)
+                            }[formPreferences.language] || formPreferences.language
+                        }
+                    </SettingValue>
+
+                    </PreferenceTile>
+                    {dropdownStates.language && (
+                        <select 
                             name="language"
                             value={formPreferences.language}
                             onChange={handleChange}
                         >
-                            {dropdownOptions.language?.map((option) => (
-                            <option key={option.value} value={option.value}>
-                                {option.label}
-                            </option>
-                            ))}
-                        </select>
-                        )} */}
+                            {/* Language Options with Flags */}
+                            <option value="en">{t('englishLabel')}</option>
+                            <option value="zh-CN">{t('chineseLabel')}</option>
+                            <option value="es">{t('spanishLabel')}</option>
+                            {/* <option value="ru">{t('russianLabel')}</option> */}
+                            <option value="ar">{t('arabicLabel')}</option>
 
-                <PreferenceTile onClick={() => toggleDropdown('locale')} isOpen={dropdownStates.locale}>
-                    <SettingLabel>Locale for Number</SettingLabel>
-                    <SettingValue>{formPreferences.locale}</SettingValue>
+                        </select>
+                    )}
+
+
+                {/* <PreferenceTile onClick={() => toggleDropdown('locale')} isOpen={dropdownStates.locale}>
+                <SettingLabel>{t('localeForNumber')}</SettingLabel>
+                <SettingValue>{t(`${formPreferences.locale}`)}</SettingValue>
                 </PreferenceTile>
                 {dropdownStates.locale && (
                     <select
@@ -507,15 +528,32 @@ const PreferenceTile = styled.div`
                         value={formPreferences.locale}
                         onChange={handleChange}
                     >
-                        {/* Options */}
-                        <option value="en-US">English (US)</option>
-                        <option value="zh-CN">Chinese (China)</option>
+                        <option value="en-US">{t('englishUS')}</option>
+                        <option value="zh-CN">{t('chineseChina')}</option>
                     </select>
-                )}
+                )} */}
+                    {/* AI Coach Preference */}
+                    <PreferenceTile onClick={() => toggleDropdown('ai_coach')} isOpen={dropdownStates.ai_coach}>
+                        <SettingLabel>{t('AICoach')}</SettingLabel>
+                        <SettingValue>{t(`${formPreferences.ai_coach}`)}</SettingValue>
+                    </PreferenceTile>
+
+                    {dropdownStates.ai_coach && (
+                        <select
+                            name="ai_coach"
+                            value={formPreferences.ai_coach}
+                            onChange={handleChange}
+                        >
+                            <option value="coach1">{t('coach1')}</option>
+                            <option value="coach2">{t('coach2')}</option>
+                        </select>
+                    )}
+
+
 
                 <PreferenceTile onClick={() => toggleDropdown('currency')} isOpen={dropdownStates.currency}>
-                    <SettingLabel>Currency</SettingLabel>
-                    <SettingValue>{formPreferences.currency}</SettingValue>
+                <SettingLabel>{t('currency')}</SettingLabel>
+                <SettingValue>{t(`${formPreferences.currency}`)}</SettingValue>
                 </PreferenceTile>
                 {dropdownStates.currency && (
                     <select
@@ -524,16 +562,32 @@ const PreferenceTile = styled.div`
                         onChange={handleChange}
                     >
                         {/* Options */}
-                        <option value="USD">US Dollar</option>
-                        <option value="CNY">Chinese Yuan</option>
-                        <option value="JPY">Japanese Yen</option>
-                        <option value="PKR">Pakistani Rupee</option>
+                        <option value="USD">{t('usDollar')}</option>
+                    <option value="EUR">{t('euro')}</option>
+                    <option value="GBP">{t('britishPound')}</option>
+                    <option value="JPY">{t('japaneseYen')}</option>
+                    <option value="AUD">{t('australianDollar')}</option>
+                    <option value="CAD">{t('canadianDollar')}</option>
+                    <option value="CHF">{t('swissFranc')}</option>
+                    <option value="CNY">{t('chineseYuan')}</option>
+                    <option value="SEK">{t('swedishKrona')}</option>
+                    <option value="NZD">{t('newZealandDollar')}</option>
+                    <option value="MXN">{t('mexicanPeso')}</option>
+                    <option value="SGD">{t('singaporeDollar')}</option>
+                    <option value="HKD">{t('hongKongDollar')}</option>
+                    <option value="NOK">{t('norwegianKrone')}</option>
+                    <option value="INR">{t('indianRupee')}</option>
+                    <option value="ZAR">{t('southAfricanRand')}</option>
+                    <option value="BRL">{t('brazilianReal')}</option>
+                    <option value="RUB">{t('russianRuble')}</option>
+                    <option value="KRW">{t('southKoreanWon')}</option>
+                    <option value="PKR">{t('pakistaniRupee')}</option>
                     </select>
                 )}
 
                 <PreferenceTile onClick={() => toggleDropdown('dateFormat')} isOpen={dropdownStates.dateFormat}>
-                    <SettingLabel>Date Format</SettingLabel>
-                    <SettingValue>{formPreferences.dateFormat}</SettingValue>
+                <SettingLabel>{t('dateFormat')}</SettingLabel>
+                <SettingValue>{t(`${formPreferences.dateFormat}`)}</SettingValue>
                 </PreferenceTile>
                 {dropdownStates.dateFormat && (
                     <select
@@ -542,15 +596,15 @@ const PreferenceTile = styled.div`
                         onChange={handleChange}
                     >
                         {/* Options */}
-                        <option value="MM-DD-YYYY">MM-DD-YYYY</option>
-                        <option value="DD-MM-YYYY">DD-MM-YYYY</option>
-                        <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                        <option value="MM-DD-YYYY">{t('formatMMDDYYYY')}</option>
+                        <option value="DD-MM-YYYY">{t('formatDDMMYYYY')}</option>
+                        <option value="YYYY-MM-DD">{t('formatYYYYMMDD')}</option>
                     </select>
                 )}
                 {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
                 {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                <SaveButton onClick={handleSubmit}>Save Preferences</SaveButton>
-                <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+                <SaveButton onClick={handleSubmit}>{t('savePreferences')}</SaveButton>
+                <LogoutButton onClick={handleLogout}>{t('logout')}</LogoutButton>
 
             </PreferencesForm>
                     </div>

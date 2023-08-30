@@ -601,6 +601,14 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
 }
+.button-submit-small {
+  color: var(--text-on-purple); /* Aligned with corporate text on purple color */
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  width: 10px;
+}
 
 .button {
   background-color: var(--purple-1); /* Aligned with corporate purple color */
@@ -630,7 +638,9 @@ body {
 .button:hover {
   background-color: var(--purple-2); /* Aligned with corporate purple color */
 }
-
+.icon-style {
+  width: 14px; /* Adjust the width as needed */
+}
 /* Add this to your App.css */
 .main-content {
   width: 100%;

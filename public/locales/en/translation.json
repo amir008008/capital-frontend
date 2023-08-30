@@ -110,4 +110,5 @@
     "serverError": "An error occurred while communicating with the server.",
     "editSuccess": "Expense edited successfully.",
     "editError": "Failed to edit expense."
+
 }

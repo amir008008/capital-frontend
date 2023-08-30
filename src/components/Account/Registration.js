@@ -162,7 +162,7 @@ const Register = () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                setSuccessMessage('Registration Success! Redirecting to login...');
+                setSuccessMessage('Registration Success! Redirecting to onboarding page...');
                 setUser({
                     id: data.id,
                     email: data.email
@@ -170,7 +170,7 @@ const Register = () => {
                 
                 // Wait for 2 seconds and then redirect
                 setTimeout(() => {
-                    navigate('/account');
+                    navigate('/onboarding');
                 }, 2000);
             } else {
                 setErrorMessage(data.error || 'Failed to register');
