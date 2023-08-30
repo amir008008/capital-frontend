@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
 
 const styles = {
@@ -368,7 +368,20 @@ function Logs() {
     const formattedOngoingMonth = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
     const { setUser, baseURL } = useContext(AuthContext);
     const { user } = useContext(AuthContext);
+<<<<<<< Updated upstream
     const [expenses, setExpenses] = useState([]);
+=======
+    //console.log('User Locale: ' + userLocale);
+    moment.locale(userLocale);
+    // const formattedOngoingMonth  = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
+    const ongoingMonthIndex = new Date().getMonth(); // Returns index from 0-11
+
+    // Get the long-form month name based on current language
+    const formattedOngoingMonth = i18n.t(`months.long[${ongoingMonthIndex}]`);
+
+    
+    const [expenses, setExpenses] = useState([])    ;
+>>>>>>> Stashed changes
     useEffect(() => {
         const fetchOngoingMonth = async () => {
             try {
@@ -393,9 +406,10 @@ function Logs() {
 
         const fetchExpenses = async () => {
             try {
-                const response = await fetch(`${BASE_URL}/get-expenses-for-logging?user_id=${user.id}&month=${ongoingMonth}`);
+                const sanitizedOngoingMonth = ongoingMonth.replace(/%/g, "");
+                const response = await fetch(`${BASE_URL}/get-expenses-for-logging?user_id=${user.id}&month=${sanitizedOngoingMonth}`);
                 const data = await response.json();
-                console.log("Expenses Data:", data);
+                console.log("Expenses Data for month ", sanitizedOngoingMonth, data);
                 if (data && data.expenses && Array.isArray(data.expenses)) {
                     setExpenses(data.expenses);
                 } else {
@@ -414,11 +428,13 @@ function Logs() {
     //Other Transactions
     const [otherTransactions, setOtherTransactions] = useState([]);
     const fetchOtherTransactions = async () => {
+
         try {
-            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}`);
+
+            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}&date=${ongoingMonth}`);
             const data = await response.json();
             if (data.success) {
-                
+
                 console.log("Raw transactions:", data.transactions); // Log the raw transactions
                 
                 const transactionsWithCategory = await Promise.all(
@@ -450,9 +466,22 @@ function Logs() {
     };
     
     useEffect(() => {
+        // Assuming expenses is an array of expense objects
+        if (!expenses.length) return;  // If there's no expense data, don't do anything
+    
+        // Process the transactions using the data from expenses
+
+        
+        fetchOtherTransactions();
+        console.log('entering Fetching other transactions');
+    
+    }, [expenses]);  // This effect will run whenever the expenses data changes
+    useEffect(() => {
         if (!ongoingMonth) return;
         
         fetchOtherTransactions();  // Call the function here
+        console.log('entering Fetching other transactions');
+
     }, [ongoingMonth,dataRefreshKey]);  // Dependency list ensures that this useEffect runs whenever user.id changes
     
 

@@ -31,9 +31,19 @@ const Login = React.lazy(() => import('./components/Account/Login'));
 
 Modal.setAppElement('#root');
 
+<<<<<<< Updated upstream
 //const BASE_URL = 'http://localhost:5000';
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
+=======
+const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+import './i18n'
+import i18n from 'i18next';
+import { initReactI18next } from 'react-i18next';
+import Backend from 'i18next-http-backend';
+import LanguageDetector from 'i18next-browser-languagedetector';
+>>>>>>> Stashed changes
 
 function NavigationLinks() {
     return (
