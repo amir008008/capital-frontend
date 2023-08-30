@@ -6,12 +6,10 @@ import { Link } from 'react-router-dom';
 import moment from 'moment';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
-import LoadingSpinner from '../../LoadingSpinner';
-import i18n from 'i18next';
-import { useTranslation } from 'react-i18next';
 
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+
+const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
 
 const styles = {
@@ -294,7 +292,6 @@ const SuccessMessage = styled.div`
 
 
 function Logs() {
-    const { t } = useTranslation();
     const [dataRefreshKey, setDataRefreshKey] = useState(0);
     const [successMessage, setSuccessMessage] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
@@ -318,34 +315,33 @@ function Logs() {
               <CategoryInput 
                 type="text"
                 className="category-input"
-                placeholder={t('category')}
+                placeholder="Category"
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
               />
               <NumberInput 
                 type="number"
                 step="0.01"
-                placeholder={t('value')}
+                placeholder="Value"
                 className="number-input"
                 value={categoryValue}
                 onChange={(e) => setCategoryValue(e.target.value)}
               />
       
-              <div className="add-category button-submit" onClick={handleSubmit}>{t('submit')}</div>
+              <div className="add-category button-submit" onClick={handleSubmit}>Submit</div>
               {handleCancel && 
-                <div className="add-category button-close" onClick={handleCancel}>{t('cancel')}</div>}
+                <div className="add-category button-close" onClick={handleCancel}>Cancel</div>}
             </>
           );
         } else {
           return (
-            <div className="add-category" onClick={handleAdd}>{t('addCategory')}</div>
+            <div className="add-category" onClick={handleAdd}>Add category</div>
           );
         }
       }
     const [ongoingMonth, setOngoingMonth] = useState(null);
  
     const [dateFormat, setDateFormat] = useState('MM-DD-YYYY'); // default format, adjust as needed
-    const [userLocale, setUserLocale] = useState('en_US'); // default format, adjust as needed
     useEffect(() => {
         console.log('Fetching user preferences...');  // Added console log
     
@@ -359,10 +355,6 @@ function Logs() {
                 if (data.success) {
                     console.log('Fetched preferences:', data.data);  // Added console log
                     setDateFormat(data.data.dateFormat);
-                    setUserLocale(data.data.locale);
-                    moment.locale(data.data.locale);
-                   // console.log('Fetched locale:', data.data.locale);  // Added console log
-
                 } else {
                     console.warn('Failed fetching preferences with response:', data);  // Added warning log
                 }
@@ -373,8 +365,12 @@ function Logs() {
     }, []);  // The empty dependency array ensures this useEffect runs once
 
     // Format ongoingMonth based on user's preferences
+    const formattedOngoingMonth = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
     const { setUser, baseURL } = useContext(AuthContext);
     const { user } = useContext(AuthContext);
+<<<<<<< Updated upstream
+    const [expenses, setExpenses] = useState([]);
+=======
     //console.log('User Locale: ' + userLocale);
     moment.locale(userLocale);
     // const formattedOngoingMonth  = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
@@ -382,8 +378,10 @@ function Logs() {
 
     // Get the long-form month name based on current language
     const formattedOngoingMonth = i18n.t(`months.long[${ongoingMonthIndex}]`);
- 
+
+    
     const [expenses, setExpenses] = useState([])    ;
+>>>>>>> Stashed changes
     useEffect(() => {
         const fetchOngoingMonth = async () => {
             try {
@@ -408,9 +406,10 @@ function Logs() {
 
         const fetchExpenses = async () => {
             try {
-                const response = await fetch(`${BASE_URL}/get-expenses-for-logging?user_id=${user.id}&month=${ongoingMonth}`);
+                const sanitizedOngoingMonth = ongoingMonth.replace(/%/g, "");
+                const response = await fetch(`${BASE_URL}/get-expenses-for-logging?user_id=${user.id}&month=${sanitizedOngoingMonth}`);
                 const data = await response.json();
-                console.log("Expenses Data:", data);
+                console.log("Expenses Data for month ", sanitizedOngoingMonth, data);
                 if (data && data.expenses && Array.isArray(data.expenses)) {
                     setExpenses(data.expenses);
                 } else {
@@ -425,19 +424,17 @@ function Logs() {
 
         fetchExpenses();
     }, [user.id, ongoingMonth,dataRefreshKey]);
-    useEffect(() => {
-        console.log('Moment Locale: ' + moment.locale);
-        //setFormattedOngoingMonth (moment(ongoingMonth).format('MMMM')); // For a format like "January 2021"
-    }, []);
 
     //Other Transactions
     const [otherTransactions, setOtherTransactions] = useState([]);
     const fetchOtherTransactions = async () => {
+
         try {
-            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}`);
+
+            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}&date=${ongoingMonth}`);
             const data = await response.json();
             if (data.success) {
-                
+
                 console.log("Raw transactions:", data.transactions); // Log the raw transactions
                 
                 const transactionsWithCategory = await Promise.all(
@@ -469,9 +466,22 @@ function Logs() {
     };
     
     useEffect(() => {
+        // Assuming expenses is an array of expense objects
+        if (!expenses.length) return;  // If there's no expense data, don't do anything
+    
+        // Process the transactions using the data from expenses
+
+        
+        fetchOtherTransactions();
+        console.log('entering Fetching other transactions');
+    
+    }, [expenses]);  // This effect will run whenever the expenses data changes
+    useEffect(() => {
         if (!ongoingMonth) return;
         
         fetchOtherTransactions();  // Call the function here
+        console.log('entering Fetching other transactions');
+
     }, [ongoingMonth,dataRefreshKey]);  // Dependency list ensures that this useEffect runs whenever user.id changes
     
 
@@ -579,7 +589,7 @@ function Logs() {
     const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
         if (!expenseMonth || expenseMonth === 'null') {
             console.error('No valid expense month provided.');
-            setErrorMessage(t('noOngoingMonth') + " " + t('redirecting'));
+            setErrorMessage('There is no ongoing month for this user. Please go to the budget and set a budget.');
             return; // exit the function early
         }
     
@@ -616,7 +626,7 @@ function Logs() {
             } else {
                 const errorMessage = data.error || data.message || 'Unknown error';
                 console.error('Error adding expense:', errorMessage);
-                setErrorMessage(t('errorAddingExpense', { errorMessage: errorMessage }));
+                setErrorMessage(`Error adding expense: ${errorMessage}`);
                 
                 // Throw an error to be caught in the .catch() block
                 throw new Error(errorMessage);
@@ -627,7 +637,7 @@ function Logs() {
             console.error('Error adding expense:', error);
             
             if (error.message.includes('Incorrect date value') || error.message.includes('null-01%-01')) {
-                setErrorMessage(t('noOngoingMonth') + " " + t('redirecting'));
+                setErrorMessage('There is no ongoing month for this user. Please go to the budget and set a budget. Redirecting in 5 seconds..');
                 setTimeout(() => {
                     window.location.href = '/budget'; // Adjust this to your budget page URL if different
                 }, 5000);
@@ -636,7 +646,7 @@ function Logs() {
                 
                 // Or use window redirection if you aren't using a routing library:
             } else {
-                setErrorMessage(t('unexpectedError'));
+                setErrorMessage('An unexpected error occurred. Please try again.');
             }
         });
         
@@ -659,23 +669,20 @@ function Logs() {
                 // Assuming you have a function to refresh the list of transactions
                 handleRefresh(); 
             } else {
-                setErrorMessage(t('errorMessageWithContent', { message: data.message }));
+                setErrorMessage('Error: ' + data.message); // Setting error message
             }
         })
         .catch(error => {
             console.error('There was an error deleting the transaction:', error);
-            setErrorMessage(t('errorProcessing'));
+            setErrorMessage('There was an error processing your request. Please try again.'); // Setting a general error message for unexpected issues
         });
     };
-    const [isLoading, setIsLoading] = useState(false); // For the loading spinner
-
     
-    return isLoading ? <LoadingSpinner /> : (
-        
+    return (
         
         <Wrapper>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Heading>{t('step2')}</Heading>
+                <Heading>Step 2: Track ALL my transactions </Heading>
 
                 {ongoingMonth && (
                     <div 
@@ -716,7 +723,7 @@ function Logs() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                                 
                                 {/* Category Name (Left-Aligned) */}
-                                <span style={{ color: 'grey' }}>📌 {transaction.matched_expense_name}</span>
+                                <span style={{ color: 'grey' }}>📌 {transaction.category_name}</span>
                                 
                                 {/* Transaction Amount (Right-Aligned to Delete Button) */}
                                 <span style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}>
