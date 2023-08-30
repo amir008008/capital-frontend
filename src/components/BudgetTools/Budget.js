@@ -18,15 +18,11 @@ import AuthContext from '../Account/AuthContext';
 import LoadingSpinner from '../../LoadingSpinner';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
-
+import { useTranslation } from 'react-i18next';
+import { faCheck } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
-<<<<<<< Updated upstream
- const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
- const BASE_URL = 'http://localhost:5000';
-=======
 //  const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 const BASE_URL = 'http://localhost:5000';
->>>>>>> Stashed changes
 const YEAR = 2023;
 
 // Custom hook to log and track how often it's invoked
@@ -34,6 +30,8 @@ function useLoggedHook(hookFunction, ...args) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
+          console.log("Timeout 7 300");
+
       setCount(prevCount => prevCount + 1);
   });
 
@@ -43,9 +41,19 @@ function useLoggedHook(hookFunction, ...args) {
 }
 
 const Budget = () => {
+  
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const { t, i18n } = useTranslation(); // Use i18next hooks
+  const { user } = useContext(AuthContext); 
+  const { setPreferences, baseURL } = useContext(UserPreferencesContext);
+  const [formPreferences, setFormPreferences] = useState({});
   const [renderCount, setRenderCount] = useState(0);
 
+
   useEffect(() => {
+    console.log("Timeout 2 300");
+
       setRenderCount(prevCount => prevCount + 1);
       console.log(`Component has rendered ${renderCount} times.`);
   }, []);
@@ -53,8 +61,12 @@ const Budget = () => {
   // window.alert('Reset');
   const currentSystemMonthIndex_X9aB72 = new Date().getMonth();
   const [activeMonthIndex_X9aB72, setActiveMonthIndex_X9aB72] = useState(currentSystemMonthIndex_X9aB72);
+  useEffect(() => {
+    setIsEditing(false);
+}, [activeMonthIndex_X9aB72]); 
+
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
+  //const { user } = useContext(AuthContext);
   const username = user ? user.username : null;
   const [dataRefreshKey, setDataRefreshKey] = useState(0);
   const handleRefresh = () => {
@@ -68,6 +80,16 @@ const monthRefs = React.useRef({});
 
 // 1. Scroll to the active month when the active month changes
 React.useEffect(() => {
+
+  // console.log('Active ref:', activeRef);
+  // console.log('Active month:', activeMonthIndex_X9aB72);
+}, [activeMonthIndex_X9aB72]);
+
+// 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
+React.useEffect(() => {
+
+  console.log("【4】activeMonthIndex_X9aB72 ",activeMonthIndex_X9aB72);
+
   if (monthRefs.current[activeMonthIndex_X9aB72] && monthRefs.current[activeMonthIndex_X9aB72].current) {
     monthRefs.current[activeMonthIndex_X9aB72].current.scrollIntoView({
       behavior: 'smooth',
@@ -77,13 +99,6 @@ React.useEffect(() => {
   }
 
   // Capture the active ref and log the details
-  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
-  // console.log('Active ref:', activeRef);
-  // console.log('Active month:', activeMonthIndex_X9aB72);
-}, [activeMonthIndex_X9aB72]);
-
-// 2. Fetch data when activeMonthIndex_X9aB72 or dataRefreshKey changes
-React.useEffect(() => {
   const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
 
   async function fetchData() {
@@ -133,16 +148,11 @@ React.useEffect(() => {
   // This ensures fetchData only runs if the ref is set.
   if (activeRef && activeRef.current) {
     fetchData();
-  }
+  } 
+
 }, [activeMonthIndex_X9aB72, dataRefreshKey]);
 
-// 3. Watch for ref changes
-React.useEffect(() => {
-  const activeRef = monthRefs.current[activeMonthIndex_X9aB72];
-  if (activeRef && activeRef.current) {
-    // console.log("Ref has been set!");
-  }
-}, [activeMonthIndex_X9aB72]);
+
 
   // if (!username) {
   //     navigate('/login');
@@ -176,8 +186,8 @@ React.useEffect(() => {
 };
 
   const { preferences } = useContext(UserPreferencesContext);
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    const monthsfull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const months = t('months.short', { returnObjects: true });
+    const monthsfull = t('months.long', { returnObjects: true });
 
     if (process.env.NODE_ENV === 'development') {
         whyDidYouRender(React, {
@@ -187,7 +197,39 @@ React.useEffect(() => {
         });
     }
      
+    useEffect(() => {
 
+      console.log("Set preferences" );
+  
+        // if (user) {
+  
+        //     fetch(`${BASE_URL}/preferences/${user.id}`)
+        //         .then(response => {
+        //             if (!response.ok) {
+        //                 throw new Error(`HTTP error! Status: ${response.status}`);
+        //             }
+        //             return response.json();
+        //         })
+        //         .then(data => {
+        //             if (data.success && data.data) {
+  
+        //                 setPreferences(data.data);
+        //                 setFormPreferences(data.data);
+                        
+        //                 // Set the language for i18next
+        //                 if (data.data.language) {
+        //                     i18n.changeLanguage(data.data.language);
+        //                 }
+        //             } else {
+        //                 throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
+        //             }
+        //         })
+        //         .catch(error => {
+        //             console.error('Error:', error);
+        //             setErrorMessage(t('preferencesFetchError'));
+        //         });
+        // }
+    }, []);
     
     
     const openAgain = () => {
@@ -422,11 +464,81 @@ React.useEffect(() => {
       window.alert(feedback);
 
     };
+
+    function EditExpenseInput({ 
+      isEditing, 
+      handleSave, 
+      handleCancel,
+      toggleEdit,  // <-- New prop
+      saveEditedExpense, // <-- New prop
+      expense, // <-- New prop
+      initialExpenseName,
+      initialExpenseValue 
+  }) {
+      const [editExpenseName, setEditExpenseName] = useState(initialExpenseName);
+      const [editExpenseValue, setEditExpenseValue] = useState(initialExpenseValue);
     
-    
+      const handleSaveEdit = () => {
+        if (editExpenseName && editExpenseValue) {
+          handleSave(editExpenseName, editExpenseValue);
+          
+          // Reset fields
+          setEditExpenseName('');
+          setEditExpenseValue('');
+          
+          // Call the saveEditedExpense function here
+          saveEditedExpense({
+            ...expense,
+            expense_name: editExpenseName,
+            expense_amount: editExpenseValue
+          });
+          // Close edit mode
+          toggleEdit();
+        }
+      };
+  
+      if (isEditing) {
+        return (
+          <>
+            <input
+              type="text"
+              className="category-input"
+              placeholder="Expense"
+              value={editExpenseName}
+              onChange={(e) => setEditExpenseName(e.target.value)}
+            />
+            <input
+              type="number"
+              step="0.01"
+              placeholder="Value"
+              className="number-input"
+              value={editExpenseValue}
+              onChange={(e) => setEditExpenseValue(e.target.value)}
+            />
+  
+              <button
+                className="button-submit"
+                onClick={() => handleSaveEdit()}
+                style={{ width: 'auto', marginLeft: '5px' }} // Corrected style properties
+              >
+                <FontAwesomeIcon icon={faCheck} style={{ width: '14px', height: '14px' }} /> {/* Adjust the width */}
+              </button>  
+            {/* {handleCancel && 
+              <div className="edit-expense button-close" onClick={handleCancel}>Cancel</div>} */}
+          </>
+        );
+      } else {
+        return null;  // Render nothing if not editing
+      }
+  }
+  
+    const [currentlyEditingExpenseId, setCurrentlyEditingExpenseId] = useState(null);
+    const [currentEditExpenseName, setCurrentEditExpenseName] = useState('');
+    const [currentEditExpenseValue, setCurrentEditExpenseValue] = useState('');
+    const [isEditing, setIsEditing] = useState(false);
+
+  
     const getExpensesOfType = (expenseType, status) => {
-<<<<<<< Updated upstream
-=======
       
       const setEditingExpense = (expense) => {
         setCurrentlyEditingExpenseId(expense.id);
@@ -486,29 +598,47 @@ React.useEffect(() => {
     const currencyCode = user.currency || 'CNY';
 
 
->>>>>>> Stashed changes
       return expenses
-        .filter(expense => expense.expense_type === expenseType)
-        .map((expense, expenseIndex) => (
-          <li key={expenseIndex} className="expense-item">
-            {editingExpenseId === expense.id ? (
+          .filter(expense => expense.expense_type === expenseType)
+          .map((expense, expenseIndex) => (
+            <li key={expenseIndex} className="expense-item">
+              {currentlyEditingExpenseId === expense.id ? (
+                <EditExpenseInput 
+                isEditing={true}
+                toggleEdit={() => setIsEditing(!isEditing)} // Toggle the edit mode
+                handleSave={(name, value) => {
+                  // Use the edited name and value directly
+                  saveEditedExpense({
+                    expenseId: expense.id,
+                    user_id: user.id,
+                    category_id: expense.category_id, 
+                    expense_name: name, 
+                    expense_amount: value, 
+                    expense_type: expense.expense_type, 
+                    expense_month: expense.expense_month
+                  });
+                }}
+                
+                handleCancel={() => {/* Cancel logic here */}}
+                saveEditedExpense={() => saveEditedExpense(expense)} // <-- Pass down this prop
+                expense={expense} // <-- Pass down this prop
+                initialExpenseName={expense.expense_name}
+                initialExpenseValue={expense.expense_amount}
+              />
+              ) : (
               <>
-                <input 
-                  value={editingExpenseName}
-                  onChange={(e) => setEditingExpenseName(e.target.value)}
-                />
-                <input 
-                  value={editingExpenseValue}
-                  onChange={(e) => setEditingExpenseValue(e.target.value)}
-                />
-                <button className="button-submit" onClick={() => setEditingExpenseId(null)}>Save</button>
-              </>
-            ) : (
-              <>
-                <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
+                <span className="expense-name" onClick={() => {
+                    setEditingExpense(expense);  // Set the current expense to edit
+                    setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
+                }}>
+                    {formatExpenseName(expense.expense_name)}
+                </span>
 
+    
                 <span className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}>
-                   {new Intl.NumberFormat(preferences.locale, { style: 'currency', currency: preferences.currency }).format(Math.round(expense.expense_amount))}
+                  {/* ${user.locale} */}
+                  {/* ${user.currency} */}
+                   {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
                 </span>
 
 
@@ -535,15 +665,18 @@ React.useEffect(() => {
                 </button>
                 */}
                 {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
-                  <FontAwesomeIcon 
-                    icon={faTimes} 
-                    className="custom-icon-class" 
-                    onClick={() => deleteExpense(1, expense.id)}
-                  />
-                )}
-              </>
+              <FontAwesomeIcon
+                icon={faTimes}
+                className="custom-icon-class"
+                onClick={() => deleteExpense(user.id, expense.id)}
+              />
             )}
-          </li>
+            {/* <button className="button-submit" onClick={() => setEditingExpense(expense)}>
+              Edit
+            </button> */}
+          </>
+        )}
+      </li>
         ));
     };
     
@@ -572,6 +705,7 @@ React.useEffect(() => {
           .then(data => {
             if (data.success) {
               console.log('Successfully added expense:', data.expenseId);
+
               handleRefresh();
             } else {
               console.error('Error adding expense:', data.error || data.message);
@@ -733,8 +867,8 @@ React.useEffect(() => {
         .then(data => {
           if (data.success) {
             console.log('Successfully deleted expense.');
-            goToNextMonth();
-            
+            //goToNextMonth();
+            handleRefresh();
           } else {
             console.error('Error deleting expense:', data.error || data.message);
           }
@@ -742,7 +876,7 @@ React.useEffect(() => {
         .catch(error => {
           console.error('Error deleting expense:', error);
         });
-        goToPreviousMonth();
+        //goToPreviousMonth();
       };
     
       const addValue = (userId, expenseId, usedAlready) => {
@@ -863,27 +997,27 @@ React.useEffect(() => {
             <input
               type="text"
               className="category-input"
-              placeholder="Category"
+              placeholder={t('category')}
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
             />
             <input
               type="number"
               step="0.01"
-              placeholder="Value"
+              placeholder={t('value')}
               className="number-input"
               value={categoryValue}
               onChange={(e) => setCategoryValue(e.target.value)}
             />
     
-            <div className="add-category button-submit" onClick={handleSubmit}>Submit</div>
+            <div className="add-category button-submit" onClick={handleSubmit}>{t('submit')}</div>
             {handleCancel && 
-              <div className="add-category button-close" onClick={handleCancel}>Cancel</div>}
+              <div className="add-category button-close" onClick={handleCancel}>{t('cancel')}</div>}
           </>
         );
       } else {
         return (
-          <div className="add-category" onClick={handleAdd}>Add category</div>
+          <div className="add-category" onClick={handleAdd}>{t('addCategory')}</div>
         );
       }
     }
@@ -1048,17 +1182,17 @@ React.useEffect(() => {
                   return (
                       <div>
                       <div className="budget-info">
-                          <div className="current-month">
-                              {monthsfull[activeMonthIndex_X9aB72]} {YEAR}  {/* This line displays the current month followed by the year */}
-                          </div>
-                          <div className="budget-amount">{calculateTotalExpenses()}</div>
-                          <div className="step-description">Step 1: Estimated Budget</div>
+                        <div className="current-month">
+                          {t('currentMonthYear', { month: monthsfull[activeMonthIndex_X9aB72], year: YEAR })}
                       </div>
+                          <div className="budget-amount">{calculateTotalExpenses()}</div>
+                          <div className="step-description">{t('step1')}</div>
+                        </div>
 
 
 
                           <div className="budget-details">
-                          <div className="expenses-heading">Fixed Expenses</div>
+                          <div className="expenses-heading">{t('fixedExpenses')}</div>
                             <ul className="expense-list">
                             {getExpensesOfType('Fixed', currentMonthStatus)}
                             </ul>
@@ -1078,7 +1212,7 @@ React.useEffect(() => {
                           </div>
                           <div className="budget-details">
                             <p></p>
-                            <div className="expenses-heading">Variable Expenses</div>
+                            <div className="expenses-heading">{t('variableExpenses')}</div>
                             <ul className="expense-list ">
                             {getExpensesOfType('Variable', currentMonthStatus)}
                             </ul>
@@ -1100,16 +1234,16 @@ React.useEffect(() => {
               return (
                 <div>
                   <div className="ongoing-info">
-                    <div className="header-text">Expenses up to date</div>
+                  <div className="header-text">{t('ongoingHeader')}</div>
                     <div className="expense-value">{calculateActualUsed()}</div>
-                    <div className="step-description">Step 3, stay on budget {calculateTotalExpenses()}</div>
+                    <div className="step-description">{t('step3StayOnBudget', { budget: calculateTotalExpenses() })}</div>
                   </div>
                   <div className="budget-details">
-                    {/* <div className="expenses-heading">Fixed Expenses</div> */}
+                    {/* <div className="expenses-heading">{t('fixedExpenses')}</div> */}
                     <ul className="expense-list">
                       <li className="expense-item">
-                        <span className="expenses-heading">Fixed Expenses</span>
-                        <div className="expenses-heading">Variable Expenses<span className="available-heading">Available</span></div>
+                        <span className="expenses-heading">{t('fixedExpenses')}</span>
+                        <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading">{t('available')}</span></div>
                       </li>
                       {getExpensesOfType('Fixed', currentMonthStatus)}
                     </ul>
@@ -1118,7 +1252,7 @@ React.useEffect(() => {
                       <div className="add-value">Add value</div>
                     </div> */}
                     <p></p>
-                    <div className="expenses-heading">Variable Expenses<span className="available-heading"></span></div>
+                    <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading"></span></div>
                      {/* Heading for the column */}
 
                     <ul className="expense-list">
@@ -1128,9 +1262,9 @@ React.useEffect(() => {
                       <div className="add-category">Add item</div>
                       <div className="add-value">Add value</div>
                     </div> */}
-                    <button className="submit-button  open" onClick={closeBudget}>
-                      Close Budget
-                    </button>
+                     <button className="submit-button  open" onClick={closeBudget}>
+                        {t('closeBudgetButton')}
+                      </button>
                   </div>
                 </div>
                 
@@ -1139,29 +1273,29 @@ React.useEffect(() => {
                 return (
                   <div>
                     <div className="closed-info">
-                      <div className="total-price">Budget</div>
+                      <div className="total-price">{t('budget')}</div>
                       <div className="budget-amount">{calculateTotalExpenses()}</div>
-                      <div className="total-price">Expenses</div>
+                      <div className="total-price">{t('expenses')}</div>
                       <div className="budget-amount">{calculateActualUsed()}</div>
-                      <div className="step-description">Closed</div>
+                      <div className="step-description">{t('closed')}</div>
                     </div>
                     <div className="budget-details">
-                    <ul className="expense-list">
-                      <li className="expense-item">
-                        <span className="expenses-heading">Fixed Expenses</span>
-                        <div className="expenses-heading">Variable Expenses<span className="available-heading">Available</span></div>
-                      </li>
-                      {getExpensesOfType('Fixed', currentMonthStatus)}
-                    </ul>
-                    <p></p>
-                    <div className="expenses-heading">Variable Expenses</div>
-                    <ul className="expense-list">
-                    {getExpensesOfType('Variable', currentMonthStatus)}
-                    </ul>
-                    <button className="submit-button  admin" onClick={openAgain}>
-                      Open Again / Admin only
-                    </button>
-                  </div>
+                      <ul className="expense-list">
+                        <li className="expense-item">
+                          <span className="expenses-heading">{t('fixedExpenses')}</span>
+                          <div className="expenses-heading">{t('variableExpenses')}<span className="available-heading">{t('available')}</span></div>
+                        </li>
+                        {getExpensesOfType('Fixed', currentMonthStatus)}
+                      </ul>
+                      <p></p>
+                      <div className="expenses-heading">{t('variableExpenses')}</div>
+                      <ul className="expense-list">
+                      {getExpensesOfType('Variable', currentMonthStatus)}
+                      </ul>
+                      <button className="submit-button  admin" onClick={openAgain}>
+                        {t('openAgain')}
+                      </button>
+                    </div>
                   </div>
                   
                 );
@@ -1200,6 +1334,8 @@ React.useEffect(() => {
 
     
     useEffect(() => {
+      console.log("【6】 newCategoryNameFixed", newCategoryNameFixed);
+
       if (fixedCategoryInputRef.current) {
           fixedCategoryInputRef.current.focus();
       }
@@ -1243,8 +1379,71 @@ React.useEffect(() => {
   //     };
   // }, [newCategoryValueVariable]);
   
-    
+        // console.log("【start】pref"+preferences.locale);
+        // console.log("locale "+user.locale);
+        // console.log("user "+user.username);
+          if (user) {
+  
+            fetch(`${BASE_URL}/preferences/${user.id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success && data.data) {
+  
+                        // setPreferences(data.data);
+                        // setFormPreferences(data.data);
+                        user.locale = data.data.locale;
+                        user.currency = data.data.currency;
+
+                        // Set the language for i18next
+                        // if (data.data.language) {
+                        //     i18n.changeLanguage(data.data.language);
+                        // }
+                    } else {
+                        throw new Error('Failed to fetch preferences: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    setErrorMessage(t('preferencesFetchError'));
+                });
+        }
+      //  user.locale = preferences.locale;
+      //   console.log("【end】"+preferences.locale);
+      //   console.log("locale "+user.locale);
+      //   console.log("user "+user.username);
+      function getButtonLabel(status) {
+  switch (status) {
+    case 'closed':
+      return 'CLOSED';
+    case 'waiting':
+      return t('currentMonthStatus'); // Assuming you have the translation key as 'waiting' in your i18n file
+    case 'ongoing':
+      return 'LOG TRANSACTION';
+    case 'expected':
+      return 'Expected';
+    default:
+      return 'NOT CLOSED';
+  }
+}
+
+function getButtonClassName(status) {
+  switch (status) {
+    case 'closed':
+    case 'waiting':
+    case 'expected':
+    case 'ongoing':
+      return status;
+    default:
+      return 'not-closed';
+  }
+}  
   return isLoading ? <LoadingSpinner /> : (
+            
             <div>
                     <Tabs className="tabs-container" selectedIndex={2} onSelect={handleMonthChange} forceRenderTabPanel={true}>
             
@@ -1269,7 +1468,10 @@ React.useEffect(() => {
                           <div className={`tab-content ${monthStatusClass}`}>
                               {month}
                           </div>
+
                       </div>
+                                                // {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}，
+                                                // {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
                   );
               })}
           </div>
@@ -1290,30 +1492,18 @@ React.useEffect(() => {
                 ))}
             </SwipeableViews>
             <div className="budget-details">
-              <button
-            className={`submit-button 
-                            ${currentMonthStatus === 'closed' ? 'closed' : 
-                              currentMonthStatus === 'waiting' ? 'waiting' : 
-                              currentMonthStatus === 'expected' ? 'expected' : 
-                              currentMonthStatus === 'ongoing' ? 'ongoing' : 
-                              'not-closed'}`}
-                onClick={() => {
-                  if (currentMonthStatus === 'waiting') {
-                    approveBudget();
-                  } else if (currentMonthStatus === 'ongoing') {
-                    setShowTransactionLogger(true);  // Open the modal
-                  }
-                }}
-              >
-              {currentMonthStatus === 'closed'
-                  ? 'CLOSED'
-                  : currentMonthStatus === 'waiting'
-                  ? 'I commit myself to my goal 😊'
-                  : currentMonthStatus === 'ongoing'
-                  ? 'LOG TRANSACTION'
-                  : 'Expected'}
-
-              </button>
+            <button
+              className={`submit-button ${getButtonClassName(currentMonthStatus)}`}
+              onClick={() => {
+                if (currentMonthStatus === 'waiting') {
+                  approveBudget();
+                } else if (currentMonthStatus === 'ongoing') {
+                  setShowTransactionLogger(true); // Open the modal
+                }
+              }}
+            >
+              {getButtonLabel(currentMonthStatus)}
+            </button>
               {/* <button className="submit-button"onClick={fetchBudgetFeedback}>Get Budget Feedback</button> */}
 
             </div>
