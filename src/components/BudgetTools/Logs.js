@@ -10,8 +10,8 @@ import LoadingSpinner from '../../LoadingSpinner';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 
-const BASE_URL = 'http://localhost:5000';
-//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+//const BASE_URL = 'http://localhost:5000';
+const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
 
 const styles = {
