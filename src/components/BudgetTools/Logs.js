@@ -11,8 +11,8 @@ import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 import {  faSave, faBan } from '@fortawesome/free-solid-svg-icons';
 
-const BASE_URL = 'http://localhost:5000';
-//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+//const BASE_URL = 'http://localhost:5000';
+const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
 
 const styles = {
@@ -348,6 +348,7 @@ function Logs() {
     const [ongoingMonth, setOngoingMonth] = useState(null);
  
     const [dateFormat, setDateFormat] = useState('MM-DD-YYYY'); // default format, adjust as needed
+    const [aiCoach, setAiCoach] = useState('coach1'); // default format, adjust as needed
     const [userLocale, setUserLocale] = useState('en_US'); // default format, adjust as needed
     useEffect(() => {
         console.log('Fetching user preferences...');  // Added console log
@@ -362,6 +363,8 @@ function Logs() {
                 if (data.success) {
                     console.log('Fetched preferences:', data.data);  // Added console log
                     setDateFormat(data.data.dateFormat);
+                    setAiCoach(data.data.ai_coach);
+                    console.log("Coach selected: " ,data.data.ai_coach)
                     setUserLocale(data.data.locale);
                     moment.locale(data.data.locale);
                    // console.log('Fetched locale:', data.data.locale);  // Added console log
@@ -856,12 +859,38 @@ function Logs() {
     const [backupTransaction, setBackupTransaction] = useState(null);
 
     //Editing section function end
-    
+    const [userInput, setUserInput] = useState('');
+     const chatWithCoach = () => {
+    // Your logic to interact with the chatWithCoach API endpoint
+    };
     return isLoading ? <LoadingSpinner /> : (
         
         
         <Wrapper>
+            <Card>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img src={`/Nushi/${aiCoach}.jpg`} alt="User Avatar" style={{ width: '60px', height: '60px', marginRight: '10px' }} /> 
+                    <Heading>Write any financial note or transaction I will do the rest!</Heading>
+                </div>
+            </div>
+
+            <textarea
+                value={userInput}
+                onChange={e => setUserInput(e.target.value)}
+                rows="6"
+                placeholder="Enter your financial note or transaction here."
+                style={{ width: '300px', padding: '5px', boxSizing: 'border-box' }}
+            />
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button onClick={chatWithCoach} className={"button"} style={{ marginRight: '10px' }}>Analyze</button>
+                <button className={"button"}>Submit</button>
+            </div>
+
+            </Card>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            
                 <Heading>{t('step2')}</Heading>
 
                 {ongoingMonth && (
