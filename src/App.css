@@ -464,6 +464,24 @@ body {
 .ongoing-info .expense-value {
   font-size: large; /* adjust to your preference */
 }
+.navbar-title {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Adds a gap between the icon and the text */
+}
+
+.navbar-logo {
+  width: 30px;   /* Or whatever width you prefer */
+  height: 30px;  /* Adjust as needed */
+  border-radius: 50%;  /* Makes the image round, remove if not needed */
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2); /* Optional subtle shadow */
+}
+
+/* If you want a hover effect on the logo when you hover over the title */
+.navbar-title:hover .navbar-logo {
+  transform: scale(1.1); /* Slightly enlarges the logo */
+  transition: transform 0.3s; /* Smoothens the enlargement effect */
+}
 
 .expense-item {
   display: grid;

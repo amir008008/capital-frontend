@@ -608,7 +608,7 @@ const PreferenceTile = styled.div`
 
             </PreferencesForm>
                     </div>
-                    <LogoutButton onClick={handleDeleteClick}>Delete Account</LogoutButton>
+                    {/* <button onClick={handleDeleteClick}>Delete Account</button>
 
                     {showDeleteDialog && (
                         <div className="delete-dialog">
@@ -616,7 +616,7 @@ const PreferenceTile = styled.div`
                             <button onClick={handleConfirmDelete}>Confirm</button>
                             <button onClick={handleCancelDelete}>Cancel</button>
                         </div>
-                    )}
+                    )} */}
                 </Card>
                 
             ) : (

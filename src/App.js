@@ -33,8 +33,8 @@ const Login = React.lazy(() => import('./components/Account/Login'));
 
 Modal.setAppElement('#root');
 
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 import './i18n'
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -122,9 +122,11 @@ function MainApp() {
                 <Header />
                 <div className="main-content-app bg-off-white">
                     <div className="navbar-top">
-                        <div className="navbar-title">
+                         <div className="navbar-title">
+                            <img src="/logo/icon.jpg" alt="Myfinancepal Logo" className="navbar-logo" />
                             Myfinancepal
                         </div>
+
                         <div className="navbar-icons">
                             <FontAwesomeIcon icon={faQuestionCircle} onClick={handleIconClick} style={{ cursor: "pointer" }} />
                         </div>
