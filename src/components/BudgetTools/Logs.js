@@ -9,6 +9,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '../../LoadingSpinner';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
+import {  faSave, faBan } from '@fortawesome/free-solid-svg-icons';
 
 const BASE_URL = 'http://localhost:5000';
 //const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
@@ -294,6 +295,8 @@ const SuccessMessage = styled.div`
 
 
 function Logs() {
+
+
     const { t } = useTranslation();
     const [dataRefreshKey, setDataRefreshKey] = useState(0);
     const [successMessage, setSuccessMessage] = useState('');
@@ -431,6 +434,76 @@ function Logs() {
         console.log('Moment Locale: ' + moment.locale);
         //setFormattedOngoingMonth (moment(ongoingMonth).format('MMMM')); // For a format like "January 2021"
     }, []);
+
+    // //Edit Transactions sectin start
+    // function TransactionList() {
+    //     return (
+    //         <div>
+    //             {otherTransactions.map(transaction => (
+    //                 <div key={transaction.id}>
+    //                     {transaction.isEditing ? (
+    //                         <TransactionEditForm transaction={transaction} />
+    //                     ) : (
+    //                         <>
+    //                             {/* Display transaction data here */}
+    //                             <button onClick={() => handleEditClick(transaction.id)}>Edit</button>
+    //                         </>
+    //                     )}
+    //                 </div>
+    //             ))}
+    //         </div>
+    //     );
+    // }
+    // function handleEditClick(transactionId) {
+    //     setOtherTransactions(prevTransactions =>
+    //         prevTransactions.map(transaction =>
+    //             transaction.id === transactionId
+    //                 ? { ...transaction, isEditing: true }
+    //                 : transaction
+    //         )
+    //     );
+    // }
+    
+    // function TransactionEditForm({ transaction }) {
+    //     const [editedTransaction, setEditedTransaction] = useState(transaction);
+    
+    //     const handleSubmit = async () => {
+    //         // Call backend to update transaction
+    //         // Example: await updateTransactionAPI(editedTransaction);
+    
+    //         // Update local state to reflect changes and exit edit mode
+    //         setOtherTransactions(prevTransactions =>
+    //             prevTransactions.map(t =>
+    //                 t.id === transaction.id
+    //                     ? { ...editedTransaction, isEditing: false }
+    //                     : t
+    //             )
+    //         );
+    //     };
+    
+    //     return (
+    //         <div>
+    //             {/* Sample fields for editing */}
+    //             <input
+    //                 value={editedTransaction.category_name}
+    //                 onChange={e =>
+    //                     setEditedTransaction({
+    //                         ...editedTransaction,
+    //                         category_name: e.target.value,
+    //                     })
+    //                 }
+    //             />
+    //             {/* Add other fields as needed */}
+    //             <button onClick={handleSubmit}>Save2</button>
+    //             <button onClick={() => cancelEdit(transaction.id)}>Cancel2</button>
+    //         </div>
+    //     );
+    // }
+    
+
+    
+    // //Edit Transactions section end
+
 
     //Other Transactions
     const [otherTransactions, setOtherTransactions] = useState([]);
@@ -685,7 +758,104 @@ function Logs() {
         });
     };
     const [isLoading, setIsLoading] = useState(false); // For the loading spinner
+    //Editing section function start
+    function handleTransactionChange(event, type, transactionId) {
+        const newValue = event.target.value;
+        setOtherTransactions(prevTransactions =>
+            prevTransactions.map(transaction =>
+                transaction.id === transactionId
+                    ? { ...transaction, [type === 'name' ? 'transaction_name' : 'transaction_amount']: newValue }
+                    : transaction
+            )
+        );
+    }
+    function cancelEdit(transactionId) {
+        if (backupTransaction && backupTransaction.id === transactionId) {
+            setOtherTransactions(prevTransactions =>
+                prevTransactions.map(transaction => {
+                    if (transaction.id === transactionId) {
+                        return { ...backupTransaction, isEditing: false };
+                    }
+                    return transaction;
+                })
+            );
+        } else {
+            // Even if there's no backup for some reason, still ensure the transaction exits edit mode
+            setOtherTransactions(prevTransactions =>
+                prevTransactions.map(transaction =>
+                    transaction.id === transactionId
+                        ? { ...transaction, isEditing: false }
+                        : transaction
+                )
+            );
+        }
+    }
+    
+    
+    function toggleEdit(transactionId) {
+        setOtherTransactions(prevTransactions =>
+            prevTransactions.map(transaction => {
+                if (transaction.id === transactionId) {
+                    // If entering edit mode, save a backup
+                    if (!transaction.isEditing) {
+                        setBackupTransaction({...transaction});
+                    }
+                    return { ...transaction, isEditing: !transaction.isEditing };
+                }
+                return transaction;
+            })
+        );
+    }
+    
+    function formatDateToMonthString(date) {
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');  // +1 to get the month in 1-12 format
+        return `${year}-${month}`;
+    }
+    function saveEdit(transactionId) {
+        const editedTransaction = otherTransactions.find(t => t.id === transactionId && t.isEditing);
+    
+        if (!editedTransaction) {
+            console.error(`Transaction with ID ${transactionId} not found or not in editing mode.`);
+            return;
+        }
+    
+        const newTransactionValues = {
+            transaction_name: editedTransaction.transaction_name,
+            transaction_amount: editedTransaction.transaction_amount,
+            transaction_date: formatDateToMonthString(editedTransaction.transaction_date)
+        };
+    
+        fetch(`${BASE_URL}/update-transaction`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                transaction_id: transactionId,
+                newTransactionValues
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                console.log('Transaction updated successfully:', data.message);
+                toggleEdit(transactionId);
+            } else {
+                console.error('Failed to update transaction:', data.message);
+                // Handle any additional logic if the update failed
+            }
+        })
+        .catch(error => {
+            console.error('Error updating transaction:', error);
+            // Handle the error (e.g., show an error message to the user)
+        });
+    }
+    
+    const [backupTransaction, setBackupTransaction] = useState(null);
 
+    //Editing section function end
     
     return isLoading ? <LoadingSpinner /> : (
         
@@ -729,28 +899,69 @@ function Logs() {
                 {otherTransactions.map(transaction => (
                     <CSSTransition key={transaction.id} timeout={500} classNames="item">
                         <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-                            <SettingLabel>{transaction.transaction_name}</SettingLabel>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                                
-                                {/* Category Name (Left-Aligned) */}
-                                <span style={{ color: 'grey' }}>📌 {transaction.matched_expense_name}</span>
-                                
-                                {/* Transaction Amount (Right-Aligned to Delete Button) */}
-                                <span style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}>
-                                    {parseInt(transaction.transaction_amount)}
-                                </span>
-
-                                {/* Delete icon/button (Rightmost) */}
-                                <FontAwesomeIcon 
-                                    icon={faTimes} 
-                                    className="custom-icon-class" 
-                                    onClick={() => deleteExpense(transaction.user_id, transaction.id)}
-                                    style={{ cursor: 'pointer' }}  // Optional styling to position the delete icon
-                                />
+                            {transaction.isEditing ? (
+                                // If in edit mode
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+                                <div style={{ display: 'flex', flexGrow: 1, marginRight: '10px' }}>
+                                    <input
+                                        value={transaction.transaction_name}
+                                        type="text"
+                                        className="log-category-input"
+                                        placeholder="Expense"
+                                        onChange={e => handleTransactionChange(e, 'name', transaction.id)}
+                                        style={{ marginRight: '10px', flexGrow: 1 }}
+                                    />
+                                    <input
+                                        value={transaction.transaction_amount.toString()}
+                                        className="log-number-input"
+                                        step="0.01"
+                                        placeholder="Value"
+                                        onChange={e => handleTransactionChange(e, 'amount', transaction.id)}
+                                        type="number"
+                                        style={{ flexGrow: 1 }}
+                                    />
+                                </div>
+                                <div style={{ display: 'flex' }}>
+                                    <FontAwesomeIcon 
+                                        icon={faSave} 
+                                        onClick={() => saveEdit(transaction.id)}
+                                        style={{ cursor: 'pointer', marginRight: '10px' }} 
+                                    />
+                                    <FontAwesomeIcon 
+                                        icon={faBan} 
+                                        onClick={() => cancelEdit(transaction.id)}
+                                        style={{ cursor: 'pointer' }} 
+                                    />
+                                </div>
                             </div>
+                            
+                            ) : (
+                                // If not in edit mode, render static content
+                                <>
+                                    <SettingLabel onClick={() => toggleEdit(transaction.id)}>
+                                        {transaction.transaction_name}
+                                    </SettingLabel>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                        <span style={{ color: 'grey' }} onClick={() => toggleEdit(transaction.id)}>📌 {transaction.matched_expense_name}</span>
+                                        <span 
+                                            style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}
+                                            onClick={() => toggleEdit(transaction.id)}
+                                        >
+                                            {parseInt(transaction.transaction_amount)}
+                                        </span>
+                                        <FontAwesomeIcon 
+                                            icon={faTimes} 
+                                            className="custom-icon-class" 
+                                            onClick={() => deleteExpense(transaction.user_id, transaction.id)}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </div>
+                                </>
+                            )}
                         </PreferenceTile>
                     </CSSTransition>
                 ))}
+
 
 
 

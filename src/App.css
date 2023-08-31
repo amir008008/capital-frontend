@@ -977,12 +977,28 @@ body {
   border: 1px solid #e0e0e0;
   border-radius: 4px;
 }
+.log-category-input {
+  flex: 2;
+  padding: 8px; /* slightly reduced for mobile */
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width: 112px;
+}
 .number-input {
   flex: 2;
   padding: 8px; /* slightly reduced for mobile */
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   width:  80px;
+  margin-left: 20px;
+
+}
+.log-number-input {
+  flex: 2;
+  padding: 8px; /* slightly reduced for mobile */
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  width:  30px;
   margin-left: 20px;
 
 }
