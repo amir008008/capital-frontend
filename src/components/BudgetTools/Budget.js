@@ -275,7 +275,50 @@ React.useEffect(() => {
                 console.error('Error editing budget:', error);
             });
     };
-    
+    const setToWaiting = () => {
+      const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+      const userId = user.id; // Replace with the user ID later on
+  
+      // Check if there's a month with 'ongoing' status
+      const isOngoingMonthExists = Object.values(monthStatuses).includes('ongoing');
+  
+      if (!isOngoingMonthExists) {
+          console.warn("There's no month with 'ongoing' status.");
+          window.alert("There's no month with 'ongoing' status.");
+          return; // Exit the function if no 'ongoing' month exists
+      }
+  
+      // If 'ongoing' month exists, set the status to 'waiting'
+      const newStatus = 'waiting';
+  
+      fetch(`${BASE_URL}/edit-budget-status`, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+              user_id: userId,
+              month: monthYear,
+              newStatus: newStatus,
+          }),
+      })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // Update the monthStatuses state to reflect the new status
+                  setMonthStatuses(prevStatus => ({
+                      ...prevStatus,
+                      [monthYear]: newStatus,
+                  }));
+              } else {
+                  console.error('Error editing budget:', data.error || data.message);
+              }
+          })
+          .catch(error => {
+              console.error('Error editing budget:', error);
+          });
+  };
+  
     const displayExpensesForTesting = () => {
       const variableExpenses = getExpensesOfType('Variable', currentMonthStatus);
       const fixedExpenses = getExpensesOfType('Fixed', currentMonthStatus);
@@ -1493,18 +1536,30 @@ function getButtonClassName(status) {
             </SwipeableViews>
             <div className="budget-details">
             <button
-              className={`submit-button ${getButtonClassName(currentMonthStatus)}`}
-              onClick={() => {
-                if (currentMonthStatus === 'waiting') {
-                  approveBudget();
-                } else if (currentMonthStatus === 'ongoing') {
-                  setShowTransactionLogger(true); // Open the modal
-                }
-              }}
-            >
-              {getButtonLabel(currentMonthStatus)}
-            </button>
-              {/* <button className="submit-button"onClick={fetchBudgetFeedback}>Get Budget Feedback</button> */}
+                className={`submit-button ${getButtonClassName(currentMonthStatus)}`}
+                onClick={() => {
+                  if (currentMonthStatus === 'waiting') {
+                    approveBudget();
+                  } else if (currentMonthStatus === 'ongoing') {
+                    // Other logic for 'ongoing', if any
+                  }
+                }}
+              >
+                {getButtonLabel(currentMonthStatus)}
+              </button>
+              
+              {
+                currentMonthStatus === 'ongoing' && (
+                  <button
+                    className="submit-button open"
+                    onClick={() => {
+                      setToWaiting (); // Open the modal for editing
+                    }}
+                  >
+                    {t('editBudget')}
+                  </button>
+                )}
+                {/* <button className="submit-button"onClick={fetchBudgetFeedback}>Get Budget Feedback</button> */}
 
             </div>
         </Tabs>

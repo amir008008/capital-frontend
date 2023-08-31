@@ -110,5 +110,6 @@
     "southKoreanWon": "KRW (South Korean Won)",
     "serverError": "An error occurred while communicating with the server.",
     "editSuccess": "Expense edited successfully.",
-    "editError": "Failed to edit expense."
+    "editError": "Failed to edit expense.",
+    "editBudget": "Edit Budget"
 }
