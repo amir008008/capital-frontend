@@ -1007,7 +1007,7 @@ function Logs() {
     const [coachReply, setCoachReply] = useState('');
     const chatPopupStyles = {
         position: 'fixed',
-        bottom: isChatPopupVisible ? '0px' : '-350px',
+        bottom: isChatPopupVisible ? '0px' : '-450px',
         left: '0px',
         right: '0px',
         height: '400px',
