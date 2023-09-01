@@ -10,7 +10,9 @@ import LoadingSpinner from '../../LoadingSpinner';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
 import {  faSave, faBan } from '@fortawesome/free-solid-svg-icons';
-
+import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
+import { useRef } from 'react';
 //const BASE_URL = 'http://localhost:5000';
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 
@@ -349,6 +351,7 @@ function Logs() {
  
     const [dateFormat, setDateFormat] = useState('MM-DD-YYYY'); // default format, adjust as needed
     const [aiCoach, setAiCoach] = useState('coach1'); // default format, adjust as needed
+    const [monthlyIncome, setMonthlyIncome] = useState('5000'); // default format, adjust as needed
     const [userLocale, setUserLocale] = useState('en_US'); // default format, adjust as needed
     useEffect(() => {
         console.log('Fetching user preferences...');  // Added console log
@@ -364,6 +367,7 @@ function Logs() {
                     console.log('Fetched preferences:', data.data);  // Added console log
                     setDateFormat(data.data.dateFormat);
                     setAiCoach(data.data.ai_coach);
+                    setMonthlyIncome(data.data.monthly_income);
                     console.log("Coach selected: " ,data.data.ai_coach)
                     setUserLocale(data.data.locale);
                     moment.locale(data.data.locale);
@@ -386,8 +390,18 @@ function Logs() {
     // const formattedOngoingMonth  = moment(ongoingMonth).format('MMMM'); // For a format like "January 2021"
     const ongoingMonthIndex = new Date().getMonth(); // Returns index from 0-11
 
-    // Get the long-form month name based on current language
-    const formattedOngoingMonth = i18n.t(`months.long[${ongoingMonthIndex}]`);
+    // if (ongoingMonth) {
+    //     const monthNum = parseInt(ongoingMonth.split('-')[1], 10);
+    //     const monthNames = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
+    //     const monthKeyName = monthNames[monthNum - 1];
+    //     const formattedOngoingMonth = i18n.t(`months.${monthKeyName}`);
+    // } else {
+    //     console.error("monthKey is not initialized!");
+    // }
+
+    const formattedOngoingMonth = i18n.t(`month${ongoingMonthIndex}`);
+
+
 
     
     const [expenses, setExpenses] = useState([])    ;
@@ -723,7 +737,7 @@ function Logs() {
                 setErrorMessage(t('noOngoingMonth') + " " + t('redirecting'));
                 setTimeout(() => {
                     window.location.href = '/budget'; // Adjust this to your budget page URL if different
-                }, 5000);
+                }, 10000);
                 // Using react-router's history to navigate
                 // history.push('/budget'); 
                 
@@ -860,38 +874,266 @@ function Logs() {
 
     //Editing section function end
     const [userInput, setUserInput] = useState('');
-     const chatWithCoach = () => {
-    // Your logic to interact with the chatWithCoach API endpoint
+    const [lastSent, setLastSent] = useState(null);
+    const [lastResponse, setLastResponse] = useState(null); // <-- New state
+    const typingIntervalRef = useRef(null);
+    const chatWithCoach = async () => {
+        const currentTime = new Date().getTime();
+
+        // Check if the last message was sent within 5 seconds
+        if (lastSent && (currentTime - lastSent) < 5000) { 
+            console.log("You've already sent a message recently. Please wait for a few seconds before sending again.");
+            return;
+        }
+    
+        // Check if it's been less than 5 seconds since the last response
+        if (lastResponse && (currentTime - lastResponse) < 5000) {
+            console.log("Received a response recently. Please wait before triggering another request.");
+            return;
+        }
+    
+        // Clear any existing interval before starting a new one
+        if (typingIntervalRef.current) {
+            clearInterval(typingIntervalRef.current);
+        }
+    
+        // Start the 'typing' effect
+        let dotCount = 0;
+
+        // Ensure you're setting an initial '...' effect immediately
+        setCoachReply('.');
+
+        typingIntervalRef.current = setInterval(() => {
+            dotCount = (dotCount + 1) % 4;
+            let dots = ".".repeat(dotCount);
+            setCoachReply(dots);
+        }, 500);
+    
+        const simplifiedExpenses = expenses.map(expense => ({
+            expense_name: expense.expense_name,
+            expense_amount: expense.expense_amount,
+            expense_type: expense.expense_type,
+            used_already: expense.used_already,
+            category_name: expense.category_name
+        }));
+    
+        const simplifiedTransactions = otherTransactions.map(transaction => ({
+            transaction_name: transaction.transaction_name,
+            transaction_amount: transaction.transaction_amount,
+            matched_expense_name: transaction.matched_expense_name,
+            category_name: transaction.category_name
+        }));
+    
+        const data = {
+            prompt: userInput,
+            max_tokens: 1000,
+            user_id: user.id,
+            language: i18n.language,
+            monthly_income: monthlyIncome,
+            expenses: simplifiedExpenses,
+            transactions: simplifiedTransactions,
+            coach: aiCoach,
+            name: user.username,
+        };
+    
+        let isResponseReceived = false;
+    
+        const handleResponseCompletion = () => {
+            isResponseReceived = true;
+            clearInterval(typingIntervalRef.current);
+        };
+    
+        const timeoutId = setTimeout(() => {
+            if (!isResponseReceived) {
+                handleResponseCompletion();
+                setCoachReply(t('serverError'));
+            }
+        }, 5000);
+    
+        try {
+            console.log("Trying to communicate with AI Coach...", data);
+            setChatPopupVisible(true);
+            const response = await axios.post(`${BASE_URL}/chatWithNushi`, data);
+    
+            clearTimeout(timeoutId);  // Clear the timeout since response is received
+        
+            if (response.data) {
+                setCoachReply(response.data);
+                console.log("Got Reply...", response.data);
+                setLastResponse(currentTime);  // <-- Update the last response time here
+            } else {
+                setCoachReply(t('noResponse'));
+            }
+        
+            setLastSent(currentTime);
+        } catch (error) {
+            handleResponseCompletion();
+            clearTimeout(timeoutId);  // Clear the timeout since an error occurred
+            setCoachReply(t('serverError'));
+        } finally {
+            handleResponseCompletion();
+            setChatPopupVisible(true);
+        }
+        // Delayed clearing of the interval
+        setTimeout(() => {
+            if (typingIntervalRef.current) {
+                clearInterval(typingIntervalRef.current);
+            }
+        }, 200);
     };
+    
+    
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const cardStyles = isExpanded
+    ? { 
+        transition: 'maxHeight 0.5s ease-in-out, opacity 0.4s ease-in-out', 
+        maxHeight: '1000px',
+        overflow: 'hidden'
+      }
+    : {
+        transition: 'maxHeight 0.5s ease-in-out, opacity 0.4s ease-in-out', 
+        maxHeight: '50px',  /* or whatever height the collapsed state should be */
+        overflow: 'hidden'
+      };
+
+  const textareaStyles = {
+    width: '100%',
+    padding: '5px',
+    boxSizing: 'border-box'
+  };
+  //Pop-up area
+    const [isChatPopupVisible, setChatPopupVisible] = useState(false);
+    const [coachReply, setCoachReply] = useState('');
+    const chatPopupStyles = {
+        position: 'fixed',
+        bottom: isChatPopupVisible ? '0px' : '-350px',
+        left: '0px',
+        right: '0px',
+        height: '400px',
+        backgroundColor: 'white',
+        boxShadow: '0px -4px 10px rgba(0, 0, 0, 0.1)',
+        padding: '20px',
+        transition: 'bottom 0.3s ease-out',
+        zIndex: 999
+    };
+    
     return isLoading ? <LoadingSpinner /> : (
         
         
         <Wrapper>
-            <Card>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <img src={`/Nushi/${aiCoach}.jpg`} alt="User Avatar" style={{ width: '60px', height: '60px', marginRight: '10px' }} /> 
-                    <Heading>Write any financial note or transaction I will do the rest!</Heading>
+
+            {/* <div style={chatPopupStyles}>
+            <button className="button" onClick={() => setChatPopupVisible(false)} style={{ position: 'absolute', top: '10px', right: '10px' }}>X</button>
+                <img src={`/Nushi/${aiCoach}.jpg`} alt="User Avatar" style={{ width: '60px', height: '60px', marginRight: '10px' }} />
+                <div>{coachReply}</div>
+            </div> */}
+            <div style={chatPopupStyles}>
+                <button 
+                    className="button" 
+                    onClick={() => setChatPopupVisible(false)} 
+                    style={{ 
+                        position: 'absolute', 
+                        top: '10px', 
+                        right: '10px', 
+                        fontFamily: 'Gelix' 
+                    }}>
+                    X
+                </button>
+
+                <div style={{ 
+                    display: 'flex', 
+                    flexDirection: 'row', 
+                    alignItems: 'flex-start', 
+                    marginTop: '40px' 
+                }}>
+                    <img 
+                        src={`/Nushi/${aiCoach}.jpg`} 
+                        alt="User Avatar" 
+                        style={{ 
+                            width: '60px', 
+                            height: '60px', 
+                            marginRight: '10px', 
+                            borderRadius: '30px' 
+                        }} 
+                    />
+
+                    <div style={{ 
+                        padding: '10px 15px', 
+                        backgroundColor: '#e1f3fd', 
+                        borderRadius: '10px', 
+                        maxWidth: '300px', 
+                        wordWrap: 'break-word',
+                        fontFamily: 'Gelix' 
+                    }}>
+                        {coachReply}
+                    </div>
                 </div>
             </div>
 
-            <textarea
+
+            <Card style={cardStyles} onClick={() => setIsExpanded(!isExpanded)}>
+            {!isExpanded ? (
+                <div 
+                style={{ 
+                    padding: '10px', 
+                    textAlign: 'center', 
+                    cursor: 'pointer', // Makes the cursor a hand when hovering over it
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', // Adds a subtle shadow
+                    borderRadius: '5px', // Rounds the corners slightly
+                    border: '1px solid #dcdcdc', // Adds a subtle border
+                    display: 'flex', // Ensures children are in a row
+                    alignItems: 'center', // Vertically aligns the children in the center
+                    justifyContent: 'center' // Horizontally aligns the children in the center
+                }} 
+                onClick={() => setIsExpanded(!isExpanded)}
+                >
+                <img src={`/Nushi/${aiCoach}.jpg`} alt="User Avatar" style={{ width: '30px', height: '30px', marginRight: '10px' }} />
+
+                {t('talkWithAiCoach')}
+                <FontAwesomeIcon 
+                    icon={faChevronRight} 
+                    style={{
+                    marginLeft: '5px', 
+                    transform: isExpanded ? 'rotate(90deg)' : 'none'
+                    }} 
+                />
+                </div>
+            ) : (
+            <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <img src={`/Nushi/${aiCoach}.jpg`} alt="User Avatar" style={{ width: '60px', height: '60px', marginRight: '10px' }} />
+                    <Heading>{t('writeFinancialNote')}</Heading>
+                </div>
+                </div>
+
+                <textarea
                 value={userInput}
-                onChange={e => setUserInput(e.target.value)}
+                onChange={e => {
+                    e.stopPropagation();
+                    setUserInput(e.target.value);
+                }}
+                onClick={e => e.stopPropagation()}
                 rows="6"
-                placeholder="Enter your financial note or transaction here."
-                style={{ width: '300px', padding: '5px', boxSizing: 'border-box' }}
-            />
+                placeholder={t('enterTransaction')}
+                style={textareaStyles}
+                />
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
-                <button onClick={chatWithCoach} className={"button"} style={{ marginRight: '10px' }}>Analyze</button>
-                <button className={"button"}>Submit</button>
-            </div>
-
-            </Card>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '10px' }}>
+                <button     className='button' 
+                onClick={e => {
+                    e.stopPropagation();
+                    chatWithCoach();
+                }}  style={{ marginRight: '10px' }}>{t('analyze')}</button>
+                {/* <button className='button'>{t('submit')}</button> */}
+                </div>
+            </>
+            )}
+        </Card>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             
-                <Heading>{t('step2')}</Heading>
+                <Heading>{t('recentTransactions')} </Heading>
 
                 {ongoingMonth && (
                     <div 
@@ -903,9 +1145,11 @@ function Logs() {
                             color: 'grey'
                         }}
                     >
-                        {formattedOngoingMonth}
+                        {/* {t(formattedOngoingMonth)} */}
+                        {t('step2')}
                     </div>
                 )}
+
             </div>
 
             {/* Display the formatted ongoingMonth */}

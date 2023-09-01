@@ -108,8 +108,28 @@
     "brazilianReal": "BRL (Brazilian Real)",
     "russianRuble": "RUB (Russian Ruble)",
     "southKoreanWon": "KRW (South Korean Won)",
-    "serverError": "An error occurred while communicating with the server.",
     "editSuccess": "Expense edited successfully.",
     "editError": "Failed to edit expense.",
-    "editBudget": "Edit Budget"
+    "editBudget": "Edit Budget",
+    "talkWithAiCoach": "Talk with your AI Coach",
+    "writeFinancialNote": "Is there any financial doubt? I'm ready to advise!",
+    "enterTransaction": "Eg.: Are my finances good?",
+    "analyze": "Analyze",
+    "recentTransactions": "Recent Transactions:",
+    "month1": "January",
+    "month2": "February",
+    "month3": "March",
+    "month4": "April",
+    "month5": "May",
+    "month6": "June",
+    "month7": "July",
+    "month8": "August",
+    "month9": "September",
+    "month10": "October",
+    "month11": "November",
+    "month12": "December",
+    "noResponse": "Sorry, we couldn't get a response from the coach.",
+    "serverError": "Can't connect to the server or process the response. Please try again later."
+  
+
 }

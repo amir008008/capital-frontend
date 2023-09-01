@@ -111,7 +111,26 @@
     "southAfricanRand": "ZAR (Rand sudafricano)",
     "brazilianReal": "BRL (Real brasileño)",
     "russianRuble": "RUB (Rublo ruso)",
-    "southKoreanWon": "KRW (Won surcoreano)"
+    "southKoreanWon": "KRW (Won surcoreano)",
+    "talkWithAiCoach": "Habla con tu Entrenador AI",
+    "writeFinancialNote": "¿Tienes alguna duda financiera? ¡Estoy listo para aconsejarte!",
+    "enterTransaction": "Ej.: ¿Mis finanzas están bien?",
+    "analyze": "Analizar",
+    "recentTransactions": "Recent Transactions:",
+    "month1": "Enero",
+    "month2": "Febrero",
+    "month3": "Marzo",
+    "month4": "Abril",
+    "month5": "Mayo",
+    "month6": "Junio",
+    "month7": "Julio",
+    "month8": "Agosto",
+    "month9": "Septiembre",
+    "month10": "Octubre",
+    "month11": "Noviembre",
+    "month12": "Diciembre",
+    "noResponse": "Lo siento, no pudimos obtener una respuesta del entrenador.",
+    "serverError": "No se puede conectar al servidor o procesar la respuesta. Por favor, inténtalo de nuevo más tarde."
 
       
 }

@@ -38,10 +38,6 @@
   "zh-CN": "中文（中国）",
   "preferencesUpdatedSuccess": "成功更新了偏好设置！",
   "preferencesFetchError": "获取偏好设置失败。请稍后再试。",
-  "months": {
-    "short": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-    "long": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"]
-  },
   "expenses": "开销",
   "closed": "已结束",
   "fixedExpenses": "固定开销",
@@ -113,8 +109,26 @@
   "brazilianReal": "BRL (巴西雷亚尔)",
   "russianRuble": "RUB (俄罗斯卢布)",
   "southKoreanWon": "KRW (韩元)",
-  "editBudget": "编辑预算"
-
+  "editBudget": "编辑预算",
+  "talkWithAiCoach": "与您的AI教练交谈",
+  "writeFinancialNote": "有任何财务疑虑吗？我准备好给予建议了!",
+  "enterTransaction": "例如：我的财务状况好吗？",
+  "analyze": "分析",
+  "recentTransactions": "最近的交易:",
+  "month1": "一月",
+  "month2": "二月",
+  "month3": "三月",
+  "month4": "四月",
+  "month5": "五月",
+  "month6": "六月",
+  "month7": "七月",
+  "month8": "八月",
+  "month9": "九月",
+  "month10": "十月",
+  "month11": "十一月",
+  "month12": "十二月",
+  "noResponse": "对不起，我们无法从教练那里得到答复。",
+  "serverError": "无法连接到服务器或处理响应。请稍后再试。"
 
 
 
