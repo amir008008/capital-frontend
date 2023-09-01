@@ -351,6 +351,7 @@ function Logs() {
  
     const [dateFormat, setDateFormat] = useState('MM-DD-YYYY'); // default format, adjust as needed
     const [aiCoach, setAiCoach] = useState('coach1'); // default format, adjust as needed
+    const [currency, setCurrency] = useState('CNY'); // default format, adjust as needed
     const [monthlyIncome, setMonthlyIncome] = useState('5000'); // default format, adjust as needed
     const [userLocale, setUserLocale] = useState('en_US'); // default format, adjust as needed
     useEffect(() => {
@@ -368,6 +369,7 @@ function Logs() {
                     setDateFormat(data.data.dateFormat);
                     setAiCoach(data.data.ai_coach);
                     setMonthlyIncome(data.data.monthly_income);
+                    setCurrency(data.data.currency);
                     console.log("Coach selected: " ,data.data.ai_coach)
                     setUserLocale(data.data.locale);
                     moment.locale(data.data.locale);
@@ -934,6 +936,7 @@ function Logs() {
             transactions: simplifiedTransactions,
             coach: aiCoach,
             name: user.username,
+            currency: currency
         };
     
         let isResponseReceived = false;
