@@ -33,8 +33,8 @@ const Login = React.lazy(() => import('./components/Account/Login'));
 
 Modal.setAppElement('#root');
 
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const BASE_URL = 'http://localhost:5000';
+//const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 import './i18n'
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -74,8 +74,8 @@ function BottomNavBar() {
     return (
         <div className="bottom-nav-bar">
             <button onClick={() => navigate("/logs")} className="nav-button">
-                <i className="fa fa-list-alt"></i>
-                <span>{t('logs')}</span>
+                <i className="fa fa-calendar"></i>
+                <span>{t('today')}</span>
             </button>
             <button onClick={() => navigate("/budget")} className="nav-button">
                 <i className="fa fa-money"></i>

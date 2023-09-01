@@ -40,15 +40,15 @@
   "preferencesFetchError": "获取偏好设置失败。请稍后再试。",
   "expenses": "开销",
   "closed": "已结束",
-  "fixedExpenses": "固定开销",
-  "variableExpenses": "浮动开销",
+  "fixedExpenses": "定期费用",
+  "variableExpenses": "变动费用",
   "available": "可用",
   "openAgain": "再次打开 / 仅管理员",
   "currentMonthYear": "{{month}} {{year}}",
   "step1": "第一步：预估预算",
   "ongoingHeader": "最新的费用",
   "step3StayOnBudget": "第三步，遵循预算 {{budget}}",
-  "closeBudgetButton": "关闭预算",
+  "closeBudgetButton": "开始新的一个月",
   "step2": "第二步：跟踪所有的交易",
   "errorProcessing": "处理您的请求时出现错误。请再试一次。",
   "errorMessageWithContent": "错误：{{message}}",
@@ -128,7 +128,10 @@
   "month11": "十一月",
   "month12": "十二月",
   "noResponse": "对不起，我们无法从教练那里得到答复。",
-  "serverError": "无法连接到服务器或处理响应。请稍后再试。"
+  "serverError": "无法连接到服务器或处理响应。请稍后再试。",
+  "today" : "今天",
+  "dailyPurchases" : "记录你的支出"
+
 
 
 

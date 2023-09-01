@@ -343,7 +343,7 @@ function Logs() {
           );
         } else {
           return (
-            <div className="add-category" onClick={handleAdd}>{t('addCategory')}</div>
+            <div className="add-category" onClick={handleAdd}>{t('dailyPurchases')}</div>
           );
         }
       }
@@ -1220,11 +1220,12 @@ function Logs() {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                                         <span style={{ color: 'grey' }} onClick={() => toggleEdit(transaction.id)}>📌 {transaction.matched_expense_name}</span>
                                         <span 
-                                            style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}
+                                            style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px', step:"0.01" }}
                                             onClick={() => toggleEdit(transaction.id)}
                                         >
-                                            {parseInt(transaction.transaction_amount)}
+                                            {parseFloat(transaction.transaction_amount).toFixed(2)}
                                         </span>
+
                                         <FontAwesomeIcon 
                                             icon={faTimes} 
                                             className="custom-icon-class" 

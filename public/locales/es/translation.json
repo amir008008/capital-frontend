@@ -39,15 +39,15 @@
     },
     "expenses": "Gastos",
     "closed": "Cerrado",
-    "fixedExpenses": "Gastos Fijos",
-    "variableExpenses": "Gastos Variables",
+    "fixedExpenses": "Gastos fijos",
+    "variableExpenses": "Gastos variables",
     "available": "Disponible",
     "openAgain": "Abrir de nuevo / Solo administrador",
     "currentMonthYear": "{{month}} {{year}}",
     "step1": "Paso 1: Presupuesto estimado",
     "ongoingHeader": "Gastos hasta la fecha",
     "step3StayOnBudget": "Paso 3, mantente en el presupuesto {{budget}}",
-    "closeBudgetButton": "Cerrar Presupuesto",
+    "closeBudgetButton": "Comenzar un nuevo mes",
     "step2": "Paso 2: Registra TODAS mis transacciones",
     "errorProcessing": "Hubo un error procesando tu solicitud. Por favor, inténtalo de nuevo.",
     "errorMessageWithContent": "Error: {{message}}",
@@ -58,19 +58,19 @@
     "successAddExpense": "¡Gasto ingresado con éxito!",
     "addCategory": "Añadir categoría",
     "category": "Categoría",
-    "submit": "Presentación",
+    "submit": "Enviar",
     "value": "Valor",
     "Choose your language": "¿Cuál es tu idioma preferido?",
     "appInfo": "Información de la Aplicación",
     "appDescription": "Esta aplicación utiliza inteligencia artificial para empoderarte y ayudarte a alcanzar tus objetivos financieros.",
-    "finishOnboarding": "Terminar la incorporación",
+    "finishOnboarding": "Terminar el registro",
     
     "selectAICoach": "¿Cuál es tu estilo de coaching preferido?",
     "basedOnThis": "Basado en esto, te aconsejaré",
     "coach1": "Analítico",
     "coach1Description": "Establece objetivos claros, diseña estrategias y te motiva hacia el éxito financiero con confianza.",
-    "coach2": "Solidario",
-    "coach2Description": "Guía empática que nutre el crecimiento financiero. Equilibra la creatividad y la practicidad para ayudarte a lograr armonía y satisfacción financiera.",
+    "coach2": "Comprensivo",
+    "coach2Description": "Guía empático para tu crecimiento financiero. Equilibra la creatividad y practicidad para ayudarte a lograr armonía y satisfacción",
  
     "coach3": "Entrenador Sam",
     "coach3Description": "Aquí está Sam. Tiene un ojo de águila para las inversiones y le encanta ayudar a otros a crecer su riqueza con el tiempo. ¿Listo para jugar a largo plazo? Sam te respalda.",
@@ -130,7 +130,11 @@
     "month11": "Noviembre",
     "month12": "Diciembre",
     "noResponse": "Lo siento, no pudimos obtener una respuesta del entrenador.",
-    "serverError": "No se puede conectar al servidor o procesar la respuesta. Por favor, inténtalo de nuevo más tarde."
+    "serverError": "No se puede conectar al servidor o procesar la respuesta. Por favor, inténtalo de nuevo más tarde.",
+    "today" : "Hoy",
+    "dailyPurchases" : "Registra el gasto de hoy"
+
+
 
       
 }

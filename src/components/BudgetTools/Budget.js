@@ -677,12 +677,16 @@ React.useEffect(() => {
                     {formatExpenseName(expense.expense_name)}
                 </span>
 
-    
-                <span className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}>
-                  {/* ${user.locale} */}
-                  {/* ${user.currency} */}
-                   {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
+                <span 
+                    className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}
+                    onClick={() => {
+                        setEditingExpense(expense);  // Set the current expense to edit
+                        setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
+                    }}
+                >
+                    {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
                 </span>
+
 
 
                     

@@ -39,15 +39,15 @@
     },
     "expenses": "Expenses",
     "closed": "Closed",
-    "fixedExpenses": "Fixed Expenses",
-    "variableExpenses": "Variable Expenses",
+    "fixedExpenses": "Regular Expenses",
+    "variableExpenses": "Changing Expenses",
     "available": "Available",
     "openAgain": "Open Again / Admin only",
     "currentMonthYear": "{{month}} {{year}}", 
     "step1": "Step 1: Estimated Budget",
     "ongoingHeader": "Expenses up to date",
     "step3StayOnBudget": "Step 3, stay on budget {{budget}}",
-    "closeBudgetButton": "Close Budget",
+    "closeBudgetButton": "Start a New Month",
     "step2": "Step 2: Track ALL my transactions",
     "errorProcessing": "There was an error processing your request. Please try again.",
     "errorMessageWithContent": "Error: {{message}}",
@@ -129,7 +129,10 @@
     "month11": "November",
     "month12": "December",
     "noResponse": "Sorry, we couldn't get a response from the coach.",
-    "serverError": "Can't connect to the server or process the response. Please try again later."
+    "serverError": "Can't connect to the server or process the response. Please try again later.",
+    "today" : "Today",
+    "dailyPurchases" : "Record Your Spend"
+
   
 
 }
