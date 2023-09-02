@@ -9,7 +9,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import LoadingSpinner from '../../LoadingSpinner';
 import i18n from 'i18next';
 import { useTranslation } from 'react-i18next';
-import {  faSave, faBan } from '@fortawesome/free-solid-svg-icons';
+import {  faSave, faBan,faEdit,faCheckCircle,faCircle } from '@fortawesome/free-solid-svg-icons';
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useRef } from 'react';
@@ -1020,7 +1020,75 @@ function Logs() {
         transition: 'bottom 0.3s ease-out',
         zIndex: 999
     };
+    const [isEditingCategory, setIsEditingCategory] = useState(false);
+    const [currentEditingCategory, setCurrentEditingCategory] = useState(null);
+    const handleCategoryEditClick = (transactionId) => {
+        setIsEditingCategory(true);
+        setCurrentEditingCategory(transactionId);
+    };
+    const handleCategoryChange = (matched_expense_name, newCategory, id) => {
+        // Display "Updating..." message when a category is clicked
+        setMessage('Updating...');
+        console.log('From...',matched_expense_name, " to ", newCategory, " id: ", id);
+        
+        // Prepare data to be sent to the backend
+        const payload = {
+            transaction_id: id, 
+            oldCategory: matched_expense_name,
+            newCategory: newCategory
+        };
     
+        // Make API call to change category
+        axios.put(`${BASE_URL}/change-transaction-category`, payload)
+            .then(response => {
+                if (response.data.success) {
+                    // Update the local state to reflect the change in category
+                    let updatedTransactions = otherTransactions.map(trans => {
+                        if (trans.id === id) {
+                            trans.matched_expense_name = newCategory;
+                        }
+                        return trans;
+                    });
+                    
+                    // Update the state
+                    setOtherTransactions(updatedTransactions);
+    
+                    // Show success message
+                    setMessage('Update Successful!');
+    
+                    // Optionally hide the message after some time
+                    setTimeout(() => {
+                        setMessage(null);
+                    }, 3000);
+                } else {
+                    // Handle failure scenario here
+                    setMessage('Update Failed!');
+                }
+    
+                // Reset states
+                setIsEditingCategory(false);  // Close the category dropdown
+                setCurrentEditingCategory(null);  // Reset the editing category
+            })
+            .catch(error => {
+                console.error('Error updating category:', error);
+                setMessage('An error occurred.');
+                
+                // Reset states
+                setIsEditingCategory(false);
+                setCurrentEditingCategory(null);
+            });
+    };
+    const sendCategoryChange = (transactionId, newCategory) => {
+        return new Promise((resolve) => {
+          setTimeout(() => {
+            // Mocking an API call with a 2-second delay
+            resolve({ success: true });
+          }, 2000);
+        });
+    };
+    const [selectedCategory, setSelectedCategory] = useState("");
+    const [message, setMessage] = useState(null);
+
     return isLoading ? <LoadingSpinner /> : (
         
         
@@ -1218,7 +1286,59 @@ function Logs() {
                                         {transaction.transaction_name}
                                     </SettingLabel>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+                                    {
+                                    isEditingCategory && transaction.id === currentEditingCategory ? (
+                                        <>
+                                    <div>
+                                                <div style={{ border: '0px solid black', display: 'block !important', position: 'relative' }}>
+                                                {expenses.map((expense) => (
+                                                    <div
+                                                        key={expense.id}
+                                                        style={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            padding: '5px',
+                                                            margin: '5px',
+                                                            border: '1px solid #ccc',
+                                                            cursor: 'pointer',
+                                                        }}
+                                                        onClick={() => handleCategoryChange(transaction.matched_expense_name, expense.expense_name, transaction.id)}
+                                                    >
+                                                        {transaction.matched_expense_name === expense.expense_name && (
+                                                            <FontAwesomeIcon 
+                                                                icon={faCheckCircle} 
+                                                                style={{ marginRight: '10px'}}
+                                                            />
+                                                        )}
+                                                        {expense.expense_name}
+                                                    </div>
+                                                ))}
+                                                </div>
+
+                                                {/* Display the success, error, or updating message */}
+                                                {message && (
+                                                    <div>
+                                                        {message === 'Update Successful!' && <SuccessMessage>{message}</SuccessMessage>}
+                                                        {message === 'Updating...' && <SuccessMessage>{message}</SuccessMessage>}
+                                                        {message !== 'Update Successful!' && message !== 'Updating...' && <ErrorMessage>{message}</ErrorMessage>}
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                        </>
+                                    ) : (
+                                        <>
                                         <span style={{ color: 'grey' }} onClick={() => toggleEdit(transaction.id)}>📌 {transaction.matched_expense_name}</span>
+                                        <FontAwesomeIcon 
+                                            icon={faEdit} 
+                                            style={{ marginLeft: '4px',color: 'grey'  }}
+                                            onClick={() => handleCategoryEditClick(transaction.id)}
+                                        />
+                                        
+                                        </>
+                                    )
+                                    }
+
                                         <span 
                                             style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px', step:"0.01" }}
                                             onClick={() => toggleEdit(transaction.id)}
