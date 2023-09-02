@@ -1,7 +1,12 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "MyFinancePal",
+  "name": "MyFinancePal by Capital AI",
   "icons": [
+    {
+      "src": "/logo/icon.jpg",
+      "sizes": "512x512", 
+      "type": "image/jpeg"
+    },
     {
       "src": "favicon.ico",
       "sizes": "64x64 32x32 24x24 16x16",
