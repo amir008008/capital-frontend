@@ -13,8 +13,8 @@ import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 //const BASE_URL = 'http://localhost:5000';
 const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
 const Nushi = process.env.PUBLIC_URL + '/Nushi/onboarding.jpg';
-const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/analytical.jpg';
-const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/supportive.jpg';
+const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/analytical.png';
+const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/supportive.png';
 
 
 export const OnboardingContainer = styled.div`

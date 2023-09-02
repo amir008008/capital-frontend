@@ -324,12 +324,14 @@ function Logs() {
                 type="text"
                 className="category-input"
                 placeholder={t('category')}
+                fontSize = "16px"
                 value={categoryName}
                 onChange={(e) => setCategoryName(e.target.value)}
               />
               <NumberInput 
                 type="number"
                 step="0.01"
+                fontSize = "16px"
                 placeholder={t('value')}
                 className="number-input"
                 value={categoryValue}

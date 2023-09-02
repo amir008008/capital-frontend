@@ -21,8 +21,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
- const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
- //const BASE_URL = 'http://localhost:5000';
+const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+  //const BASE_URL = 'http://localhost:5000';
 const YEAR = 2023;
 
 // Custom hook to log and track how often it's invoked
@@ -1045,12 +1045,14 @@ React.useEffect(() => {
               type="text"
               className="category-input"
               placeholder={t('category')}
+              fontSize = "16px"
               value={categoryName}
               onChange={(e) => setCategoryName(e.target.value)}
             />
             <input
               type="number"
               step="0.01"
+              fontSize = "16px"
               placeholder={t('value')}
               className="number-input"
               value={categoryValue}
