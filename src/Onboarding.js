@@ -53,12 +53,18 @@ const containerStyle = {
 };
 
 const lineStyle = {
-    position: 'fixed',
-    top: 50,  // Position it right at the top
-    left: '15%',  // Assuming you want it to start 15% from the left to achieve 70% width
+    position: 'relative',
+    top: 30,  // Position it right at the top
+    left: '0%',  // Start from the left
     width: '70%',
-    zIndex: 1000  // Ensure it stays above other elements
+    zIndex: 1000,  // Ensure it stays above other elements
+
+    // background: 'linear-gradient(to right, var(--purple-2), var(--purple-3))',  // Gradient from medium to dark purple
+    boxShadow: '0 2px 4px rgba(var(--purple-3), 0.5)',  // Less intense shadow with reduced opacity
+    borderRadius: '2px',  // Rounded corners
+    transition: 'all 0.3s ease',  // Smooth transition effect for any changes
 };
+
 const buttonStyle = {
     margin: '10px',
     border: '1px solid #d0d0d0',
@@ -103,109 +109,117 @@ function CompletionModal({ onFinish, onNext, onAICoachChange, setProgress, progr
     );
 }
 
-function AppInfo({ onNext, setProgress, progress }) {
+function AppInfo({ onNext, setProgress }) {
     const { t } = useTranslation();
-    setProgress(40); 
     const { user } = useContext(AuthContext);
 
-    const containerStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'flex-start',
-        height: '100vh',
-        margin: '40px auto 0', // Added 10px margin from the top
-        padding: '0 5%',
-        maxWidth: '100%',
-        textAlign: 'left',
-    };
-
-    const contentWrapperStyle = {
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        flex: 1,
-    };
-
-    const headingStyle = {
-        fontSize: '28px',
-        marginBottom: '20px',
-    };
-
-    const paragraphStyle = {
-        fontSize: '16px',
-        margin: '20px 0',
-        lineHeight: '1.5',
-        textAlign: 'left',
-    };
-
-    const buttonStyle = {
-        padding: '10px 20px',
-        fontSize: '18px',
-        marginTop: '300px', // Adjusted margin from the image
-        alignSelf: 'flex-end', // Move the button to the right
-    };
-
-    const imageStyle = {
-        width: '255px', // Adjusted width to 70% of the original
-        height: '402px', // Adjusted height to 70% of the original
-        position: 'absolute',
-        top: 'calc(340px + 45px)', // Adjusted top position with additional margin
-        right: '25%',
-        zIndex: 1,
-    };
+    setProgress(40);
 
     const handleContinue = () => {
         setProgress(60);
         onNext();
     };
-
+    const styles = {
+        container: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minHeight: '100vh',
+            margin: '40px auto 0',
+            padding: '0 5%',
+            maxWidth: '100%',
+            textAlign: 'left',
+            position: 'relative'
+        },
+        headingRow: {
+            width: '100%',
+            textAlign: 'center'
+        },
+        contentRow: {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+            width: '100%',
+        },
+        image: {
+            flex: '1 0 30%',  // Adjusted to take up only 30% of the width instead of 50%
+            maxWidth: '200px',  // Added a maximum width
+            height: 'auto',  // Adjusted to maintain aspect ratio
+            objectFit: 'cover',
+            marginRight: 'auto',  // This will push the image to the left
+        },
+        
+        textWrapper: {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            flex: '1 0 50%',
+        },
+        heading: {
+            fontSize: '28px',
+            marginBottom: '20px',
+        },
+        paragraph: {
+            fontSize: '16px',
+            margin: '20px 0',
+            lineHeight: '1.5',
+            wordWrap: 'break-word',
+            paddingRight: '20px',
+        },
+        button: {
+            padding: '10px 20px',
+            fontSize: '18px',
+            alignSelf: 'flex-end',
+            paddingRight: '20px',
+            marginLeft: 'auto', // This moves the button to the left if it's within a flex container
+        },
+        
+    };
+    
     return (
-        <div style={containerStyle}>
-            <div style={contentWrapperStyle}>
-                <h1 style={headingStyle}>{t('greeting', {username: user.username})}</h1>
-                <p style={paragraphStyle}>{t('coachIntro')}</p>
-                <ul>
-                    <li>{t('bulletPoint1')}</li>
-                    <li>{t('bulletPoint2')}</li>
-                    <li>{t('bulletPoint3')}</li>
-                </ul>
-                <p style={paragraphStyle}>{t('successNote')}</p>
-                <Button style={buttonStyle} onClick={handleContinue}>{t('agree')}</Button>
-            </div>
-            <img src={Nushi} alt="Man Image" style={imageStyle} />
+        <div style={styles.container}>
+        <div style={styles.headingRow}>
+            <h1 style={styles.heading}>{t('greeting', { username: user.username })}</h1>
         </div>
+        <div style={styles.contentRow}>
+            <img src={Nushi} alt="Illustration of a Man" style={styles.image} />
+            <div style={styles.textWrapper}>
+                <p style={styles.paragraph}>{t('coachIntro')}</p>
+                <ul>
+                    <li style={styles.paragraph}>{t('bulletPoint1')}</li>
+                    <li style={styles.paragraph}>{t('bulletPoint2')}</li>
+                    <li style={styles.paragraph}>{t('bulletPoint3')}</li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <p style={styles.paragraph}>{t('successNote')}</p>
+        </div>
+        <Button style={styles.button} onClick={handleContinue}>{t('agree')}</Button>
+    </div>
     );
 }
 
 
 function LanguageSelection({ onNext, onLanguageChange }) {
     const { t } = useTranslation();
-    const [transformValue, setTransformValue] = useState('100vh');
-
-    useEffect(() => {
-        setTransformValue('0');
-    }, []);
 
     const containerStyle = {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        height: '100vh',
+        minHeight: '100vh',  // changed from height to minHeight to allow content expansion
         justifyContent: 'center',
         padding: '5%',
-        overflow: 'hidden',
-        transition: 'transform 0.7s ease-in-out',
-        transform: `translateY(${transformValue})`
+        overflowY: 'auto'   // Allow vertical scroll if content exceeds the viewport height
     };
 
-    document.body.style.margin = "0";
-    document.body.style.overflow = "hidden";
-    
     const headingStyle = {
         fontSize: '24px',
-        textAlign: 'top',
-        marginTop: '0%',   // Move the heading closer to the top
-        marginBottom: '50px'  // Slightly reduce the bottom margin to balance spacing
+        textAlign: 'center',  // center-aligned the heading
+        marginTop: '0%',  // Move the heading closer to the top
+        marginBottom: '30px'  // Reduced the bottom margin to balance spacing
     };
 
     const buttonContainer = {
@@ -293,8 +307,21 @@ function Onboarding() {
         }, []);
         const [currency, setCurrency] = useState('CNY'); // Default to USD
 
+        const containerStyle = {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            minHeight: '100vh',
+            margin: '40px auto 0',
+            padding: '0 5%',
+            maxWidth: '100%',
+            textAlign: 'left',
+            position: 'relative'
+        };
         return (
-            <div style={{ padding: '20px', textAlign: 'center' }}>
+            
+            <div style={{ ...containerStyle, marginTop: '30px' }}>
+
                 <h2>{t('tellUsMore')}</h2>
                 <label>
                     {t('monthlyIncome')}
@@ -390,10 +417,12 @@ function AICoachSelection({ onNext, setProgress, progress }) {
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'flex-start', 
-        padding: '10px 5%',
-        height: 'calc(100vh - 0px)', // account for the header
-        overflowY: 'auto' // enable vertical scrolling
+        minHeight: '100vh',
+        margin: '40px auto 0',
+        padding: '0 5%',
+        maxWidth: '100%',
+        textAlign: 'left',
+        position: 'relative'
     };
 
     const titleStyle = {
@@ -626,15 +655,11 @@ const selectButtonStyle = {
     
     const skipButtonStyle = {
         position: 'absolute',
-        bottom: '5vh',
-        right: '5vw',
+        right: '10px',
+        bottom: '10px',  // position the button at the bottom-right corner
         background: 'transparent',
-        border: '1px solid grey',
-        borderRadius: '15px',
-        color: 'grey',
-        padding: '15px 40px', // Increase right and left padding to make it wider
-        cursor: 'pointer',
-        minWidth: '150px' // Setting a minimum width will also ensure it's wider
+        border: 'none',
+        color: 'grey'
     };
     
 
