@@ -718,13 +718,18 @@ function Logs() {
         })
         .then(data => {
             if (data.success) {
-                console.log('Successfully added expense:', data.message, data.expenseId);
-                setSuccessMessage('Expense entered successfully!');
+                console.log('Successfully added expense:', data);
+            
+                // Set the message to advice if it exists and is not an empty string, otherwise, use the default message
+                const message = data.advice && data.advice.trim() !== '' ? data.advice : 'Expense entered successfully!';
+                setSuccessMessage(message);
+            
                 setTimeout(() => {
                     setSuccessMessage('');  
                     handleRefresh(); 
                 }, 1000);
-            } else {
+            }
+             else {
                 const errorMessage = data.error || data.message || 'Unknown error';
                 console.error('Error adding expense:', errorMessage);
                 setErrorMessage(t('errorAddingExpense', { errorMessage: errorMessage }));
@@ -1090,7 +1095,17 @@ function Logs() {
     };
     const [selectedCategory, setSelectedCategory] = useState("");
     const [message, setMessage] = useState(null);
-
+    const [expandedTransactions, setExpandedTransactions] = useState([]);
+    const toggleTransaction = (transactionId) => {
+        setExpandedTransactions(prev => {
+            if (prev.includes(transactionId)) {
+                return prev.filter(id => id !== transactionId);
+            } else {
+                return [...prev, transactionId];
+            }
+        });
+    };
+    
     return isLoading ? <LoadingSpinner /> : (
         
         
@@ -1229,70 +1244,62 @@ function Logs() {
 
 
             <Card>
+                {/* Header section for user profile or relevant icon. Currently commented out. */}
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                    {/* This can be replaced with a user's profile or a relevant icon */}
                     {/* <PreferenceTile>
                         <SettingLabelBold>Fixed Expenses</SettingLabelBold>
                     </PreferenceTile> */}
                 </div>
                 
-
-
-                {/* <PreferenceTile>
-                    <SettingLabelBold>Variable Expenses</SettingLabelBold>
-                </PreferenceTile> */}
-                
+                {/* Render a list of other transactions */}
                 {otherTransactions.map(transaction => (
                     <CSSTransition key={transaction.id} timeout={500} classNames="item">
                         <PreferenceTile style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
                             {transaction.isEditing ? (
-                                // If in edit mode
+                                // Editing mode
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                                <div style={{ display: 'flex', flexGrow: 1, marginRight: '10px' }}>
-                                    <input
-                                        value={transaction.transaction_name}
-                                        type="text"
-                                        className="log-category-input"
-                                        placeholder="Expense"
-                                        onChange={e => handleTransactionChange(e, 'name', transaction.id)}
-                                        style={{ marginRight: '10px', flexGrow: 1 }}
-                                    />
-                                    <input
-                                        value={transaction.transaction_amount.toString()}
-                                        className="log-number-input"
-                                        step="0.01"
-                                        placeholder="Value"
-                                        onChange={e => handleTransactionChange(e, 'amount', transaction.id)}
-                                        type="number"
-                                        style={{ flexGrow: 1 }}
-                                    />
+                                    <div style={{ display: 'flex', flexGrow: 1, marginRight: '10px' }}>
+                                        <input
+                                            value={transaction.transaction_name}
+                                            type="text"
+                                            className="log-category-input"
+                                            placeholder="Expense"
+                                            onChange={e => handleTransactionChange(e, 'name', transaction.id)}
+                                            style={{ marginRight: '10px', flexGrow: 1 }}
+                                        />
+                                        <input
+                                            value={transaction.transaction_amount.toString()}
+                                            className="log-number-input"
+                                            step="0.01"
+                                            placeholder="Value"
+                                            onChange={e => handleTransactionChange(e, 'amount', transaction.id)}
+                                            type="number"
+                                            style={{ flexGrow: 1 }}
+                                        />
+                                    </div>
+                                    <div style={{ display: 'flex' }}>
+                                        <FontAwesomeIcon 
+                                            icon={faSave} 
+                                            onClick={() => saveEdit(transaction.id)}
+                                            style={{ cursor: 'pointer', marginRight: '10px' }} 
+                                        />
+                                        <FontAwesomeIcon 
+                                            icon={faBan} 
+                                            onClick={() => cancelEdit(transaction.id)}
+                                            style={{ cursor: 'pointer' }} 
+                                        />
+                                    </div>
                                 </div>
-                                <div style={{ display: 'flex' }}>
-                                    <FontAwesomeIcon 
-                                        icon={faSave} 
-                                        onClick={() => saveEdit(transaction.id)}
-                                        style={{ cursor: 'pointer', marginRight: '10px' }} 
-                                    />
-                                    <FontAwesomeIcon 
-                                        icon={faBan} 
-                                        onClick={() => cancelEdit(transaction.id)}
-                                        style={{ cursor: 'pointer' }} 
-                                    />
-                                </div>
-                            </div>
-                            
                             ) : (
-                                // If not in edit mode, render static content
+                                // Static content mode
                                 <>
                                     <SettingLabel onClick={() => toggleEdit(transaction.id)}>
                                         {transaction.transaction_name}
                                     </SettingLabel>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-                                    {
-                                    isEditingCategory && transaction.id === currentEditingCategory ? (
-                                        <>
-                                    <div>
-                                                <div style={{ border: '0px solid black', display: 'block !important', position: 'relative' }}>
+                                        {isEditingCategory && transaction.id === currentEditingCategory ? (
+                                            // Category selection list
+                                            <div>
                                                 {expenses.map((expense) => (
                                                     <div
                                                         key={expense.id}
@@ -1315,9 +1322,7 @@ function Logs() {
                                                         {expense.expense_name}
                                                     </div>
                                                 ))}
-                                                </div>
-
-                                                {/* Display the success, error, or updating message */}
+                                                {/* Message display section */}
                                                 {message && (
                                                     <div>
                                                         {message === 'Update Successful!' && <SuccessMessage>{message}</SuccessMessage>}
@@ -1326,28 +1331,23 @@ function Logs() {
                                                     </div>
                                                 )}
                                             </div>
-
-                                        </>
-                                    ) : (
-                                        <>
-                                        <span style={{ color: 'grey' }} onClick={() => toggleEdit(transaction.id)}>📌 {transaction.matched_expense_name}</span>
-                                        <FontAwesomeIcon 
-                                            icon={faEdit} 
-                                            style={{ marginLeft: '4px',color: 'grey'  }}
-                                            onClick={() => handleCategoryEditClick(transaction.id)}
-                                        />
-                                        
-                                        </>
-                                    )
-                                    }
-
+                                        ) : (
+                                            // Display category name and edit icon
+                                            <>
+                                                <span style={{ color: 'grey' }} onClick={() => toggleEdit(transaction.id)}>📌 {transaction.matched_expense_name}</span>
+                                                <FontAwesomeIcon 
+                                                    icon={faEdit} 
+                                                    style={{ marginLeft: '4px', color: 'grey' }}
+                                                    onClick={() => handleCategoryEditClick(transaction.id)}
+                                                />
+                                            </>
+                                        )}
                                         <span 
-                                            style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px', step:"0.01" }}
+                                            style={{ flexGrow: 1, textAlign: 'right', marginRight: '10px' }}
                                             onClick={() => toggleEdit(transaction.id)}
                                         >
                                             {parseFloat(transaction.transaction_amount).toFixed(2)}
                                         </span>
-
                                         <FontAwesomeIcon 
                                             icon={faTimes} 
                                             className="custom-icon-class" 
@@ -1360,28 +1360,26 @@ function Logs() {
                         </PreferenceTile>
                     </CSSTransition>
                 ))}
-
-
-
-
-                            {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
-                            {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
-                            <PreferenceTile>
-                                
- 
-                           <div className="button-group">
-                            <ExpenseInput 
-                                isAddingCategory={isAddingCategoryVariable}
-                                categoryName={newCategoryNameVariable}
-                                categoryValue={newCategoryValueVariable}
-                                setCategoryName={setNewCategoryNameVariable}
-                                setCategoryValue={setNewCategoryValueVariable}
-                                handleAdd={(categoryName, categoryValue) => handleAddCategory('Variable', categoryName, categoryValue)}
-                            />
-                          </div>
-                          </PreferenceTile>
-
+                
+                {/* Render success and error messages */}
+                {successMessage && <SuccessMessage>{successMessage}</SuccessMessage>}
+                {errorMessage && <ErrorMessage>{errorMessage}</ErrorMessage>}
+                
+                {/* Category input section */}
+                <PreferenceTile>
+                    <div className="button-group">
+                        <ExpenseInput 
+                            isAddingCategory={isAddingCategoryVariable}
+                            categoryName={newCategoryNameVariable}
+                            categoryValue={newCategoryValueVariable}
+                            setCategoryName={setNewCategoryNameVariable}
+                            setCategoryValue={setNewCategoryValueVariable}
+                            handleAdd={(categoryName, categoryValue) => handleAddCategory('Variable', categoryName, categoryValue)}
+                        />
+                    </div>
+                </PreferenceTile>
             </Card>
+
             
         </Wrapper>
     );

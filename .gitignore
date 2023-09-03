@@ -27,3 +27,6 @@ node_modules/
 src/App.js
 src/components/BudgetTools/Budget.js
 src/Onboarding.js
+src/App.js
+src/components/BudgetTools/Budget.js
+src/Onboarding.js
