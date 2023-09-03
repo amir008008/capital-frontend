@@ -958,7 +958,7 @@ function Logs() {
         try {
             console.log("Trying to communicate with AI Coach...", data);
             setChatPopupVisible(true);
-            const response = await axios.post(`${BASE_URL}/chatWithNushi`, data);
+            const response = await axios.post(`${BASE_URL}/chatWithNushi3.5`, data);
     
             clearTimeout(timeoutId);  // Clear the timeout since response is received
         
