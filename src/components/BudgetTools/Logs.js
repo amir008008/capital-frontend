@@ -725,9 +725,9 @@ function Logs() {
                 setSuccessMessage(message);
             
                 setTimeout(() => {
-                    setSuccessMessage('');  
+                    //setSuccessMessage('');  
                     handleRefresh(); 
-                }, 5000);
+                }, 1000);
             }
              else {
                 const errorMessage = data.error || data.message || 'Unknown error';
