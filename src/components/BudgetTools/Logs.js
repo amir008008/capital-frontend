@@ -13,8 +13,19 @@ import {  faSave, faBan,faEdit,faCheckCircle,faCircle } from '@fortawesome/free-
 import { faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import axios from 'axios';
 import { useRef } from 'react';
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+
+
+const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
+
+let BASE_URL;
+
+if (ENV === 'prod') {
+    BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+} else {
+    BASE_URL = 'http://localhost:5000';
+}
+
+console.log(BASE_URL);
 
 
 const styles = {
@@ -356,6 +367,7 @@ function Logs() {
     const [currency, setCurrency] = useState('CNY'); // default format, adjust as needed
     const [monthlyIncome, setMonthlyIncome] = useState('5000'); // default format, adjust as needed
     const [userLocale, setUserLocale] = useState('en_US'); // default format, adjust as needed
+    const [userLang, setUserLang] = useState('en_US'); // default format, adjust as needed
     useEffect(() => {
         console.log('Fetching user preferences...');  // Added console log
     
@@ -372,6 +384,7 @@ function Logs() {
                     setAiCoach(data.data.ai_coach);
                     setMonthlyIncome(data.data.monthly_income);
                     setCurrency(data.data.currency);
+                    setUserLang(data.data.language);
                     console.log("Coach selected: " ,data.data.ai_coach)
                     setUserLocale(data.data.locale);
                     moment.locale(data.data.locale);
@@ -695,7 +708,8 @@ function Logs() {
         }
     
         const adjustedExpenseMonth = `${expenseMonth.slice(0, 7)}%`;
-    
+        setSuccessMessage(t('adding'));
+
         fetch(`${BASE_URL}/add-log`, {
             method: 'POST',
             headers: {
@@ -707,7 +721,8 @@ function Logs() {
                 expenseName: expenseName,
                 expenseAmount: expenseAmount,
                 expenseType: expenseType,
-                expenseMonth: adjustedExpenseMonth
+                expenseMonth: adjustedExpenseMonth,
+                userLang: userLang
             }),
         })
         .then(response => {

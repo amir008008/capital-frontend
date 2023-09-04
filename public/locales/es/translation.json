@@ -132,7 +132,8 @@
     "noResponse": "Lo siento, no pudimos obtener una respuesta del entrenador.",
     "serverError": "No se puede conectar al servidor o procesar la respuesta. Por favor, inténtalo de nuevo más tarde.",
     "today" : "Hoy",
-    "dailyPurchases" : "Registra el gasto de hoy"
+    "dailyPurchases" : "Registra el gasto de hoy",
+    "adding": "Añadiendo ítem al gasto"
 
 
 

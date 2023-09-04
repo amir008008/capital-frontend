@@ -33,8 +33,17 @@ const Login = React.lazy(() => import('./components/Account/Login'));
 
 Modal.setAppElement('#root');
 
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const ENV = 'dev';  // This can be 'dev' or 'prod' or any other environment name you choose
+
+let BASE_URL;
+
+if (ENV === 'prod') {
+    BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+} else {
+    BASE_URL = 'http://localhost:5000';
+}
+
+console.log(BASE_URL);
 import './i18n'
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';

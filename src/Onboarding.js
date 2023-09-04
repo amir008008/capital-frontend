@@ -10,8 +10,17 @@ import i18n from 'i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-//const BASE_URL = 'http://localhost:5000';
-const BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
+
+let BASE_URL;
+
+if (ENV === 'prod') {
+    BASE_URL = "http://capital-route-amir-sh-dev.apps.sandbox-m2.ll9k.p1.openshiftapps.com";
+} else {
+    BASE_URL = 'http://localhost:5000';
+}
+
+console.log(BASE_URL);
 const Nushi = process.env.PUBLIC_URL + '/Nushi/onboarding.jpg';
 const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/analytical.png';
 const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/supportive.png';
