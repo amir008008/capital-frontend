@@ -162,25 +162,45 @@ const Register = () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                setSuccessMessage('Registration Success! Redirecting to onboarding page...');
-                setUser({
-                    id: data.id,
-                    email: data.email
+                // Automatically login the user after successful registration
+                fetch(`${baseURL}/api/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        password: password
+                    })
+                })
+                .then(response => response.json())
+                .then(loginData => {
+                    if (loginData.success) {
+                        localStorage.setItem('authToken', loginData.token);
+                        setUser({
+                            id: loginData.id,
+                            email: loginData.email,
+                            username: loginData.username,
+                            country: loginData.country
+                        });
+                        navigate('/onboarding');
+                    } else {
+                        throw new Error(loginData.error || 'Failed to login');
+                    }
+                })
+                .catch(err => {
+                    setErrorMessage(err.message);
                 });
-                
-                // Wait for 2 seconds and then redirect
-                setTimeout(() => {
-                    navigate('/onboarding');
-                }, 2000);
+
             } else {
                 setErrorMessage(data.error || 'Failed to register');
             }
         })
-        
         .catch(err => {
             setErrorMessage(err.message);
         });
     };
+
     const handleLogin= () => {
         navigate('/login');
     };

@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useRef } from 'react';
 
 
-const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
@@ -722,7 +722,8 @@ function Logs() {
                 expenseAmount: expenseAmount,
                 expenseType: expenseType,
                 expenseMonth: adjustedExpenseMonth,
-                userLang: userLang
+                userLang: userLang,
+                monthlyIncome: monthlyIncome
             }),
         })
         .then(response => {

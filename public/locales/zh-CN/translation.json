@@ -131,7 +131,8 @@
   "serverError": "无法连接到服务器或处理响应。请稍后再试。",
   "today" : "今天",
   "dailyPurchases" : "记录你的支出",
-  "adding": "将项目添加到费用中"
+  "adding": "将项目添加到费用中...",
+  "set_current_category": "为 {expenseName} 添加预算"
 
 
 

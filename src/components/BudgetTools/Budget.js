@@ -21,7 +21,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
-const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
@@ -1243,7 +1243,7 @@ React.useEffect(() => {
                         <div className="current-month">
                           {t('currentMonthYear', { month: monthsfull[activeMonthIndex_X9aB72], year: YEAR })}
                       </div>
-                          <div className="budget-amount">{calculateTotalExpenses()}</div>
+                      <div className="budget-amount">{parseFloat(calculateTotalExpenses()).toFixed(2)}</div>
                           <div className="step-description">{t('step1')}</div>
                         </div>
 

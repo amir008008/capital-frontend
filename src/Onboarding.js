@@ -10,7 +10,8 @@ import i18n from 'i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
-const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
+import { debounce } from 'lodash'; // Import the debounce function
+const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
@@ -93,14 +94,128 @@ const skipButtonStyle = {
 };
 import { useNavigate } from 'react-router-dom';  // Replace useHistory with useNavigate
 
-function CompletionModal({ onFinish, onNext, onAICoachChange, setProgress, progress }) {
+function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext, onAICoachChange, setProgress, progress }) {
     const navigate = useNavigate();
-
     useEffect(() => {
         if (progress < 100) {
             setProgress(prevProgress => Math.min(prevProgress + 20, 100));
         }
     }, [setProgress, progress]);
+    const [currentCategory, setCurrentCategory] = useState("");
+    const categoryIdMap = {
+        "Other": 1,
+        "Saving for emergency fund": 2,
+        "Saving for big purchase": 3,
+        "Other savings": 4,
+        "Investment": 5,
+        "Housing": 6,
+        "Groceries": 7,
+        "Utilities & Subscriptions": 8,
+        "Transportation": 9,
+        "Household Items": 10,
+        "Personal care": 11,
+        "Childcare": 12,
+        "Eating out by myself": 13,
+        "Pets": 14,
+        "Medical care": 15,
+        "Insurance": 16,
+        "Debt": 17,
+        "Clothing": 18,
+        "Saving for traveling": 19,
+        "Education": 20,
+        "Eating out to make friends": 21,
+        "Entertainment": 22,
+        "Gifts/Donations": 23
+    };
+    
+    const categories = [
+        { category: "Saving for emergency fund", description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
+        { category: "Saving for big purchase", description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
+        { category: "Housing", description: "Housing costs", purpose: "Living expenses", type: "Fixed", budget: 0.10 },
+        { category: "Groceries", description: "Food/Supplies - groceries", purpose: "Living expenses", type: "Fixed", budget: 0.07 },
+        { category: "Utilities & Subscriptions", description: "Utilities and subscriptions", purpose: "Living expenses", type: "Fixed", budget: 0.05 },
+        { category: "Transportation", description: "Transportation costs", purpose: "Living expenses", type: "Fixed", budget: 0.04 },
+        { category: "Household Items", description: "Household items", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { category: "Personal care", description: "Personal care expenses", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { category: "Eating out by myself", description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
+        { category: "Saving for traveling", description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
+        { category: "Education", description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
+        { category: "Eating out to make friends", description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: 0.0666 },
+        { category: "Entertainment", description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: 0.0666 },
+        { category: "Gifts/Donations", description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: 0.0666 }
+    ];
+    
+     // Debounce the addExpenses function to avoid rapid consecutive calls.
+     const debouncedAddExpenses = debounce(() => {
+        addExpenses(userId, monthlyIncome, currentMonth);
+    }, 1000); // Adjust the delay as needed
+
+    useEffect(() => {
+        debouncedAddExpenses();
+    }, []); // Run this effect only once when the component mounts
+    const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
+        const categoryId = categoryIdMap[category]; // Getting the correct category id
+        fetch(`${BASE_URL}/add-expense`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id: userId,
+                category_id: categoryId,  // Send the category_id
+                category: category,
+                expenseName: expenseName,
+                expenseAmount: expenseAmount,
+                expenseType: expenseType,
+                expenseMonth: expenseMonth
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                setCurrentCategory(`Adding budget for ${expenseName}`);
+            } else {
+                console.error('Error adding expense:', data.error || data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding expense:', error);
+        });
+    };
+    const formatExpenseMonth = (month) => {
+        const currentYear = new Date().getFullYear();
+        return `${currentYear}-${String(month).padStart(2, '0')}-01`;
+    };
+    
+    
+    const addExpenses = async (userId, monthlyIncome, currentMonth) => {
+        const promises = categories.map(category => {
+            const expenseAmount = monthlyIncome * category.budget;
+            const categoryId = categoryIdMap[category.category]; 
+            return addCategory(
+                userId,
+                categoryId,  
+                category.category,
+                expenseAmount,
+                category.type,
+                formatExpenseMonth(currentMonth)
+            );
+            
+        });
+        try {
+            await Promise.all(promises);
+            setCurrentCategory('Well Done!');
+        } catch (error) {
+            console.error("Error in adding all expenses:", error);
+        }
+    };
+    
+
+    useEffect(() => {
+        if (progress >= 100) {
+            setCurrentCategory('Well Done!');
+        }
+    }, [progress]);
 
     const { t } = useTranslation();
 
@@ -109,11 +224,18 @@ function CompletionModal({ onFinish, onNext, onAICoachChange, setProgress, progr
     };
 
     return (
-        <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', backgroundColor: 'white', padding: '20px', borderRadius: '5px', boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)' }}>
-            {/* <img src="path_to_avatar_image.jpg" alt="Avatar" /> */}
-            <h2>{t('allDone')}</h2>
-            {/* <Button onClick={onFinish}>{t('finishOnboarding')}</Button> */}
-            <Button onClick={navigateToLogs}>{t('finishOnboarding')}</Button> {/* Add this button */}
+        <div style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'white',
+            padding: '20px',
+            borderRadius: '5px',
+            boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
+        }}>
+            <h2>{currentCategory || t('allDone')}</h2>
+            {currentCategory === 'Well Done!' && <Button onClick={navigateToLogs}>{t('finishOnboarding')}</Button>}
         </div>
     );
 }
@@ -366,7 +488,12 @@ function Onboarding() {
                 </label>
 
                 <Button onClick={() => handleMonthlyIncomeChange(income,currency)}>{t('submit')}</Button>
-                {showCompletionModal && <CompletionModal onFinish={() => setShowCompletionModal(false)} />}
+                {showCompletionModal && <CompletionModal 
+                          monthlyIncome={income} 
+                          userId={user.id} 
+                          currentMonth={new Date().getMonth() + 1}  // Use JavaScript's Date object to get the current month
+                          onFinish={() => setShowCompletionModal(false)} 
+                        />}
             </div>
         );
     }
