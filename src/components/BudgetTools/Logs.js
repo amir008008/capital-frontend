@@ -15,7 +15,7 @@ import axios from 'axios';
 import { useRef } from 'react';
 
 
-const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'dev'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 

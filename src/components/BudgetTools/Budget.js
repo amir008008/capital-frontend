@@ -20,8 +20,9 @@ import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faChevronUp,faChevronDown,faEdit } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
-const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'dev'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
@@ -33,6 +34,7 @@ if (ENV === 'prod') {
 
 console.log(BASE_URL);
 const YEAR = 2023;
+
 
 // Custom hook to log and track how often it's invoked
 function useLoggedHook(hookFunction, ...args) {
@@ -548,6 +550,15 @@ React.useEffect(() => {
           toggleEdit();
         }
       };
+      const handleCancelEdit = () => {
+        // You might want to reset any state related to the editing process
+        setEditExpenseName(''); 
+        setEditExpenseValue('');
+      
+        // Close edit mode by setting isEditing to false
+        setIsEditing(false);
+      };
+      
   
       if (isEditing) {
         return (
@@ -567,7 +578,11 @@ React.useEffect(() => {
               value={editExpenseValue}
               onChange={(e) => setEditExpenseValue(e.target.value)}
             />
-  
+                <FontAwesomeIcon
+                  icon={faTimes}
+                  className="custom-icon-class cancel-icon"
+                  onClick={handleCancelEdit}
+              />
               <button
                 className="button-submit"
                 onClick={() => handleSaveEdit()}
@@ -575,6 +590,8 @@ React.useEffect(() => {
               >
                 <FontAwesomeIcon icon={faCheck} style={{ width: '14px', height: '14px' }} /> {/* Adjust the width */}
               </button>  
+
+
             {/* {handleCancel && 
               <div className="edit-expense button-close" onClick={handleCancel}>Cancel</div>} */}
           </>
@@ -588,6 +605,15 @@ React.useEffect(() => {
     const [currentEditExpenseName, setCurrentEditExpenseName] = useState('');
     const [currentEditExpenseValue, setCurrentEditExpenseValue] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    const [otherTransactions, setOtherTransactions] = useState([]);
+    const [expandedExpenseId, setExpandedExpenseId] = useState(null);
+
+    // Function to get transactions of a specific expense.
+    const getTransactionsOfExpense = (expenseName) => {
+      console.log("ExpenseName ", expenseName)
+      console.log("RETURN: ", otherTransactions.filter(otherTransactions => otherTransactions.matched_expense_name === expenseName))
+      return otherTransactions.filter(otherTransactions => otherTransactions.matched_expense_name === expenseName);
+    };
 
   
     const getExpensesOfType = (expenseType, status) => {
@@ -651,8 +677,8 @@ React.useEffect(() => {
 
 
       return expenses
-          .filter(expense => expense.expense_type === expenseType)
-          .map((expense, expenseIndex) => (
+        .filter(expense => expense.expense_type === expenseType)
+        .map((expense, expenseIndex) => (
             <li key={expenseIndex} className="expense-item">
               {currentlyEditingExpenseId === expense.id ? (
                 <EditExpenseInput 
@@ -677,24 +703,61 @@ React.useEffect(() => {
                 initialExpenseName={expense.expense_name}
                 initialExpenseValue={expense.expense_amount}
               />
+              
               ) : (
               <>
-                <span className="expense-name" onClick={() => {
-                    setEditingExpense(expense);  // Set the current expense to edit
-                    setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
-                }}>
-                    {formatExpenseName(expense.expense_name)}
-                </span>
+                  <div className="expense-header expense-name">
+                      <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
+
+                      {/* Icon for expanding/collapsing the list */}
+                      <FontAwesomeIcon
+                            icon={expense.id === expandedExpenseId ? faChevronUp : faChevronDown}
+                            style={{ color: 'grey', fontSize: '14px', cursor: 'pointer' }}
+                            onClick={() => setExpandedExpenseId(expense.id === expandedExpenseId ? null : expense.id)}
+                        />
+
+
+                      {expandedExpenseId === expense.id && (
+                    <span className="transaction-list" style={{ fontStyle: 'italic', padding: '0px 0' }}>
+                      
+                      {/* Loop through each transaction of the expense */}
+                      {getTransactionsOfExpense(expense.expense_name).map((transaction, index) => (
+                        <div key={index}>
+                          <span className="transaction-item" style={{ marginLeft: '20px' }}>
+                            <span style={{ marginRight: '20px' }}>{transaction.transaction_name}</span>
+                            <a 
+                              className={`used-already ${expense.expense_amount - expense.used_already >= 0 ? 'positive' : 'negative'}`} 
+                              style={{ fontSize: '0.9em', marginTop: '0px' }}
+                            >
+                              {transaction.transaction_amount}
+                            </a>
+                          </span>
+                          <br />
+                        </div>
+                      ))}
+
+                    </span>
+                  )}
+
+
+                </div>
 
                 <span 
                     className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}
-                    onClick={() => {
-                        setEditingExpense(expense);  // Set the current expense to edit
-                        setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
-                    }}
                 >
                     {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
+                    <FontAwesomeIcon 
+                          icon={faEdit}
+                          style={{ fontSize: '14px', cursor: 'pointer' }}
+                          onClick={(e) => {
+                              setEditingExpense(expense);
+                              setIsEditing(true);
+                              e.stopPropagation();
+                          }}
+                      />
+
                 </span>
+
 
 
 
@@ -720,6 +783,18 @@ React.useEffect(() => {
                   Edit
                 </button>
                 */}
+                                {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
+
+                    <FontAwesomeIcon
+                        icon={faEdit}
+                        style={{ color: 'grey', fontSize: '14px', cursor: 'pointer' }}
+                        onClick={() => {
+                            setEditingExpense(expense);  
+                            setIsEditing(true);
+                        }}
+                    />
+
+                        )}
                 {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
               <FontAwesomeIcon
                 icon={faTimes}
@@ -730,6 +805,7 @@ React.useEffect(() => {
             {/* <button className="button-submit" onClick={() => setEditingExpense(expense)}>
               Edit
             </button> */}
+
           </>
         )}
       </li>
@@ -1500,6 +1576,72 @@ function getButtonClassName(status) {
       return 'not-closed';
   }
 }  
+    //Other Transactions
+    const [ongoingMonth, setOngoingMonth] = useState(null);
+
+    useEffect(() => {
+      const fetchOngoingMonth = async () => {
+          try {
+              const response = await fetch(`${BASE_URL}/get-ongoing-budget-month?user_id=${user.id}`);
+              const data = await response.json();
+              console.log("Ongoing Month Data:", data);
+              if (data.success && data.ongoingMonths.length > 0) {
+                  setOngoingMonth(`${data.ongoingMonths[0]}%`); // Appending '%' at the end
+              } else {
+                  console.error("No ongoing month found:", data.message);
+              }
+          } catch (error) {
+              console.error("Error fetching ongoing month:", error);
+          }
+      };
+  
+      fetchOngoingMonth();
+  }, [user.id]);
+    useEffect(() => {
+      if (!ongoingMonth) return;
+      
+      fetchOtherTransactions();  // Call the function here
+      console.log('entering Fetching other transactions');
+
+  }, [ongoingMonth]);  // Dependency list ensures that this useEffect runs whenever user.id changes
+    const fetchOtherTransactions = async () => {
+
+        try {
+            console.log("monthRefs: ",monthRefs);
+            console.log("ongoingMonth: ",ongoingMonth);
+            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}&date=${ongoingMonth}`);
+            const data = await response.json();
+            if (data.success) {
+
+                console.log("Raw transactions:", data.transactions); // Log the raw transactions
+                
+                const transactionsWithCategory = await Promise.all(
+                    data.transactions.map(async transaction => {
+                        const categoryResponse = await fetch(`${BASE_URL}/get-category-by-name?expense_name=${transaction.matched_expense_name}&expense_month=${ongoingMonth}`);
+                        const categoryData = await categoryResponse.json();
+                        if (categoryData.success && categoryData.data.length > 0) {
+                            transaction.category_name = categoryData.data[0].category_name;
+                        } else {
+                            transaction.category_name = 'Unknown'; // Default if not found
+                        }
+    
+                        console.log("Processed transaction:", transaction); // Log the processed transaction with its category
+                        return transaction;
+                    })
+                );
+    
+                console.log("Final transactions with categories:", transactionsWithCategory); // Log the final array
+    
+                setOtherTransactions(transactionsWithCategory);
+                
+
+            } else {
+                console.error("Failed to fetch transactions:", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        }
+    };
   return isLoading ? <LoadingSpinner /> : (
             
             <div>

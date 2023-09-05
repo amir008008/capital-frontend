@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { debounce } from 'lodash'; // Import the debounce function
-const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'dev'  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
@@ -204,7 +204,7 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         });
         try {
             await Promise.all(promises);
-            setCurrentCategory('Well Done!');
+            setCurrentCategory(t('allDone'));
         } catch (error) {
             console.error("Error in adding all expenses:", error);
         }
@@ -213,7 +213,7 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
 
     useEffect(() => {
         if (progress >= 100) {
-            setCurrentCategory('Well Done!');
+            setCurrentCategory(t('allDone'));
         }
     }, [progress]);
 
@@ -235,7 +235,7 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
             boxShadow: '0px 0px 10px rgba(0, 0, 0, 0.1)'
         }}>
             <h2>{currentCategory || t('allDone')}</h2>
-            {currentCategory === 'Well Done!' && <Button onClick={navigateToLogs}>{t('finishOnboarding')}</Button>}
+            {currentCategory === t('allDone') && <Button onClick={navigateToLogs}>{t('finishOnboarding')}</Button>}
         </div>
     );
 }
