@@ -23,8 +23,8 @@ if (ENV === 'prod') {
 
 console.log(BASE_URL);
 const Nushi = process.env.PUBLIC_URL + '/Nushi/onboarding.jpg';
-const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/analytical.png';
-const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/supportive.png';
+const NushiAnalytical = process.env.PUBLIC_URL + '/Nushi/Analytical.png';
+const NushiSupportive = process.env.PUBLIC_URL + '/Nushi/Supportive.png';
 
 
 export const OnboardingContainer = styled.div`
@@ -173,7 +173,7 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                setCurrentCategory(`Adding budget for ${expenseName}`);
+                //setCurrentCategory(`Adding budget for ${expenseName}`);
             } else {
                 console.error('Error adding expense:', data.error || data.message);
             }
