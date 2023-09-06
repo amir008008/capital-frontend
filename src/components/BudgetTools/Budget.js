@@ -1306,12 +1306,12 @@ React.useEffect(() => {
 
     
   
-    function toThreeSignificantDigits(num) {
-      if (num === 0) return "0"; 
-      const magnitude = Math.floor(Math.log10(Math.abs(num)));
-      const divisor = Math.pow(10, magnitude - 2);
-      return String(Math.round(num / divisor) * divisor);
-  }
+  //   function toThreeSignificantDigits(num) {
+  //     if (num === 0) return "0"; 
+  //     const magnitude = Math.floor(Math.log10(Math.abs(num)));
+  //     const divisor = Math.pow(10, magnitude - 2);
+  //     return num;
+  // }
   
     
       
@@ -1378,7 +1378,7 @@ React.useEffect(() => {
                   <div className="ongoing-info">
                   <div className="header-text">{t('ongoingHeader')}</div>
                     <div className="expense-value">{calculateActualUsed()}</div>
-                    <div className="step-description">{t('step3StayOnBudget', { budget: toThreeSignificantDigits(calculateTotalExpenses()) })}</div>
+                    <div className="step-description">{t('step3StayOnBudget', { budget: calculateTotalExpenses().toFixed(2) })}</div>
                   </div>
                   <div className="budget-details">
                     {/* <div className="expenses-heading">{t('fixedExpenses')}</div> */}
