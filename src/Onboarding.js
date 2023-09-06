@@ -4,7 +4,7 @@ import { Circle, Line } from 'rc-progress';
 import styled from 'styled-components';
 import { useSwipeable } from 'react-swipeable';
 import AuthContext from './components/Account/AuthContext';  // Update this to the actual path
-import React, { useContext, useState, useEffect,useRef,useCallback } from 'react';
+import React, { useContext, useState, useEffect,useRef,useCallback,useMemo  } from 'react';
 import UserPreferencesContext from '../src/components/Account/UserPreferencesContext';
 import i18n from 'i18next';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -95,6 +95,8 @@ const skipButtonStyle = {
 import { useNavigate } from 'react-router-dom';  // Replace useHistory with useNavigate
 
 function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext, onAICoachChange, setProgress, progress }) {
+    const { t } = useTranslation();
+
     const navigate = useNavigate();
     useEffect(() => {
         if (progress < 100) {
@@ -128,22 +130,25 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         "Gifts/Donations": 23
     };
     
-    const categories = [
-        { category: t('saving_for_emergency_fund'), description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
-        { category: t('saving_for_big_purchase'), description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
-        { category: t('housing'), description: "Housing costs", purpose: "Living expenses", type: "Fixed", budget: 0.10 },
-        { category: t('groceries'), description: "Food/Supplies - groceries", purpose: "Living expenses", type: "Fixed", budget: 0.07 },
-        { category: t('utilities_and_subscriptions'), description: "Utilities and subscriptions", purpose: "Living expenses", type: "Fixed", budget: 0.05 },
-        { category: t('transportation'), description: "Transportation costs", purpose: "Living expenses", type: "Fixed", budget: 0.04 },
-        { category: t('household_items'), description: "Household items", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
-        { category: t('personal_care'), description: "Personal care expenses", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
-        { category: t('eating_out_by_myself'), description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
-        { category: t('saving_for_traveling'), description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
-        { category: t('education'), description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
-        { category: t('eating_out_to_make_friends'), description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
-        { category: t('entertainment'), description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
-        { category: t('gifts_donations'), description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) }
-      ];
+    const categories = useMemo(() => ([
+        { id: 2, category: t('saving_for_emergency_fund'), description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
+        { id: 3, category: t('saving_for_big_purchase'), description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
+        { id: 6, category: t('housing'), description: "Housing costs", purpose: "Living expenses", type: "Fixed", budget: 0.10 },
+        { id: 7, category: t('groceries'), description: "Food/Supplies - groceries", purpose: "Living expenses", type: "Fixed", budget: 0.07 },
+        { id: 8, category: t('utilities_and_subscriptions'), description: "Utilities and subscriptions", purpose: "Living expenses", type: "Fixed", budget: 0.05 },
+        { id: 9, category: t('transportation'), description: "Transportation costs", purpose: "Living expenses", type: "Fixed", budget: 0.04 },
+        { id: 10, category: t('household_items'), description: "Household items", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { id: 11, category: t('personal_care'), description: "Personal care expenses", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { id: 13, category: t('eating_out_by_myself'), description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
+        { id: 19, category: t('saving_for_traveling'), description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
+        { id: 20, category: t('education'), description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
+        { id: 21, category: t('eating_out_to_make_friends'), description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
+        { id: 22, category: t('entertainment'), description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
+        { id: 23, category: t('gifts_donations'), description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) }
+        // ... Add more categories as needed
+    ]), [t]);
+    
+    
       
     
      // Debounce the addExpenses function to avoid rapid consecutive calls.
@@ -155,6 +160,33 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         debouncedAddExpenses();
     }, []); // Run this effect only once when the component mounts
     const addCategory = (userId, category, expenseName, expenseAmount, expenseType, expenseMonth) => {
+        const categoryIdMap = {
+            "other": 1,
+            "saving_for_emergency_fund": 2,
+            "saving_for_big_purchase": 3,
+            "other_savings": 4,
+            "investment": 5,
+            "housing": 6,
+            "groceries": 7,
+            "utilities_and_subscriptions": 8,
+            "transportation": 9,
+            "household_items": 10,
+            "personal_care": 11,
+            "childcare": 12,
+            "eating_out_by_myself": 13,
+            "pets": 14,
+            "medical_care": 15,
+            "insurance": 16,
+            "debt": 17,
+            "clothing": 18,
+            "saving_for_traveling": 19,
+            "education": 20,
+            "eating_out_to_make_friends": 21,
+            "entertainment": 22,
+            "gifts_donations": 23
+        };
+        
+          
         const categoryId = categoryIdMap[category]; // Getting the correct category id
         fetch(`${BASE_URL}/add-expense`, {
             method: 'POST',
@@ -192,7 +224,8 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
     const addExpenses = async (userId, monthlyIncome, currentMonth) => {
         const promises = categories.map(category => {
             const expenseAmount = monthlyIncome * category.budget;
-            const categoryId = categoryIdMap[category.category]; 
+            const categoryId = category.id;
+
             return addCategory(
                 userId,
                 categoryId,  
@@ -218,7 +251,7 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         }
     }, [progress]);
 
-    const { t } = useTranslation();
+    
 
     const navigateToLogs = () => {
         navigate('/logs');
