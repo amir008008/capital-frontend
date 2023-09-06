@@ -129,7 +129,6 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         "Entertainment": 22,
         "Gifts/Donations": 23
     };
-    
     const categories = useMemo(() => ([
         { id: 2, category: t('saving_for_emergency_fund'), description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
         { id: 3, category: t('saving_for_big_purchase'), description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
@@ -142,9 +141,9 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
         { id: 13, category: t('eating_out_by_myself'), description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
         { id: 19, category: t('saving_for_traveling'), description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
         { id: 20, category: t('education'), description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
-        { id: 21, category: t('eating_out_to_make_friends'), description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
-        { id: 22, category: t('entertainment'), description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
-        { id: 23, category: t('gifts_donations'), description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) }
+        { id: 21, category: t('eating_out_to_make_friends'), description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: 0.0666 },
+        { id: 22, category: t('entertainment'), description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: 0.0666 },
+        { id: 23, category: t('gifts_donations'), description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: 0.0666 }
         // ... Add more categories as needed
     ]), [t]);
     
