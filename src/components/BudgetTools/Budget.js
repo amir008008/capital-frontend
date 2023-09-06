@@ -1574,6 +1574,72 @@ function getButtonClassName(status) {
       return 'not-closed';
   }
 }  
+ //Other Transactions
+    const [ongoingMonth, setOngoingMonth] = useState(null);
+
+    useEffect(() => {
+      const fetchOngoingMonth = async () => {
+          try {
+              const response = await fetch(`${BASE_URL}/get-ongoing-budget-month?user_id=${user.id}`);
+              const data = await response.json();
+              console.log("Ongoing Month Data:", data);
+              if (data.success && data.ongoingMonths.length > 0) {
+                  setOngoingMonth(`${data.ongoingMonths[0]}%`); // Appending '%' at the end
+              } else {
+                  console.error("No ongoing month found:", data.message);
+              }
+          } catch (error) {
+              console.error("Error fetching ongoing month:", error);
+          }
+      };
+  
+      fetchOngoingMonth();
+  }, [user.id]);
+    useEffect(() => {
+      if (!ongoingMonth) return;
+      
+      fetchOtherTransactions();  // Call the function here
+      console.log('entering Fetching other transactions');
+
+  }, [ongoingMonth]);  // Dependency list ensures that this useEffect runs whenever user.id changes
+    const fetchOtherTransactions = async () => {
+
+        try {
+            console.log("monthRefs: ",monthRefs);
+            console.log("ongoingMonth: ",ongoingMonth);
+            const response = await fetch(`${BASE_URL}/get-transactions?user_id=${user.id}&date=${ongoingMonth}`);
+            const data = await response.json();
+            if (data.success) {
+
+                console.log("Raw transactions:", data.transactions); // Log the raw transactions
+                
+                const transactionsWithCategory = await Promise.all(
+                    data.transactions.map(async transaction => {
+                        const categoryResponse = await fetch(`${BASE_URL}/get-category-by-name?expense_name=${transaction.matched_expense_name}&expense_month=${ongoingMonth}`);
+                        const categoryData = await categoryResponse.json();
+                        if (categoryData.success && categoryData.data.length > 0) {
+                            transaction.category_name = categoryData.data[0].category_name;
+                        } else {
+                            transaction.category_name = 'Unknown'; // Default if not found
+                        }
+    
+                        console.log("Processed transaction:", transaction); // Log the processed transaction with its category
+                        return transaction;
+                    })
+                );
+    
+                console.log("Final transactions with categories:", transactionsWithCategory); // Log the final array
+    
+                setOtherTransactions(transactionsWithCategory);
+                
+
+            } else {
+                console.error("Failed to fetch transactions:", data.message);
+            }
+        } catch (error) {
+            console.error("Error fetching transactions:", error);
+        }
+    };
   return isLoading ? <LoadingSpinner /> : (
             
             <div>
