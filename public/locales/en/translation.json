@@ -134,7 +134,21 @@
     "today" : "Today",
     "dailyPurchases" : "Record Your Spend",
     "adding": "Adding item to expense...",
-    "set_current_category": "Adding budget for {expenseName}"
+    "set_current_category": "Adding budget for {expenseName}",
+    "saving_for_emergency_fund": "Saving for emergency fund",
+    "saving_for_big_purchase": "Saving for big purchase",
+    "housing": "Housing",
+    "groceries": "Groceries",
+    "utilities_and_subscriptions": "Utilities & Subscriptions",
+    "transportation": "Transportation",
+    "household_items": "Household Items",
+    "personal_care": "Personal care",
+    "eating_out_by_myself": "Eating out by myself",
+    "saving_for_traveling": "Saving for traveling",
+    "education": "Education",
+    "eating_out_to_make_friends": "Eating out to make friends",
+    "entertainment": "Entertainment",
+    "gifts_donations": "Gifts/Donations"
 
   
 

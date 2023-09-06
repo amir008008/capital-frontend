@@ -1197,3 +1197,7 @@ body {
   /* Other styles similar to .bullet-point if needed */
     width: 100%;
 }
+.positive, .negative {
+  font-family: 'Gellix', Gellix, monospace;
+  width: 30%;
+}

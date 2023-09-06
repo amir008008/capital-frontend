@@ -132,7 +132,21 @@
   "today" : "今天",
   "dailyPurchases" : "记录你的支出",
   "adding": "将项目添加到费用中...",
-  "set_current_category": "为 {expenseName} 添加预算"
+  "set_current_category": "为 {expenseName} 添加预算",
+  "saving_for_emergency_fund": "紧急基金储备",
+  "saving_for_big_purchase": "大额购物储备",
+  "housing": "住房",
+  "groceries": "杂货",
+  "utilities_and_subscriptions": "公共事业与订阅",
+  "transportation": "交通",
+  "household_items": "家居用品",
+  "personal_care": "个人护理",
+  "eating_out_by_myself": "自己外出用餐",
+  "saving_for_traveling": "旅行储备",
+  "education": "教育",
+  "eating_out_to_make_friends": "为了交朋友而外出用餐",
+  "entertainment": "娱乐",
+  "gifts_donations": "礼物/捐款"
 
 
 

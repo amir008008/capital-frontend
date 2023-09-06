@@ -132,6 +132,20 @@
     "today" : "اليوم",
     "dailyPurchases": "سجل مصروفك",
     "adding": "...إضافة عنصر إلى المصروف",
-    "set_current_category": "إضافة ميزانية لـ {expenseName}"
+    "set_current_category": "إضافة ميزانية لـ {expenseName}",
+    "saving_for_emergency_fund": "التوفير لصندوق الطوارئ",
+    "saving_for_big_purchase": "التوفير لشراء كبير",
+    "housing": "الإسكان",
+    "groceries": "البقالة",
+    "utilities_and_subscriptions": "الخدمات والاشتراكات",
+    "transportation": "النقل",
+    "household_items": "الأدوات المنزلية",
+    "personal_care": "العناية الشخصية",
+    "eating_out_by_myself": "تناول الطعام بمفردي",
+    "saving_for_traveling": "التوفير للسفر",
+    "education": "التعليم",
+    "eating_out_to_make_friends": "تناول الطعام لكسب الأصدقاء",
+    "entertainment": "الترفيه",
+    "gifts_donations": "الهدايا/التبرعات"
 
 }

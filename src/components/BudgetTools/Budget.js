@@ -719,15 +719,15 @@ React.useEffect(() => {
               <>
           <div className="expense-header expense-name" onClick={() => setExpandedExpenseId(expense.id === expandedExpenseId ? null : expense.id)}>
           <span className="combined-content">
-    {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
-        <span className="bullet-pointexpense-name">
-            {expense.expense_amount-expense.total_amount < 0 ? '✓' : '•'} {formatExpenseName(expense.expense_name)}
-        </span>
-        
-    ) : (
-        <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
-    )}
-</span>
+                            {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
+                                <span className="bullet-pointexpense-name">
+                                    {expense.expense_amount-expense.total_amount < 0 ? '✓' : '•'} {formatExpenseName(expense.expense_name)}
+                                </span>
+                                
+                            ) : (
+                                <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
+                            )}
+                        </span>
 
 
 
@@ -740,7 +740,7 @@ React.useEffect(() => {
                                       <span className="transaction-item" style={{ marginLeft: '20px' }}>
                                           <span style={{ marginRight: '20px' }}>{transaction.transaction_name}</span>
                                           <a 
-                                              className={`used-already ${expense.expense_amount - expense.used_already >= 0 ? 'positive' : 'negative'}`} 
+                                              className={`used-already ${expense.expense_amount - expense.total_amount >= 0 ? 'positive' : 'negative'}`} 
                                               style={{ fontSize: '0.9em', marginTop: '0px' }}
                                           >
                                     
@@ -779,16 +779,16 @@ React.useEffect(() => {
                       </span>
                       
                   )} */}
-                  {(status !== 'waiting' && status !== 'expected' ) && (
+                  {(status !== 'waiting' && status !== 'expected') && (
                       <span className={`used-already ${expense.expense_amount - expense.total_amount >= 0 ? 'positive' : 'negative'}`}>
                           {expense.expense_amount - expense.total_amount >= 0 ? (
-                              <span className="positive">{(expense.expense_amount - expense.total_amount).toFixed(2)}</span>
+                              <span className="positive">{String((expense.expense_amount - expense.total_amount).toFixed(2)).padStart(5, '\u00A0')}</span>
                           ) : (
-                              <span className="negative">({Math.abs(expense.expense_amount - expense.total_amount).toFixed(2)})</span>
+                              <span className="negative">({String(Math.abs(expense.expense_amount - expense.total_amount).toFixed(2)).padStart(5, '\u00A0')})</span>
                           )}
                       </span>
-                      
                   )}
+
 
                   {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
                       <>
@@ -1306,6 +1306,12 @@ React.useEffect(() => {
 
     
   
+    function toThreeSignificantDigits(num) {
+      if (num === 0) return "0"; 
+      const magnitude = Math.floor(Math.log10(Math.abs(num)));
+      const divisor = Math.pow(10, magnitude - 2);
+      return String(Math.round(num / divisor) * divisor);
+  }
   
     
       
@@ -1372,7 +1378,7 @@ React.useEffect(() => {
                   <div className="ongoing-info">
                   <div className="header-text">{t('ongoingHeader')}</div>
                     <div className="expense-value">{calculateActualUsed()}</div>
-                    <div className="step-description">{t('step3StayOnBudget', { budget: calculateTotalExpenses() })}</div>
+                    <div className="step-description">{t('step3StayOnBudget', { budget: toThreeSignificantDigits(calculateTotalExpenses()) })}</div>
                   </div>
                   <div className="budget-details">
                     {/* <div className="expenses-heading">{t('fixedExpenses')}</div> */}

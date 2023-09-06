@@ -132,7 +132,21 @@
     "today" : "сегодня",
     "dailyPurchases" : "Запишите ваш расход",
     "adding": "добавление элемента в расходы...",
-    "set_current_category": "Добавление бюджета для {expenseName}"
+    "set_current_category": "Добавление бюджета для {expenseName}",
+    "saving_for_emergency_fund": "Создание фонда экстренных ситуаций",
+    "saving_for_big_purchase": "Сбережения на крупную покупку",
+    "housing": "Жилье",
+    "groceries": "Продукты питания",
+    "utilities_and_subscriptions": "Коммунальные платежи и подписки",
+    "transportation": "Транспорт",
+    "household_items": "Хозяйственные товары",
+    "personal_care": "Личная гигиена",
+    "eating_out_by_myself": "Еда вне дома одному",
+    "saving_for_traveling": "Сбережения на путешествия",
+    "education": "Образование",
+    "eating_out_to_make_friends": "Еда в ресторанах для заведения друзей",
+    "entertainment": "Развлечения",
+    "gifts_donations": "Подарки/Пожертвования"
 
 
 

@@ -134,7 +134,21 @@
     "today" : "Hoy",
     "dailyPurchases" : "Registra el gasto de hoy",
     "adding": "Añadiendo ítem al gasto...",
-    "set_current_category": "Agregando presupuesto para {expenseName}"
+    "set_current_category": "Agregando presupuesto para {expenseName}",
+    "saving_for_emergency_fund": "Ahorro para fondo de emergencia",
+    "saving_for_big_purchase": "Ahorro para grandes compras",
+    "housing": "Vivienda",
+    "groceries": "Comestibles",
+    "utilities_and_subscriptions": "Utilidades y suscripciones",
+    "transportation": "Transporte",
+    "household_items": "Artículos del hogar",
+    "personal_care": "Cuidado personal",
+    "eating_out_by_myself": "Comer fuera solo",
+    "saving_for_traveling": "Ahorro para viajar",
+    "education": "Educación",
+    "eating_out_to_make_friends": "Comer fuera para hacer amigos",
+    "entertainment": "Entretenimiento",
+    "gifts_donations": "Regalos/Donaciones"
 
 
 

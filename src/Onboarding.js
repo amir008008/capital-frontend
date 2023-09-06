@@ -129,21 +129,22 @@ function CompletionModal({ monthlyIncome, userId, currentMonth, onFinish, onNext
     };
     
     const categories = [
-        { category: "Saving for emergency fund", description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
-        { category: "Saving for big purchase", description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
-        { category: "Housing", description: "Housing costs", purpose: "Living expenses", type: "Fixed", budget: 0.10 },
-        { category: "Groceries", description: "Food/Supplies - groceries", purpose: "Living expenses", type: "Fixed", budget: 0.07 },
-        { category: "Utilities & Subscriptions", description: "Utilities and subscriptions", purpose: "Living expenses", type: "Fixed", budget: 0.05 },
-        { category: "Transportation", description: "Transportation costs", purpose: "Living expenses", type: "Fixed", budget: 0.04 },
-        { category: "Household Items", description: "Household items", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
-        { category: "Personal care", description: "Personal care expenses", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
-        { category: "Eating out by myself", description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
-        { category: "Saving for traveling", description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
-        { category: "Education", description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
-        { category: "Eating out to make friends", description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: 0.0666 },
-        { category: "Entertainment", description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: 0.0666 },
-        { category: "Gifts/Donations", description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: 0.0666 }
-    ];
+        { category: t('saving_for_emergency_fund'), description: "Emergency fund", purpose: "Saving & investing", type: "Fixed", budget: 0.20 },
+        { category: t('saving_for_big_purchase'), description: "Big purchases like a new mattress or laptop", purpose: "Saving & investing", type: "Fixed", budget: 0.05 },
+        { category: t('housing'), description: "Housing costs", purpose: "Living expenses", type: "Fixed", budget: 0.10 },
+        { category: t('groceries'), description: "Food/Supplies - groceries", purpose: "Living expenses", type: "Fixed", budget: 0.07 },
+        { category: t('utilities_and_subscriptions'), description: "Utilities and subscriptions", purpose: "Living expenses", type: "Fixed", budget: 0.05 },
+        { category: t('transportation'), description: "Transportation costs", purpose: "Living expenses", type: "Fixed", budget: 0.04 },
+        { category: t('household_items'), description: "Household items", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { category: t('personal_care'), description: "Personal care expenses", purpose: "Living expenses", type: "Fixed", budget: 0.02 },
+        { category: t('eating_out_by_myself'), description: "", purpose: "Living expenses", type: "Fixed", budget: 0.00 },
+        { category: t('saving_for_traveling'), description: "", purpose: "Traveling", type: "Variable", budget: 0.10 },
+        { category: t('education'), description: "Education expenses", purpose: "Learn", type: "Variable", budget: 0.15 },
+        { category: t('eating_out_to_make_friends'), description: "Eating at restaurants", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
+        { category: t('entertainment'), description: "Entertainment expenses", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) },
+        { category: t('gifts_donations'), description: "Gifts and donations", purpose: "Making friends", type: "Variable", budget: parseFloat(0.0666).toFixed(2) }
+      ];
+      
     
      // Debounce the addExpenses function to avoid rapid consecutive calls.
      const debouncedAddExpenses = debounce(() => {
