@@ -718,13 +718,17 @@ React.useEffect(() => {
               ) : (
               <>
           <div className="expense-header expense-name" onClick={() => setExpandedExpenseId(expense.id === expandedExpenseId ? null : expense.id)}>
-                        <span className="combined-content">
-                            {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
-                                <span className="bullet-pointexpense-name">&#8226; {formatExpenseName(expense.expense_name)}</span>
-                            ) : (
-                                <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
-                            )}
-                        </span>
+          <span className="combined-content">
+    {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
+        <span className="bullet-pointexpense-name">
+            {expense.expense_amount-expense.total_amount < 0 ? '✓' : '•'} {formatExpenseName(expense.expense_name)}
+        </span>
+        
+    ) : (
+        <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
+    )}
+</span>
+
 
 
 
