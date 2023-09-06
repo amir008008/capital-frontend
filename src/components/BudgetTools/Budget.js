@@ -720,7 +720,7 @@ React.useEffect(() => {
           <div className="expense-header expense-name" onClick={() => setExpandedExpenseId(expense.id === expandedExpenseId ? null : expense.id)}>
                         <span className="combined-content">
                             {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
-                                <span className="bullet-point expense-name">&#8226; {formatExpenseName(expense.expense_name)}</span>
+                                <span className="bullet-pointexpense-name">&#8226; {formatExpenseName(expense.expense_name)}</span>
                             ) : (
                                 <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
                             )}
@@ -1206,7 +1206,7 @@ React.useEffect(() => {
   
 
     const formatExpenseName = (name) => {
-      const maxChars = 20;  // Set this to your desired character limit
+      const maxChars = 30;  // Set this to your desired character limit
       if (name.length > maxChars) {
           return `${name.slice(0, maxChars - 3)}...`;
       } else {
