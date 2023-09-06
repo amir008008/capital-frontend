@@ -19,7 +19,8 @@ import LoadingSpinner from '../../LoadingSpinner';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faCheck,faSave,faBan } from '@fortawesome/free-solid-svg-icons';
+import { faChevronUp,faChevronDown,faEdit } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
 const ENV = 'prod'  // This can be 'dev' or 'prod' or any other environment name you choose
 
@@ -546,8 +547,19 @@ React.useEffect(() => {
           });
           // Close edit mode
           toggleEdit();
+          window.location.reload();
         }
       };
+      const handleCancelEdit = () => {
+        // You might want to reset any state related to the editing process
+        setEditExpenseName(''); 
+        setEditExpenseValue('');
+      
+        // Close edit mode by setting isEditing to false
+        setIsEditing(false);
+        window.location.reload();
+      };
+      
   
       if (isEditing) {
         return (
@@ -567,14 +579,31 @@ React.useEffect(() => {
               value={editExpenseValue}
               onChange={(e) => setEditExpenseValue(e.target.value)}
             />
-  
+                <FontAwesomeIcon
+                  icon={faBan}
+                  className="expense-amount custom-icon-class cancel-icon"
+                  onClick={handleCancelEdit}
+              />
               <button
                 className="button-submit"
                 onClick={() => handleSaveEdit()}
                 style={{ width: 'auto', marginLeft: '5px' }} // Corrected style properties
               >
-                <FontAwesomeIcon icon={faCheck} style={{ width: '14px', height: '14px' }} /> {/* Adjust the width */}
+                <FontAwesomeIcon icon={faSave} style={{ width: '14px', height: '14px' }} /> 
               </button>  
+                <div style={{ display: 'flex' }}>
+                  <FontAwesomeIcon 
+                      icon={faSave} 
+                      // onClick={() => saveEdit(transaction.id)}
+                      style={{ cursor: 'pointer', marginRight: '10px' }} 
+                  />
+                  <FontAwesomeIcon 
+                      icon={faBan} 
+                       // onClick={() => cancelEdit(transaction.id)}
+                      style={{ cursor: 'pointer' }} 
+                  />
+              </div>
+
             {/* {handleCancel && 
               <div className="edit-expense button-close" onClick={handleCancel}>Cancel</div>} */}
           </>
@@ -588,6 +617,15 @@ React.useEffect(() => {
     const [currentEditExpenseName, setCurrentEditExpenseName] = useState('');
     const [currentEditExpenseValue, setCurrentEditExpenseValue] = useState('');
     const [isEditing, setIsEditing] = useState(false);
+    const [otherTransactions, setOtherTransactions] = useState([]);
+    const [expandedExpenseId, setExpandedExpenseId] = useState(null);
+
+    // Function to get transactions of a specific expense.
+    const getTransactionsOfExpense = (expenseName) => {
+      //console.log("ExpenseName ", expenseName)
+      //console.log("RETURN: ", otherTransactions.filter(otherTransactions => otherTransactions.matched_expense_name === expenseName))
+      return otherTransactions.filter(otherTransactions => otherTransactions.matched_expense_name === expenseName);
+    };
 
   
     const getExpensesOfType = (expenseType, status) => {
@@ -679,58 +717,94 @@ React.useEffect(() => {
               />
               ) : (
               <>
-                <span className="expense-name" onClick={() => {
-                    setEditingExpense(expense);  // Set the current expense to edit
-                    setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
-                }}>
-                    {formatExpenseName(expense.expense_name)}
-                </span>
-
-                <span 
-                    className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}
-                    onClick={() => {
-                        setEditingExpense(expense);  // Set the current expense to edit
-                        setIsEditing(true);  // Set isEditing to true to show the EditExpenseInput
-                    }}
-                >
-                    {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
-                </span>
+          <div className="expense-header expense-name" onClick={() => setExpandedExpenseId(expense.id === expandedExpenseId ? null : expense.id)}>
+                        <span className="combined-content">
+                            {getTransactionsOfExpense(expense.expense_name).length > 0 ? (
+                                <span className="bullet-point expense-name">&#8226; {formatExpenseName(expense.expense_name)}</span>
+                            ) : (
+                                <span className="expense-name">{formatExpenseName(expense.expense_name)}</span>
+                            )}
+                        </span>
 
 
 
-                    
-                {(status !== 'waiting' && status !== 'expected' ) && (
-                  
-                  <span className={`used-already ${expense.expense_amount - expense.used_already >= 0 ? 'positive' : 'negative'}`}>
-                    {expense.expense_amount - expense.used_already >= 0 ? (
-                      <span className="positive">{(expense.expense_amount - expense.used_already).toFixed(2)}</span>
-                    ) : (
-                      <span className="negative">({Math.abs(expense.expense_amount - expense.used_already).toFixed(2)})</span>
-                    )}
+                      {expandedExpenseId === expense.id && (
+                          <span className="transaction-list" style={{ fontStyle: 'italic', padding: '0px 0' }}>
+                              {/* Loop through each transaction of the expense */}
+                              {getTransactionsOfExpense(expense.expense_name).map((transaction, index) => (
+                                  <div key={index}>
+                                      <span className="transaction-item" style={{ marginLeft: '20px' }}>
+                                          <span style={{ marginRight: '20px' }}>{transaction.transaction_name}</span>
+                                          <a 
+                                              className={`used-already ${expense.expense_amount - expense.used_already >= 0 ? 'positive' : 'negative'}`} 
+                                              style={{ fontSize: '0.9em', marginTop: '0px' }}
+                                          >
+                                    
+                                              {transaction.transaction_amount}
+                                          </a>
+                                      </span>
+                                      <br />
+                                  </div>
+                              ))}
+                          </span>
+                      )}
+                  </div>
+
+                  <span 
+                      className={status !== 'waiting' && status !== 'expected' ? "expense-amount-closed-ongoing" : "expense-amount"}
+                  >
+                      {new Intl.NumberFormat(user.locale, { style: 'currency', currency: user.currency }).format(Math.round(expense.expense_amount))}
+                      {/* <FontAwesomeIcon 
+                          icon={faEdit}
+                          style={{ fontSize: '14px', cursor: 'pointer' }}
+                          onClick={(e) => {
+                              setEditingExpense(expense);
+                              setIsEditing(true);
+                              e.stopPropagation();
+                          }}
+                      /> */}
                   </span>
-                )}
-    
-                {/* Uncomment the following if you wish to have an edit button in the future */}
-                {/* 
-                <button className="button-submit" onClick={() => {
-                  setEditingExpenseId(expense.id);
-                  setEditingExpenseName(expense.expense_name);
-                  setEditingExpenseValue(expense.expense_amount);
-                }}>
-                  Edit
-                </button>
-                */}
-                {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
-              <FontAwesomeIcon
-                icon={faTimes}
-                className="custom-icon-class"
-                onClick={() => deleteExpense(user.id, expense.id)}
-              />
-            )}
-            {/* <button className="button-submit" onClick={() => setEditingExpense(expense)}>
-              Edit
-            </button> */}
-          </>
+
+                  {/* {(status !== 'waiting' && status !== 'expected' ) && (
+                      <span className={`used-already ${expense.expense_amount - expense.used_already >= 0 ? 'positive' : 'negative'}`}>
+                          {expense.expense_amount - expense.used_already >= 0 ? (
+                              <span className="positive">{(expense.expense_amount - expense.used_already).toFixed(2)}</span>
+                          ) : (
+                              <span className="negative">({Math.abs(expense.expense_amount - expense.used_already).toFixed(2)})</span>
+                          )}
+                      </span>
+                      
+                  )} */}
+                  {(status !== 'waiting' && status !== 'expected' ) && (
+                      <span className={`used-already ${expense.expense_amount - expense.total_amount >= 0 ? 'positive' : 'negative'}`}>
+                          {expense.expense_amount - expense.total_amount >= 0 ? (
+                              <span className="positive">{(expense.expense_amount - expense.total_amount).toFixed(2)}</span>
+                          ) : (
+                              <span className="negative">({Math.abs(expense.expense_amount - expense.total_amount).toFixed(2)})</span>
+                          )}
+                      </span>
+                      
+                  )}
+
+                  {(currentMonthStatus !== 'closed' && currentMonthStatus !== 'ongoing') && (
+                      <>
+                          <FontAwesomeIcon
+                              icon={faEdit}
+                              style={{ color: 'grey', fontSize: '14px', cursor: 'pointer' }}
+                              onClick={() => {
+                                  setEditingExpense(expense);  
+                                  setIsEditing(true);
+                              }}
+                          />
+                          <FontAwesomeIcon
+                              icon={faTimes}
+                              className="custom-icon-class"
+                              onClick={() => deleteExpense(user.id, expense.id)}
+                          />
+                      </>
+                  )}
+              </>
+
         )}
       </li>
         ));
