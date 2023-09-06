@@ -1068,9 +1068,9 @@ React.useEffect(() => {
       }
       function calculateActualUsed() {
         return expenses.reduce((acc, curr) => {
-          const usedAlready = parseFloat(curr.used_already);
-          if (!isNaN(usedAlready)) {
-            return acc + usedAlready;
+          const totalAmount = parseFloat(curr.total_amount);
+          if (!isNaN(totalAmount)) {
+            return acc + totalAmount;
           }
           return acc;
         }, 0);
