@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Header from './components/Header';
 import './App.css';
 import ErrorBoundary from './ErrorBoundary';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Onboarding from './Onboarding';
 import {
     Link,
-    BrowserRouter as Router,
+    HashRouter as Router,
     Route,
     Switch,
     Routes,

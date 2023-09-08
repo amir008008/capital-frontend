@@ -326,13 +326,13 @@ useEffect(() => {
   const months = t("months.short", { returnObjects: true });
   const monthsfull = t("months.long", { returnObjects: true });
 
-  if (process.env.NODE_ENV === "development") {
-    whyDidYouRender(React, {
-      trackAllPureComponents: true,
-      logOwnerReasons: true, // log more info about the rerender
-      onlyLogs: true, // Don't use the default notifications but only logs
-    });
-  }
+//   if (process.env.NODE_ENV === "development") {
+//     whyDidYouRender(React, {
+//       trackAllPureComponents: true,
+//       logOwnerReasons: true, // log more info about the rerender
+//       onlyLogs: true, // Don't use the default notifications but only logs
+//     });
+//   }
 
 
   const openAgain = () => {
