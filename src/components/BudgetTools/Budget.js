@@ -200,8 +200,28 @@ const populateExpensesDropdown = async (userId, monthYear) => {
 // Other constants and hooks...
 const fetchedOngoingMonthRef = useRef(false); // ref to track if ongoing month has been fetched
 
+const operationQueue = [];
+let isOperationRunning = false;
+
+const runNextOperation = async () => {
+  if (isOperationRunning || operationQueue.length === 0) return;
+
+  isOperationRunning = true;
+
+  const nextOperation = operationQueue.shift();
+  await nextOperation();
+
+  isOperationRunning = false;
+  runNextOperation(); // Check if there's another operation in the queue
+};
+
+const queueOperation = (operation) => {
+  operationQueue.push(operation);
+  runNextOperation();
+};
+
 const fetchAndUpdateOngoingMonth = async () => {
-  if (fetchedOngoingMonthRef.current) return; // Check if already fetched, if yes, exit.
+  if (fetchedOngoingMonthRef.current) return;
 
   const data = await fetchJSON(`${BASE_URL}/get-ongoing-budget-month?user_id=${user.id}`);
   if (data?.success && data.ongoingMonths.length > 0) {
@@ -209,8 +229,8 @@ const fetchAndUpdateOngoingMonth = async () => {
   } else {
     logError("Couldn't locate ongoing month:", data?.message);
   }
-  
-  fetchedOngoingMonthRef.current = true; // Mark as fetched
+
+  fetchedOngoingMonthRef.current = true;
 };
 
 const manageScrollAndFetchData = async () => {
@@ -244,16 +264,18 @@ const manageScrollAndFetchData = async () => {
 
 // Consolidated useEffect
 useEffect(() => {
-  fetchAndUpdateOngoingMonth(); // Fetch the ongoing month
-  manageScrollAndFetchData();  // Fetch data based on active month or dataRefreshKey updates
+    queueOperation(fetchAndUpdateOngoingMonth);
+    queueOperation(manageScrollAndFetchData);
   
-  setIsEditing(false); // Reset editing state when active month changes
-  setRenderCount(prevCount => prevCount + 1); // Track render count
-}, [user.id, activeMonthIndex_X9aB72, dataRefreshKey]);
-
-useEffect(() => {
-  if (ongoingMonth) fetchOtherTransactions();
-}, [ongoingMonth]);
+    setIsEditing(false);
+    setRenderCount(prevCount => prevCount + 1);
+  }, [user.id, activeMonthIndex_X9aB72, dataRefreshKey]);
+  
+  useEffect(() => {
+    if (ongoingMonth) {
+      queueOperation(fetchOtherTransactions);
+    }
+  }, [ongoingMonth]);
 
 
   // //window.alert('Reset');
