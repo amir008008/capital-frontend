@@ -198,67 +198,62 @@ const populateExpensesDropdown = async (userId, monthYear) => {
 };
 
 // Other constants and hooks...
+const fetchedOngoingMonthRef = useRef(false); // ref to track if ongoing month has been fetched
 
-// Fetch ongoing month and update the state
-useEffect(() => {
-  (async () => {
-    const data = await fetchJSON(`${BASE_URL}/get-ongoing-budget-month?user_id=${user.id}`);
-    if (data?.success && data.ongoingMonths.length > 0) {
-      setOngoingMonth(`${data.ongoingMonths[0]}%`);
-    } else {
-      logError("Couldn't locate ongoing month:", data?.message);
-    }
-  })();
-}, [user.id]);
+const fetchAndUpdateOngoingMonth = async () => {
+  if (fetchedOngoingMonthRef.current) return; // Check if already fetched, if yes, exit.
 
-// Manage scroll position, fetch data and other utilities based on the active month or dataRefreshKey updates
-useEffect(() => {
-  (async () => {
-    const currentRef = monthRefs.current[activeMonthIndex_X9aB72];
-    if (currentRef?.current) {
-      currentRef.current.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
-    }
+  const data = await fetchJSON(`${BASE_URL}/get-ongoing-budget-month?user_id=${user.id}`);
+  if (data?.success && data.ongoingMonths.length > 0) {
+    setOngoingMonth(`${data.ongoingMonths[0]}%`);
+  } else {
+    logError("Couldn't locate ongoing month:", data?.message);
+  }
+  
+  fetchedOngoingMonthRef.current = true; // Mark as fetched
+};
+
+const manageScrollAndFetchData = async () => {
+  const currentRef = monthRefs.current[activeMonthIndex_X9aB72];
+  if (currentRef?.current) {
+    currentRef.current.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+  }
+
+  const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+  
+  try {
+    await populateExpensesDropdown(user.id, monthYear);
     
-    if (!currentRef?.current) return;
-
-    const monthYear = getYearMonth(activeMonthIndex_X9aB72);
+    const updatedMonthStatuses = await Promise.all([...months.keys()].map(async (monthIndex) => {
+      const monthYear = getYearMonth(monthIndex);
+      const data = await fetchJSON(`${BASE_URL}/get-budget-status?user_id=${user.id}&month=${monthYear}`);
+      return { [monthYear]: data?.status };
+    }));
     
-    try {
-      await populateExpensesDropdown(user.id, monthYear);
-      
-      const updatedMonthStatuses = await Promise.all([...months.keys()].map(async (monthIndex) => {
-        const monthYear = getYearMonth(monthIndex);
-        const data = await fetchJSON(`${BASE_URL}/get-budget-status?user_id=${user.id}&month=${monthYear}`);
-        return { [monthYear]: data?.status };
-      }));
-      
-      setMonthStatuses((prevStatus) => ({ ...prevStatus, ...Object.assign({}, ...updatedMonthStatuses) }));
+    setMonthStatuses(prevStatus => ({ ...prevStatus, ...Object.assign({}, ...updatedMonthStatuses) }));
 
-      const expensesData = await fetchJSON(`${BASE_URL}/get-expenses?user_id=${user.id}&month=${monthYear}`);
-      if (expensesData) setExpenses(expensesData.expenses);
+    const expensesData = await fetchJSON(`${BASE_URL}/get-expenses?user_id=${user.id}&month=${monthYear}`);
+    if (expensesData) setExpenses(expensesData.expenses);
 
-    } catch (error) {
-      logError("Error during data retrieval:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  })();
-}, [activeMonthIndex_X9aB72, dataRefreshKey]);
+  } catch (error) {
+    logError("Error during data retrieval:", error);
+  } finally {
+    setIsLoading(false);
+  }
+};
 
-// Other effects...
+// Consolidated useEffect
+useEffect(() => {
+  fetchAndUpdateOngoingMonth(); // Fetch the ongoing month
+  manageScrollAndFetchData();  // Fetch data based on active month or dataRefreshKey updates
+  
+  setIsEditing(false); // Reset editing state when active month changes
+  setRenderCount(prevCount => prevCount + 1); // Track render count
+}, [user.id, activeMonthIndex_X9aB72, dataRefreshKey]);
 
 useEffect(() => {
   if (ongoingMonth) fetchOtherTransactions();
 }, [ongoingMonth]);
-
-useEffect(() => {
-  setIsEditing(false);
-}, [activeMonthIndex_X9aB72]);
-
-useEffect(() => {
-  setRenderCount(prevCount => prevCount + 1);
-}, []);
-
 
 
   // //window.alert('Reset');
