@@ -1,7 +1,7 @@
-import React, { useRef, useState, useCallback, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Header from './components/Header';
 import './App.css';
-import ErrorBoundary from  './ErrorBoundary';
+import ErrorBoundary from './ErrorBoundary';
 import 'react-tabs/style/react-tabs.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes, faUser, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import Onboarding from './Onboarding';
 import {
     Link,
-    BrowserRouter as Router,
+    HashRouter as Router,
     Route,
     Switch,
     Routes,
@@ -44,18 +44,17 @@ if (ENV === 'prod') {
 }
 
 console.log(BASE_URL);
-import './i18n'
+
+import './i18n';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import Backend from 'i18next-http-backend';
 import LanguageDetector from 'i18next-browser-languagedetector';
 
 function NavigationLinks() {
-    
     return (
         <div>
             <Link to="/logs">Logs</Link>
-            <Link to="/">Logs</Link>
             <Link to="/budget">Budget</Link>
             <Link to="/account">Account</Link>
             <Link to="/about">About</Link>
@@ -67,18 +66,16 @@ function NavigationLinks() {
 
 function BottomNavBar() {
     const location = useLocation(); // Get the current location
+    const navigate = useNavigate(); // Use useNavigate instead of useHistory
     const { t } = useTranslation();
+
     // List of routes where you want to hide the BottomNavBar
-    const hideOnRoutes = ["/login", "/register","/onboarding"];
+    const hideOnRoutes = ["/login", "/register", "/onboarding"];
 
     if (hideOnRoutes.includes(location.pathname)) {
         // Don't render the BottomNavBar on the specified routes
         return null;
     }
-
-    const navigate = (path) => {
-        window.location.href = path;
-    };
 
     return (
         <div className="bottom-nav-bar">
@@ -86,6 +83,7 @@ function BottomNavBar() {
                 <i className="fa fa-calendar"></i>
                 <span>{t('today')}</span>
             </button>
+
             <button onClick={() => navigate("/budget")} className="nav-button">
                 <i className="fa fa-money"></i>
                 <span>{t('budget')}</span>
@@ -95,10 +93,8 @@ function BottomNavBar() {
                 <span>{t('account')}</span>
             </button>
         </div>
-      );
-    }
-
-
+    );
+}
 
 function MainApp() {
     const navigate = useNavigate();
@@ -111,52 +107,54 @@ function MainApp() {
         localStorage.setItem('hasDoneOnboarding', 'true');
         setHasDoneOnboarding(true);
     };
+
     const handleIconClick = () => {
         navigate("/about");
     };
+
     const [budgetKey, setBudgetKey] = useState(Math.random());
 
     useEffect(() => {
         setBudgetKey(Math.random());
-        // Check if user has completed onboarding
+        // Check if the user has completed onboarding
         if (!localStorage.getItem('hasDoneOnboarding')) {
             //navigate('/onboarding');
         }
     }, [location]);
-    
+
     return (
         <UserPreferencesProvider>
             <ErrorBoundary>
-            <div className="App">
-                <Header />
-                <div className="main-content-app bg-off-white">
-                    <div className="navbar-top">
-                         <div className="navbar-title">
-                            <img src="/logo/icon.jpg" alt="Myfinancepal Logo" className="navbar-logo" />
-                            Myfinancepal
-                        </div>
+                <div className="App">
+                    <Header />
+                    <div className="main-content-app bg-off-white">
+                        <div className="navbar-top">
+                            <div className="navbar-title">
+                                <img src="/logo/icon.jpg" alt="Myfinancepal Logo" className="navbar-logo" />
+                                Myfinancepal
+                            </div>
 
-                        <div className="navbar-icons">
-                            <FontAwesomeIcon icon={faQuestionCircle} onClick={handleIconClick} style={{ cursor: "pointer" }} />
+                            <div className="navbar-icons">
+                                <FontAwesomeIcon icon={faQuestionCircle} onClick={handleIconClick} style={{ cursor: "pointer" }} />
+                            </div>
                         </div>
+                        <React.StrictMode>
+                            <React.Suspense fallback={<LoadingSpinner />}>
+                                <Routes>
+                                    <Route path="/logs" element={<Logs />} />
+                                    <Route path="/" element={<Logs />} />
+                                    <Route path="/budget" element={<Budget key={budgetKey} />} />
+                                    <Route path="/account" element={<Account />} />
+                                    <Route path="/about" element={<About />} />
+                                    <Route path="/login" element={<Login />} />
+                                    <Route path="/register" element={<Register />} />
+                                    <Route path="/onboarding" element={<Onboarding onFinish={finishOnboarding} />} />
+                                </Routes>
+                            </React.Suspense>
+                        </React.StrictMode>
+                        <BottomNavBar />
                     </div>
-                    <React.StrictMode>
-                    <React.Suspense fallback={<LoadingSpinner />}>
-                            <Routes>
-                                <Route path="/logs" element={<Logs />} />
-                                <Route path="/" element={<Logs />} />
-                                <Route path="/budget" element={<Budget key={budgetKey} />} />
-                                <Route path="/account" element={<Account />} />
-                                <Route path="/about" element={<About />} />
-                                <Route path="/login" element={<Login />} />
-                                <Route path="/register" element={<Register />} />
-                                <Route path="/onboarding" element={<Onboarding onFinish={finishOnboarding} />} />
-                            </Routes>
-                        </React.Suspense>
-                    </React.StrictMode>
-                    <BottomNavBar />
                 </div>
-            </div>
             </ErrorBoundary>
         </UserPreferencesProvider>
     );
@@ -164,11 +162,13 @@ function MainApp() {
 
 function App() {
     const [showRoutes, setShowRoutes] = useState(true);
-const handleNavigation = () => {
-    setShowRoutes(false);
-    // Use a timeout to ensure that the component has time to unmount before remounting
-    setTimeout(() => setShowRoutes(true), 0);
-}
+
+    const handleNavigation = () => {
+        setShowRoutes(false);
+        // Use a timeout to ensure that the component has time to unmount before remounting
+        setTimeout(() => setShowRoutes(true), 0);
+    };
+
     return (
         <Router>
             <ErrorBoundary>
@@ -188,14 +188,18 @@ function AuthContextProvider() {
 
     useEffect(() => {
         const authToken = localStorage.getItem('authToken');
-        
+
         // Helper function to handle unauthorized actions
         const handleUnauthorized = () => {
             localStorage.removeItem('authToken');
-            if (location.pathname !== "/login" && location.pathname !== "/register" && location.pathname !== "/onboarding") {
+            if (
+                location.pathname !== "/login" &&
+                location.pathname !== "/register" &&
+                location.pathname !== "/onboarding"
+            ) {
                 navigate('/login');
             }
-        }
+        };
 
         if (authToken) {
             fetch(`${BASE_URL}/api/fetch-user`, {
@@ -204,28 +208,28 @@ function AuthContextProvider() {
                     'Authorization': `Bearer ${authToken}`
                 }
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Unauthorized');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    setUser(data.data);
-                    if (!data.data.id && location.pathname !== "/login" && location.pathname !== "/register") {
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Unauthorized');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        setUser(data.data);
+                        if (!data.data.id && location.pathname !== "/login" && location.pathname !== "/register") {
+                            handleUnauthorized();
+                        }
+                    } else {
                         handleUnauthorized();
                     }
-                } else {
+                })
+                .catch(err => {
                     handleUnauthorized();
-                }
-            })
-            .catch(err => {
-                handleUnauthorized();
-            })
-            .finally(() => {
-                setLoading(false);
-            });
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
         } else {
             handleUnauthorized();
             setLoading(false);
@@ -239,9 +243,8 @@ function AuthContextProvider() {
     return isLoading ? <LoadingSpinner /> : (
         <AuthContext.Provider value={{ user, setUser, baseURL: BASE_URL }}>
             <ErrorBoundary>
-            <MainApp />
+                <MainApp />
             </ErrorBoundary>
-            
         </AuthContext.Provider>
     );
 }

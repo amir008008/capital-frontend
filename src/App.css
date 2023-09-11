@@ -599,6 +599,8 @@ body {
   color: var(--purple-1); /* Adjusted to the corporate purple color */
   opacity: 0.3; /* Makes the element look faded */
   font-style: italic; /* Makes the font look like a comment */
+    margin-right: 10px;
+
 }
 
 .add-category, .add-value {
@@ -626,6 +628,7 @@ body {
   cursor: pointer;
   transition: background-color 0.3s;
   width: 10px;
+  height: 10px;
 }
 
 .button {
@@ -634,8 +637,9 @@ body {
 }
 
 .button-submit, .button-close {
-  padding: 5px 20px;
+  padding: 7px 7px;
   margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 .button-submit {
@@ -982,14 +986,14 @@ body {
   padding: 8px; /* slightly reduced for mobile */
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  width: 112px;
+  width: 80px;
 }
 .number-input {
   flex: 2;
   padding: 8px; /* slightly reduced for mobile */
   border: 1px solid #e0e0e0;
   border-radius: 4px;
-  width:  80px;
+  width:  50px;
   margin-left: 20px;
 
 }
@@ -1004,7 +1008,7 @@ body {
 }
 
 .expense-item {
-  display: flex;
+
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
@@ -1061,12 +1065,15 @@ body {
 }
 
 .expense-name {
-  display: inline-block;
-  width: 50%;
+  width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: block;
+    padding-right: 5px;
+
 }
+
 .month-tab-list {
   overflow-x: auto;
   white-space: nowrap;
@@ -1162,3 +1169,35 @@ body {
   font-size: 1.2rem;  /* increased font size for better visibility */
 }
 
+
+.bullet-point {
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  margin-bottom: 0px;  /* Adjust this value as needed to push the bullet upwards */
+}
+.bullet-point-empty {
+  font-size: 0.3em;  /* Adjust this value as desired to make the dot smaller */
+  color: #f4f4f4; /* Or any color you want for the hollow dot */
+  /* Other styles similar to .bullet-point if needed */
+}
+.bullet-point-expense-name {
+  width: 60%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+    padding-right: 5px;
+  display: flex;
+  justify-content: left;
+  align-items: left;
+  margin-bottom: 0px;  /* Adjust this value as needed to push the bullet upwards */
+  font-size: 0.3em;  /* Adjust this value as desired to make the dot smaller */
+  color: #f4f4f4; /* Or any color you want for the hollow dot */
+  /* Other styles similar to .bullet-point if needed */
+    width: 100%;
+}
+.positive, .negative {
+  font-family: 'Gellix', Gellix, monospace;
+  width: 30%;
+}
