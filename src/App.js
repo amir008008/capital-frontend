@@ -126,6 +126,7 @@ function MainApp() {
         <UserPreferencesProvider>
             <ErrorBoundary>
                 <div className="App">
+                <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
                     <Header />
                     <div className="main-content-app bg-off-white">
                         <div className="navbar-top">
