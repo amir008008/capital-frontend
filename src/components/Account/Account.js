@@ -263,6 +263,7 @@ const Account = () => {
                         console.log(data.data);
                           // Set the language for i18next
                         if (data.data.language) {
+                            console.log("Language for user: ",data.data.language)
                             i18n.changeLanguage(data.data.language);
                         }
                     } else {

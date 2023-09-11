@@ -670,6 +670,7 @@ const selectButtonStyle = {
             },
             body: JSON.stringify({
             locale: language,
+            language: language,
             // ... other preferences
             })
         })

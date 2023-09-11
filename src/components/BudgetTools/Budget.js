@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { faCheck } from '@fortawesome/free-solid-svg-icons';
 import { faChevronUp,faChevronDown,faEdit } from '@fortawesome/free-solid-svg-icons';
 // Logs.js
-const ENV = 'dev'  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'dev'; // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
