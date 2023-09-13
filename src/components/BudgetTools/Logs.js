@@ -432,6 +432,8 @@ function Logs() {
                     setOngoingMonth(`${data.ongoingMonths[0]}%`); // Appending '%' at the end
                 } else {
                     console.error("No ongoing month found:", data.message);
+                    setSuccessMessage(t('noOngoingMonth'));
+
                 }
             } catch (error) {
                 console.error("Error fetching ongoing month:", error);
