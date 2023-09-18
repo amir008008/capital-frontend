@@ -528,6 +528,33 @@ useEffect(() => {
       });
   };
 
+  useEffect(() => {
+    const fetchOngoingMonth = async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/get-ongoing-waiting-budget-month?user_id=${user.id}`);
+            const data = await response.json();
+            console.log("Ongoing Month Data:", data);
+            if (data.success && data.ongoingMonths.length > 0) {
+                setOngoingMonth(`${data.ongoingMonths[0]}%`); // Appending '%' at the end
+                const ongoingMonth = response.ongoingMonths[0];
+                const monthNumber = parseInt(ongoingMonth.split("-")[1], 10); // Extracting month number after "-"
+                const index = monthNumber - 1; // Subtracting 1 to get the index (as month numbers start from 1 and array indices start from 0)
+                console.log("Ongoing Month Index:", index);
+
+                setActiveMonthIndex_X9aB72(index);
+            } else {
+                console.error("No ongoing or waiting month found:", data.message);
+                setSuccessMessage(t('noOngoingMonth'));
+
+            }
+        } catch (error) {
+            console.error("Error fetching ongoing month:", error);
+        }
+    };
+
+    fetchOngoingMonth();
+  }, []);
+
   const handleMonthChange = (index) => {
     setActiveMonthIndex_X9aB72(index);
 
