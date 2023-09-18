@@ -11,7 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { debounce } from 'lodash'; // Import the debounce function
-const ENV = 'dev'  // This can be 'dev' or 'prod' or any other environment name you choose
+const ENV = 'prod';  // This can be 'dev' or 'prod' or any other environment name you choose
 
 let BASE_URL;
 
